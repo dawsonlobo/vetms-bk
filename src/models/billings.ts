@@ -1,9 +1,17 @@
+import mongoose, { Document, Schema, Model } from "mongoose";
+
 /**
  * @swagger
  * components:
  *   schemas:
  *     billings:
  *       type: object
+ *       required:
+ *         - petId
+ *         - receptionistId
+ *         - doctorId
+ *         - totalAmount
+ *         - billItems
  *       properties:
  *         _id:
  *           type: string
@@ -55,4 +63,69 @@
  *                 type: number
  *                 description: Total amount for this item (Quantity * Price)
  *                 example: 500
+ *         isDeleted:
+ *           type: boolean
+ *           description: Indicates if the billing record is marked as deleted
+ *           example: false
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the bill was created
+ *           example: "2024-02-19T12:34:56Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the bill was last updated
+ *           example: "2024-02-20T15:45:30Z"
  */
+
+// Define the Bill Item Interface
+export interface IBillItem {
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  amount: number;
+}
+
+// Define the Billing Interface
+export interface IBilling {
+  petId: mongoose.Types.ObjectId;
+  receptionistId: mongoose.Types.ObjectId;
+  doctorId: mongoose.Types.ObjectId;
+  totalAmount: number;
+  billItems: IBillItem[];
+  isDeleted?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Extend the interface with Mongoose Document
+export interface IBillingModel extends IBilling, Document {}
+
+// Define the Mongoose Schema
+const BillItemSchema: Schema = new Schema({
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  amount: { type: Number, required: true },
+});
+
+const BillingSchema: Schema = new Schema(
+  {
+    petId: { type: Schema.Types.ObjectId, ref: "pets", required: true },
+    receptionistId: { type: Schema.Types.ObjectId, ref: "receptionists", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "doctors", required: true },
+    totalAmount: { type: Number, required: true },
+    billItems: { type: [BillItemSchema], required: true },
+    isDeleted: { type: Boolean, default: false }, // Added isDeleted field
+  },
+  { timestamps: true } // Automatically manages createdAt and updatedAt
+);
+
+// Export the Mongoose Model
+export const BillingModel: Model<IBillingModel> = mongoose.model<IBillingModel>(
+  "billings",
+  BillingSchema
+);
