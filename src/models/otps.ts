@@ -1,3 +1,5 @@
+import { Schema, model, Document } from "mongoose";
+
 /**
  * @swagger
  * components:
@@ -41,3 +43,21 @@
  *           description: Timestamp when the OTP expires
  *           example: "2024-02-10T12:05:00Z"
  */
+
+export interface IOTP extends Document {
+  userId: Schema.Types.ObjectId;
+  email: string;
+  phone: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
+const OTPSchema = new Schema<IOTP>({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+},  { timestamps: true }
+);
+
+export const OTP = model<IOTP>("OTP", OTPSchema);

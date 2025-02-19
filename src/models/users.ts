@@ -44,3 +44,39 @@
  *           description: Timestamp when the user was last updated
  *           example: "2024-02-06T15:30:00Z"
  */
+
+import mongoose, { Schema, Document } from 'mongoose';
+export enum UserRole {
+    ADMIN = "ADMIN",
+    DOCTOR = "DOCTOR",
+    RECEPTIONIST = "RECEPTIONIST",
+    NURSE = "NURSE",
+  }
+  
+  export interface IUser {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;  // Uses the Enum
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+  
+  
+  export interface IUserDocument extends IUser, Document {}
+  
+  const UserSchema: Schema = new Schema(
+    {
+      name: { type: String, required: true },
+      email: { type: String, required: true, unique: true },
+      password: { type: String, required: true },
+      role: { type: String, enum: Object.values(UserRole), required: true },
+    },
+    { timestamps: true }
+  );
+  
+  const UserModel = mongoose.model<IUserDocument>("users", UserSchema);
+  
+  export default UserModel;
+  
+  

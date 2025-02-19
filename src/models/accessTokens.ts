@@ -1,3 +1,5 @@
+import { Schema, model, Document } from "mongoose";
+
 /**
  * @swagger
  * components:
@@ -29,3 +31,20 @@
  *           description: Timestamp when the token was created
  *           example: "2024-02-10T12:00:00Z"
  */
+
+export interface IAccessToken extends Document {
+  userId: Schema.Types.ObjectId;
+  token: string;
+  createdAt: Date;
+}
+
+const AccessTokenSchema = new Schema<IAccessToken>({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  token: { type: String, required: true },
+},
+
+{
+    timestamps: true,
+});
+
+export const AccessToken = model<IAccessToken>("AccessToken", AccessTokenSchema);

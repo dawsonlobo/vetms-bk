@@ -1,3 +1,5 @@
+import { Schema, model, Document } from "mongoose";
+
 /**
  * @swagger
  * components:
@@ -45,3 +47,25 @@
  *           description: Date of the follow-up visit
  *           example: "2024-02-10"
  */
+
+export interface IFollowUp extends Document {
+  petId: Schema.Types.ObjectId;
+  doctorId: Schema.Types.ObjectId;
+  diagnosis: string;
+  treatment: string;
+  prescription: string;
+  visitDate: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+const FollowUpSchema = new Schema<IFollowUp>({
+  petId: { type: Schema.Types.ObjectId, ref: "Pet", required: true },
+  doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  diagnosis: { type: String, required: true },
+  treatment: { type: String, required: true },
+  prescription: { type: String, required: true },
+  visitDate: { type: Date, required: true },
+},{timestamps:true});
+
+export const FollowUp = model<IFollowUp>("followUps", FollowUpSchema);
