@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 // import helloRoute from "./routes/providers";
 import { config } from "./config/config";
-// import { initializeModels } from "./models/index";
+ import { initializeModels } from "./models/index";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import { models } from "mongoose";
 import path from "path";
@@ -17,7 +17,7 @@ mongoose
   .connect(config.MONGODB_URI)
   .then(async () => {
     console.log("Connected to MongoDB");
-    //await initializeModels();
+    await initializeModels();
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
@@ -39,11 +39,11 @@ const port = config.PORT || 8000;
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
   try {
-    const url = await ngrok.connect({
-      addr: port,
-      authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
-    });
-    console.log(`Ngrok tunnel available at: ${url}`);
+    // const url = await ngrok.connect({
+    //   addr: port,
+    //   authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
+    // });
+    // console.log(`Ngrok tunnel available at: ${url}`);
   } catch (error) {
     console.error("Error starting ngrok:", error);
   }

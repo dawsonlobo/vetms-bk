@@ -1,5 +1,4 @@
 import { Schema, model, Document } from "mongoose";
-
 /**
  * @swagger
  * components:
@@ -46,6 +45,20 @@ import { Schema, model, Document } from "mongoose";
  *           format: date
  *           description: Date of the follow-up visit
  *           example: "2024-02-10"
+ *         isDeleted:
+ *           type: Boolean
+ *           description: Flag indicating whether the follow-up record is deleted
+ *           example: false
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the follow-up record was created
+ *           example: "2024-02-10T12:00:00Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp when the follow-up record was last updated
+ *           example: "2024-02-11T15:30:00Z"
  */
 
 export interface IFollowUp extends Document {
@@ -57,6 +70,7 @@ export interface IFollowUp extends Document {
   visitDate: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  isDeleted?: boolean;
 }
 
 const FollowUpSchema = new Schema<IFollowUp>({
@@ -66,6 +80,7 @@ const FollowUpSchema = new Schema<IFollowUp>({
   treatment: { type: String, required: true },
   prescription: { type: String, required: true },
   visitDate: { type: Date, required: true },
+  isDeleted: { type: Boolean, default: false },
 },{timestamps:true});
 
 export const FollowUp = model<IFollowUp>("followUps", FollowUpSchema);

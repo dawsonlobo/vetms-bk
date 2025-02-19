@@ -33,6 +33,10 @@
  *           enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
  *           description: Role of the user in the system
  *           example: "DOCTOR"
+ *         isDeleted:
+ *           type: boolean
+ *           description: Flag indicating whether the user has been deleted
+ *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -60,6 +64,7 @@ export enum UserRole {
     role: UserRole;  // Uses the Enum
     createdAt?: Date;
     updatedAt?: Date;
+    isDeleted: boolean
   }
   
   
@@ -71,6 +76,7 @@ export enum UserRole {
       email: { type: String, required: true, unique: true },
       password: { type: String, required: true },
       role: { type: String, enum: Object.values(UserRole), required: true },
+      isDeleted: { type: Boolean, default: false }
     },
     { timestamps: true }
   );
