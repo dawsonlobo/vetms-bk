@@ -14,6 +14,18 @@ dotenv.config({ path: finalEnvFile });
 
 function getEnvVariable(key: string, mandatory = true): string {
   const value = process.env[key];
+
+interface AppConfig {
+  PORT: number;
+  MONGODB_URI: string;
+  DYNAMIC_MODELS: { [key: string]: string | object }[];
+  SWAGGER_SERVER_URL: string;
+}
+
+// Helper function to load environment variables with error handling
+function getEnvVariable(key: string, mandatory = true): string {
+  const value = process.env[key];
+
   if (!value && mandatory) {
     throw new Error(`Environment variable ${key} is missing.`);
   }
@@ -27,7 +39,8 @@ interface AppConfig {
 }
 
 export const config: AppConfig = {
-  PORT: parseInt(getEnvVariable("PORT", false) || "5071"),
+  PORT: parseInt(getEnvVariable("PORT", false)) || 5071, // Parse to int
   MONGODB_URI: getEnvVariable("MONGODB_URI", true),
+  DYNAMIC_MODELS: [],
   SWAGGER_SERVER_URL: getEnvVariable("SWAGGER_SERVER_URL", true),
 };
