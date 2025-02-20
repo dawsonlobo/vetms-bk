@@ -143,9 +143,6 @@
  *                             type: "string"
  *                             enum: ["DEA 1.1+", "DEA 1.1-", "DEA 1.2+", "DEA 1.2-", "DEA 3", "DEA 4", "DEA 5", "DEA 7", "A", "B", "AB"]
  *                             description: The blood group of the patient
- *                           isDeleted:
- *                             type: "boolean"
- *                             description: Indicates if the patient record is marked as deleted
  *                           createdAt:
  *                             type: "string"
  *                             format: "date-time"
@@ -173,7 +170,6 @@
  *                         medicalHistory: "No known issues"
  *                         BMI: 24.7
  *                         bloodGroup: "DEA 1.1+"
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -186,7 +182,6 @@
  *                         medicalHistory: "Allergic to certain foods"
  *                         BMI: 22.1
  *                         bloodGroup: "A"
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
@@ -274,9 +269,6 @@
  *                            type: string
  *                            enum: ["DEA 1.1+", "DEA 1.1-", "DEA 1.2+", "DEA 1.2-", "DEA 3", "DEA 4", "DEA 5", "DEA 7", "A", "B", "AB"]
  *                            description: The blood group of the patient
- *                          isDeleted:
- *                            type: boolean
- *                            description: Indicates if the patient record is marked as deleted
  *                          createdAt:
  *                            type: string
  *                            format: date-time
@@ -302,7 +294,6 @@
  *                     medicalHistory: "Vaccinated, No known allergies"
  *                     BMI: 23.4
  *                     bloodGroup: "DEA 1.1+"
- *                     isDeleted: false
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */

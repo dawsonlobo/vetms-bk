@@ -7,7 +7,7 @@ import { config } from "./config/config";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import { models } from "mongoose";
 import path from "path";
-import ngrok from "ngrok";
+// import ngrok from "ngrok";
 
 dotenv.config();
 
@@ -21,10 +21,10 @@ mongoose
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-app.use((req, res, next) => {
-  res.setHeader("ngrok-skip-browser-warning", "true");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("ngrok-skip-browser-warning", "true");
+//   next();
+// });
 
 app.use(
   "/v1/swagger/",
