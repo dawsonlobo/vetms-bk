@@ -207,13 +207,6 @@
  *     tags: [admin/auth]
  *     security:
  *       - adminBearerAuth: []
- *     parameters:
- *       - in: query
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID to update
  *     requestBody:
  *       required: true
  *       content:
