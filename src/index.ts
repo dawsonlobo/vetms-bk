@@ -7,7 +7,7 @@ import { config } from "./config/config";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import { models } from "mongoose";
 import path from "path";
-// import ngrok from "ngrok";
+ //import ngrok from "ngrok";
 
 dotenv.config();
 
@@ -39,11 +39,11 @@ const port = config.PORT || 8000;
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
   try {
-    const url = await ngrok.connect({
-      addr: port,
-      authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
-    });
-    console.log(`Ngrok tunnel available at: ${url}`);
+    // const url = await ngrok.connect({
+    //   addr: port,
+    //   authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
+    // });
+    // console.log(`Ngrok tunnel available at: ${url}`);
   } catch (error) {
     console.error("Error starting ngrok:", error);
   }
