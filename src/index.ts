@@ -7,12 +7,14 @@ import { config } from "./config/config";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import { models } from "mongoose";
 import path from "path";
+import patients from './routes/patients'
+import users from './routes/users'
  //import ngrok from "ngrok";
 
 dotenv.config();
 
 const app = express();
-
+app.use(express.json());
 mongoose
   .connect(config.MONGODB_URI)
   .then(async () => {
@@ -20,7 +22,10 @@ mongoose
     await initializeModels();
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
+app.use('/v1/admin/patients',patients)
+app.use('/v1/admin/users',users)
 
+app.use(express.urlencoded({ extended: true }));
 // app.use((req, res, next) => {
 //   res.setHeader("ngrok-skip-browser-warning", "true");
 //   next();

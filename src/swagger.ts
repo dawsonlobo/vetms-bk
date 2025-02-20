@@ -17,28 +17,28 @@ const options: swaggerJSDoc.Options = {
       description: "A simple API application with Swagger documentation",
     },
     servers: swaggerUrls.map((url) => ({ url })),
-    components: {
-      securitySchemes: {
-        adminBearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "Specify the admin token",
-        },
-        userBearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "Specify the user token",
-        },
-        genericBearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "Enter any role's token",
-        },
-      },
-    },
+    // components: {
+    //   securitySchemes: {
+    //     adminBearerAuth: {
+    //       type: "http",
+    //       scheme: "bearer",
+    //       bearerFormat: "JWT",
+    //       description: "Specify the admin token",
+    //     },
+    //     userBearerAuth: {
+    //       type: "http",
+    //       scheme: "bearer",
+    //       bearerFormat: "JWT",
+    //       description: "Specify the user token",
+    //     },
+    //     genericBearerAuth: {
+    //       type: "http",
+    //       scheme: "bearer",
+    //       bearerFormat: "JWT",
+    //       description: "Enter any role's token",
+    //     },
+    //   },
+    // },
     security: [
       {
         adminBearerAuth: [],

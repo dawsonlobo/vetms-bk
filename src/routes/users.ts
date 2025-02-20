@@ -1,3 +1,7 @@
+import { Router,Request,Response } from 'express';
+import { getAll, getOne ,createUser,updateUser,deleteUser} from '../controllers/users';
+const router = Router()
+/**
 /**
  * @swagger
  * /v1/admin/users/create:
@@ -80,6 +84,11 @@
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
+router.post('/create',
+    // passport.authenticate('bearer', { session: false }), 
+    createUser, 
+    //exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/users/update/{id}:
@@ -165,11 +174,15 @@
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
-
+router.put('/update/:id', 
+    //passport.authenticate('bearer', { session: false }),
+     updateUser, 
+    // exitPoint
+    );
 
 /**
  * @swagger
- * /v1/admin/users/delete:
+ * /v1/admin/users/delete/{id}:
  *   delete:
  *     summary: Delete a user
  *     tags: [admin/users]
@@ -217,6 +230,11 @@
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
 */
+router.delete('/delete/:id',
+    //passport.authenticate('bearer', { session: false }),
+    deleteUser, 
+    // exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/users/getAll:
@@ -370,7 +388,11 @@
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
 
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/users/getOne/{id}:
@@ -455,3 +477,10 @@
  *                      createdAt: "2024-02-04T12:00:00.000Z"
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */
+
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+ export default router;

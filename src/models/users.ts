@@ -78,7 +78,9 @@ export enum UserRole {
       role: { type: String, enum: Object.values(UserRole), required: true },
       isDeleted: { type: Boolean, default: false }
     },
-    { timestamps: true }
+    { timestamps: true ,
+      versionKey:false
+    }
   );
   
   const UserModel = mongoose.model<IUserDocument>("users", UserSchema);
