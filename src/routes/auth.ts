@@ -1,12 +1,12 @@
 
 /**
  * @swagger
- * /admin/auth/login:
+ * /v1/admin/auth/login:
  *   post:
- *     summary: Admin login
+ *     summary: login
  *     tags: [admin/auth]
  *     security:
- *       - BearerAuth: []
+ *       - adminBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -33,7 +33,7 @@
  *                   example: 200
  *                 message:
  *                   type: string
- *                   example: "Login successful"
+ *                   example: "Success"
  *                 data:
  *                   type: object
  *                   properties:
@@ -49,12 +49,6 @@
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     googleId:
- *                       type: string
- *                       example: "1234567890-google"
- *                     isDeleted:
- *                       type: boolean
- *                       example: false
  *                     isVerified:
  *                       type: boolean
  *                       example: true
@@ -83,12 +77,12 @@
 
 /**
  * @swagger
- * /admin/auth/logout:
+ * /v1/admin/auth/logout:
  *   post:
- *     summary: Admin logout
+ *     summary: logout
  *     tags: [admin/auth]
  *     security:
- *       - BearerAuth: []
+ *       - adminBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -123,12 +117,12 @@
 
 /**
  * @swagger
- * /admin/auth/profile:
+ * /v1/admin/auth/profile:
  *   post:
- *     summary: Get user profile information
+ *     summary: Get user profile 
  *     tags: [admin/auth]
  *     security:
- *       - BearerAuth: []
+ *       - adminBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -186,12 +180,6 @@
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     googleId:
- *                       type: string
- *                       example: "1234567890-google"
- *                     isDeleted:
- *                       type: boolean
- *                       example: false
  *                     isVerified:
  *                       type: boolean
  *                       example: true
@@ -213,12 +201,19 @@
 
 /**
  * @swagger
- * /admin/auth/update:
- *   post:
+ * /v1/admin/auth/update:
+ *   put:
  *     summary: Update user profile 
  *     tags: [admin/auth]
  *     security:
  *       - adminBearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID to update
  *     requestBody:
  *       required: true
  *       content:
@@ -243,6 +238,18 @@
  *               - name
  *               - email
  *               - role
+ *           examples:
+ *             fullUpdate:
+ *               summary: Full profile update
+ *               value:
+ *                 name: "Alex"
+ *                 email: "alex@example.com"
+ *                 role: "DOCTOR"
+ *                 isDeleted: false
+ *             partialUpdate:
+ *               summary: Update only isDeleted status
+ *               value:
+ *                 isDeleted: true
  *     responses:
  *       200:
  *         description: User profile updated successfully
@@ -268,7 +275,7 @@
 
 /**
  * @swagger
- * /admin/auth/refresh:
+ * /v1/admin/auth/refresh:
  *   post:
  *     summary: Refresh user token 
  *     tags: [admin/auth]
@@ -313,12 +320,6 @@
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     googleId:
- *                       type: string
- *                       example: "1234567890-google"
- *                     isDeleted:
- *                       type: boolean
- *                       example: false
  *                     isVerified:
  *                       type: boolean
  *                       example: true

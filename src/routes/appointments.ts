@@ -123,9 +123,6 @@
  *                             type: "string"
  *                             enum: ["SCHEDULED", "COMPLETED", "CANCELLED"]
  *                             description: The current status of the appointment
- *                           isDeleted:
- *                             type: "boolean"
- *                             description: Indicates if the appointment is marked as deleted
  *                           createdAt:
  *                             type: "string"
  *                             format: "date-time"
@@ -148,7 +145,6 @@
  *                         doctorId: "66b3279c39c21f7342c13333"
  *                         date: "2025-02-01T08:00:00Z"
  *                         schedule: "SCHEDULED"
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -156,7 +152,6 @@
  *                         doctorId: "66b3279c39c21f7342c15555"
  *                         date: "2025-02-02T10:30:00Z"
  *                         schedule: "COMPLETED"
- *                         isDeleted: false
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
@@ -232,9 +227,6 @@
  *                       type: string
  *                       enum: ["SCHEDULED", "COMPLETED", "CANCELLED"]
  *                       description: The status of the appointment
- *                     isDeleted:
- *                       type: boolean
- *                       description: Indicates if the appointment is marked as deleted
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -255,7 +247,6 @@
  *                     doctorId: "66b3279c39c21f7342c1520d"
  *                     date: "2025-02-19T10:00:00Z"
  *                     schedule: "SCHEDULED"
- *                     isDeleted: false
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */

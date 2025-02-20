@@ -139,9 +139,6 @@
  *                                 quantity:
  *                                   type: "integer"
  *                                   description: Quantity of the billed item
- *                           isDeleted:
- *                             type: "boolean"
- *                             description: Indicates if the billing record is marked as deleted
  *                           createdAt:
  *                             type: "string"
  *                             format: "date-time"
@@ -174,7 +171,6 @@
  *                           - itemName: "Consultation Fee"
  *                             price: 2000.00
  *                             quantity: 1
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -189,7 +185,6 @@
  *                           - itemName: "Grooming"
  *                             price: 1500.50
  *                             quantity: 1
- *                         isDeleted: false
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */

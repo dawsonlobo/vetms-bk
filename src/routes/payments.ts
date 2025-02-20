@@ -123,9 +123,6 @@
  *                           reference_no:
  *                             type: string
  *                             description: The payment reference number
- *                           isDeleted:
- *                             type: boolean
- *                             description: Indicates if the payment record is marked as deleted
  *                           createdAt:
  *                             type: string
  *                             format: date-time
@@ -148,7 +145,6 @@
  *                         amount: 100.5
  *                         paymentStatus: "PAID"
  *                         reference_no: "PAY123456"
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -156,7 +152,6 @@
  *                         amount: 200.0
  *                         paymentStatus: "PENDING"
  *                         reference_no: "PAY789012"
- *                         isDeleted: false
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
@@ -227,9 +222,6 @@
  *                     reference_no:
  *                       type: string
  *                       description: Reference number for the payment
- *                     isDeleted:
- *                       type: boolean
- *                       description: Indicates if the payment record is marked as deleted
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -250,7 +242,6 @@
  *                     amount: 1500.50
  *                     paymentStatus: "PAID"
  *                     reference_no: "PAY123456789"
- *                     isDeleted: false
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
