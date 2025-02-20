@@ -1,4 +1,7 @@
+import express from "express";
+import { loginController } from "../controllers/auth";
 
+const router = express.Router();
 /**
  * @swagger
  * /v1/admin/auth/login:
@@ -16,10 +19,10 @@
  *             properties:
  *               email:
  *                 type: string
- *                 example: "admin@example.com"
+ *                 example: "alex@example.com"
  *               password:
  *                 type: string
- *                 example: "Admin@123"
+ *                 example: "admin123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -42,10 +45,10 @@
  *                       example: "6512c5f3e4b09a12d8f42b68"
  *                     name:
  *                       type: string
- *                       example: "Admin User"
+ *                       example: "Alex"
  *                     email:
  *                       type: string
- *                       example: "admin@example.com"
+ *                       example: "alex@example.com"
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
@@ -74,6 +77,12 @@
  *                   type: string
  *                   example: "Login successful"
  */
+
+
+router.post("/v1/admin/auth/login", loginController);
+
+
+
 
 /**
  * @swagger
@@ -335,4 +344,7 @@
  *                       format: date-time
  *                       example: "2024-07-15T12:57:10.956Z"
  */
+// Refresh Token Route
+router.post("/v1/admin/auth/refresh", refreshTokenController);
 
+export default router;
