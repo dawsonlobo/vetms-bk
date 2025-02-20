@@ -145,8 +145,11 @@ const PatientSchema: Schema = new Schema(
     },
     isDeleted: { type: Boolean, default: false },
   },
-  { timestamps: true ,
-    versionKey:false
+  {    timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+
   },
 );
 

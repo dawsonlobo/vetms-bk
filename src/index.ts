@@ -9,6 +9,7 @@ import { models } from "mongoose";
 import path from "path";
 import patients from './routes/patients'
 import users from './routes/users'
+import inventories from './routes/inventories'
  //import ngrok from "ngrok";
 
 dotenv.config();
@@ -24,6 +25,7 @@ mongoose
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 app.use('/v1/admin/patients',patients)
 app.use('/v1/admin/users',users)
+app.use('/v1/admin/inventory',inventories)
 
 app.use(express.urlencoded({ extended: true }));
 // app.use((req, res, next) => {

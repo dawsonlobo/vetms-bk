@@ -78,8 +78,11 @@ export enum UserRole {
       role: { type: String, enum: Object.values(UserRole), required: true },
       isDeleted: { type: Boolean, default: false }
     },
-    { timestamps: true ,
-      versionKey:false
+    {     timestamps: true,
+      usePushEach: true,
+      bufferCommands: true,
+      versionKey: false,
+  
     }
   );
   

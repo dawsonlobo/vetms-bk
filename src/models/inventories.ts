@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
-
 /**
  * @swagger
  * components:
@@ -65,7 +64,11 @@ const InventorySchema: Schema = new Schema(
     quantity: { type: Number, required: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
   },
-  { timestamps: true } // Automatically manages createdAt and updatedAt
+  {     timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+} // Automatically manages createdAt and updatedAt
 );
 
 // Export the Mongoose Model
