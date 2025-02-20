@@ -12,9 +12,6 @@ const finalEnvFile = existsSync(envFilePath) ? envFilePath : resolve(process.cwd
 // Load the final env file
 dotenv.config({ path: finalEnvFile });
 
-function getEnvVariable(key: string, mandatory = true): string {
-  const value = process.env[key];
-
 interface AppConfig {
   PORT: number;
   MONGODB_URI: string;
