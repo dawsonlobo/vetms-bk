@@ -354,9 +354,6 @@
  *                           quantity:
  *                             type: integer
  *                             description: Quantity available
- *                           isDeleted:
- *                             type: boolean
- *                             description: Flag to indicate if the item is deleted
  *                           createdAt:
  *                             type: string
  *                             format: date-time
@@ -378,14 +375,12 @@
  *                         name: "Laptop"
  *                         price: 1200.50
  *                         quantity: 10
- *                         isDeleted: false
  *                         createdAt: "2025-02-05T07:30:00Z"
  *                         updatedAt: "2025-02-06T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c152c5"
  *                         name: "Phone"
  *                         price: 800.00
  *                         quantity: 25
- *                         isDeleted: false
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
@@ -450,9 +445,6 @@
  *                       type: integer
  *                       format: int32
  *                       description: Quantity available in stock
- *                     isDeleted:
- *                       type: boolean
- *                       description: Whether the inventory item is deleted or not
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -471,7 +463,6 @@
  *                     name: "Dog Food - Premium"
  *                     price: 29.99
  *                     quantity: 50
- *                     isDeleted: false
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */

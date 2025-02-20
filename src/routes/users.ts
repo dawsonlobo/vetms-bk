@@ -80,28 +80,29 @@
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
-
 /**
  * @swagger
- * /v1/admin/users/update:
+ * /v1/admin/users/update/{id}:
  *   put:
  *     summary: Update an existing user
  *     tags: [admin/users]
  *     security:
  *       - adminBearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the user
+ *         example: "6512c5f3e4b09a12d8f42b68"
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - id
  *             properties:
- *               id:
- *                 type: string
- *                 description: The unique identifier of the user
- *                 example: "6512c5f3e4b09a12d8f42b68"
  *               name:
  *                 type: string
  *                 description: Updated name of the user (optional)
@@ -124,13 +125,11 @@
  *             UpdateNameAndRole:
  *               summary: Example of updating name and role
  *               value:
- *                 id: "6512c5f3e4b09a12d8f42b68"
  *                 name: "Dr. Jane Doe"
  *                 role: "NURSE"
  *             SoftDeleteUser:
  *               summary: Example of marking a user as deleted
  *               value:
- *                 id: "6512c5f3e4b09a12d8f42b68"
  *                 isDeleted: true
  *     responses:
  *       200:
@@ -148,7 +147,7 @@
  *                 message:
  *                   type: string
  *                   description: Message describing the result of the operation
- *                   example: "success"
+ *                   example: "Success"
  *                 data:
  *                   type: string
  *                   description: The response data
@@ -166,6 +165,7 @@
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
+
 
 /**
  * @swagger
@@ -199,7 +199,7 @@
  *                 message:
  *                   type: string
  *                   description: Message describing the result of the operation
- *                   example: "success"
+ *                   example: "Success"
  *                 data:
  *                   type: string
  *                   description: The response data
@@ -216,48 +216,7 @@
  *                   message: "Success"
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
- *       400:
- *         description: Invalid request or missing user ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   format: int64
- *                   description: Status code
- *                   example: 400
- *                 message:
- *                   type: string
- *                   description: Error message
- *                   example: "User ID is required"
- *                 toastMessage:
- *                   type: string
- *                   description: Toast notification message
- *                   example: "Invalid request"
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   format: int64
- *                   description: Status code
- *                   example: 404
- *                 message:
- *                   type: string
- *                   description: Error message
- *                   example: "User not found"
- *                 toastMessage:
- *                   type: string
- *                   description: Toast notification message
- *                   example: "User does not exist"
- */
-
+*/
 /**
  * @swagger
  * /v1/admin/users/getAll:
@@ -380,9 +339,6 @@
  *                           role:
  *                             type: string
  *                             description: User role
- *                           isDeleted:
- *                             type: boolean
- *                             description: Whether the user is active
  *                           createdAt:
  *                             type: string
  *                             format: date-time
@@ -404,14 +360,12 @@
  *                         name: "John Doe"
  *                         email: "john.doe@example.com"
  *                         role: "DOCTOR"
- *                         isDeleted: true
  *                         createdAt: "2025-02-05T07:00:00Z"
  *                         updatedAt: "2025-02-05T07:30:00Z"
  *                     -   _id: "66b3279c39c21f7342c152c5"
  *                         name: "Jane Smith"
  *                         email: "jane.smith@example.com"
  *                         role: "RECEPTIONIST"
- *                         isDeleted: false
  *                         createdAt: "2025-02-06T10:15:00Z"
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
@@ -479,9 +433,6 @@
  *                        role:
  *                          type: string
  *                          description: User role
- *                        isDeleted:
- *                          type: boolean
- *                          description: Whether the user record is marked as deleted
  *                        createdAt:
  *                          type: string
  *                          format: date-time
@@ -501,7 +452,6 @@
  *                      name: "John Doe"
  *                      email: "john.doe@example.com"
  *                      role: "DOCTOR"
- *                      isDeleted: false
  *                      createdAt: "2024-02-04T12:00:00.000Z"
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */

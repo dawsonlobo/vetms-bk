@@ -73,9 +73,6 @@
  *                       type: string
  *                       format: date
  *                       description: Date of the follow-up visit
- *                     isDeleted:
- *                       type: boolean
- *                       description: Whether the follow-up record is deleted
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -98,7 +95,6 @@
  *                     treatment: "Antibiotic injection and medicated shampoo"
  *                     prescription: "Amoxicillin 250mg, Antihistamines"
  *                     visitDate: "2024-02-10"
- *                     isDeleted: false
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
@@ -243,9 +239,6 @@
  *                             type: string
  *                             format: date-time
  *                             description: Last updated timestamp
- *                           isDeleted:
- *                             type: boolean
- *                             description: Whether the follow-up is active
  *             examples:
  *               example1:
  *                 summary: "Successful response with follow-up data"
@@ -264,7 +257,6 @@
  *                         visitDate: "2025-02-05T07:00:00Z"
  *                         createdAt: "2025-02-05T07:30:00Z"
  *                         updatedAt: "2025-02-06T08:00:00Z"
- *                         isDeleted: false
  *                     -   _id: "66b3279c39c21f7342c152c5"
  *                         petId: "65a3279c39c21f7342c125b4"
  *                         doctorId: "65b437ac48d21e8343d256c7"
@@ -274,5 +266,4 @@
  *                         visitDate: "2025-02-06T10:15:00Z"
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
- *                         isDeleted: false
  */
