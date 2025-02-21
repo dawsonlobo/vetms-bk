@@ -1,6 +1,9 @@
+import { Router,Request,Response } from 'express';
+import {getAll,getOne} from '../controllers/billings'
+const router = Router();
 /**
  * @swagger
- * /v1/admin/billings/all:
+ * /v1/admin/billings/getAll:
  *   post:
  *     tags:
  *       - admin/billings
@@ -188,11 +191,15 @@
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 
 /**
  * @swagger
- * /v1/admin/billing/{id}:
+ * /v1/admin/billings/getOne/{id}:
  *   post:
  *     tags:
  *       - admin/billings
@@ -302,3 +309,9 @@
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+     export default router;
