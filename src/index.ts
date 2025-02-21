@@ -7,10 +7,11 @@ import { config } from "./config/config";
 import { initializeModels } from "./models/index";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import "./config/passport"; // Ensure passport is configured before routes
-import authRoutes from "./routes/auth"; // Use the correct route file
+import auth from "./routes/auth"; // Use the correct route file
 import patients from './routes/patients'
 import users from './routes/users'
 import inventories from './routes/inventories'
+
  //import ngrok from "ngrok";
 
 dotenv.config();
@@ -27,6 +28,7 @@ mongoose
     await initializeModels();
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
+app.use('/v1',auth)
 app.use('/v1/admin/patients',patients)
 app.use('/v1/admin/users',users)
 app.use('/v1/admin/inventory',inventories)
@@ -48,8 +50,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 // Swagger API Documentation
 app.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
-// Use authentication routes
-app.use("", authRoutes); // Ensure route prefix is added
+// Use authentication routes// Ensure route prefix is added
 
 
 const port = config.PORT || 8000;

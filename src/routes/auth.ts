@@ -1,7 +1,15 @@
-import express from "express";
-import { loginController, refreshTokenController } from "../controllers/auth";
+import { Request, Response, NextFunction, Router } from "express";
+import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../controllers/auth";
+import { verifyAdmin } from "../middlewares/auth";
 
-const router = express.Router();
+const router = Router();
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 /**
  * @swagger
  * /v1/admin/auth/login:
@@ -52,13 +60,6 @@ const router = express.Router();
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     isVerified:
- *                       type: boolean
- *                       example: true
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-02-05T12:00:00Z"
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -79,7 +80,7 @@ const router = express.Router();
  */
 
 
-router.post("/v1/admin/auth/login", loginController);
+router.post("/admin/auth/login", loginController);
 
 
 
@@ -124,6 +125,8 @@ router.post("/v1/admin/auth/login", loginController);
  *                   example: "Admin logged out successfully"
  */
 
+
+router.post("/admin/auth/logout", asyncHandler(verifyAdmin), asyncHandler(logoutController));
 /**
  * @swagger
  * /v1/admin/auth/profile:
@@ -146,20 +149,53 @@ router.post("/v1/admin/auth/login", loginController);
  *                   _id:
  *                     type: integer
  *                     example: 1
+ *                   name:
+ *                     type: integer
+ *                     example: 1
+ *                   email:
+ *                     type: integer
+ *                     example: 1
+ *                   role:
+ *                     type: integer
+ *                     example: 1
+ *                   isVerified:
+ *                     type: integer
+ *                     example: 1
  *                   createdAt:
  *                     type: integer
  *                     example: 1
+ *                   updatedAt:
+ *                     type: integer
+ *                     example: 1
+ *                   access_token:
+ *                     type: integer
+ *                     example: 1
+ *                   refresh_token:
+ *                     type: integer
+ *                     example: 1
+ *                   tokenExpiresAt:
+ *                     type: integer
+ *                     example: 1
  *           examples:
- *             example1:
- *               summary: with Projection
+ *             fullProjection:
+ *               summary: Full data projection (Retrieve all fields)
+ *               value:
+ *                 project:
+ *                   _id: 1
+ *                   name: 1
+ *                   email: 1
+ *                   role: 1
+ *                   createdAt: 1
+ *                   updatedAt: 1
+ *                   access_token: 1
+ *                   refresh_token: 1
+ *                   tokenExpiresAt: 1
+ *             limitedProjection:
+ *               summary: Limited data projection (Retrieve only _id and createdAt)
  *               value:
  *                 project:
  *                   _id: 1
  *                   createdAt: 1
- *             example2:
- *               summary: without Projection
- *               value:
- *                 project: {}
  *     responses:
  *       200:
  *         description: User profile retrieved successfully
@@ -189,9 +225,6 @@ router.post("/v1/admin/auth/login", loginController);
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     isVerified:
- *                       type: boolean
- *                       example: true
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -206,7 +239,38 @@ router.post("/v1/admin/auth/login", loginController);
  *                     refresh_token:
  *                       type: string
  *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                     tokenExpiresAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-02-07T18:00:00Z"
+ *             examples:
+ *               fullResponse:
+ *                 summary: Full response (all fields)
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data:
+ *                     _id: "6512c5f3e4b09a12d8f42b68"
+ *                     name: "Admin User"
+ *                     email: "admin@example.com"
+ *                     role: "ADMIN"
+ *                     createdAt: "2024-02-05T12:00:00Z"
+ *                     updatedAt: "2024-02-06T15:30:00Z"
+ *                     access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                     refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                     tokenExpiresAt: "2024-02-07T18:00:00Z"
+ *               limitedResponse:
+ *                 summary: Limited response (only _id and createdAt)
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data:
+ *                     _id: "6512c5f3e4b09a12d8f42b68"
+ *                     createdAt: "2024-02-05T12:00:00Z"
  */
+
+
+router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAdminProfile));
 
 /**
  * @swagger
@@ -273,7 +337,7 @@ router.post("/v1/admin/auth/login", loginController);
  *                   type: string
  *                   example: "Updated successfully"
  */
-
+router.put("/admin/auth/update", asyncHandler(updateAdminProfile));
 
 /**
  * @swagger
@@ -322,9 +386,6 @@ router.post("/v1/admin/auth/login", loginController);
  *                     role:
  *                       type: string
  *                       example: "ADMIN"
- *                     isVerified:
- *                       type: boolean
- *                       example: true
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -344,7 +405,9 @@ router.post("/v1/admin/auth/login", loginController);
  *                       format: date-time
  *                       example: "2024-07-15T12:57:10.956Z"
  */
-// Refresh Token Route
-router.post("/v1/admin/auth/refresh", refreshTokenController);
+
+
+
+router.post("/admin/auth/refresh", asyncHandler(refreshTokenController));
 
 export default router;
