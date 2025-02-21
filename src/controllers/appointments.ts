@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { PatientModel } from "../models/patients"; // Import the Patient model
-import mongoose, { SortOrder } from "mongoose";
+import mongoose from "mongoose";
+import { AppointmentModel } from "../models/appointments"; // Import Appointment model
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -44,7 +45,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     });
     
     // Get total count before pagination
-    const totalCount = await PatientModel.countDocuments(query);
+    const totalCount = await AppointmentModel.countDocuments(query);
     
     // Handle projection properly
     let finalProjection: any = {};
@@ -68,7 +69,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     }
     
     // Fetch paginated results
-    const tableData = await PatientModel.find(query, finalProjection)
+    const tableData = await AppointmentModel.find(query, finalProjection)
       .sort(sort)
       .skip((page - 1) * itemsPerPage)
       .limit(itemsPerPage);
@@ -90,22 +91,17 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     });
   }
 };
-
-// Adjust path as needed
-
-// Ensure this path matches your project structure
-
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { id } = req.params;
-        const { projection } = req.body;
+        const { project } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             res.status(400).json({ status: 400, message: "Invalid appointment ID" });
             return;
         }
 
-        let projectionFields: any = projection || {};
+        let projectionFields: any = project || {};
 
         // If project is an inclusion projection, remove isDeleted exclusion
         const isInclusionProjection = Object.keys(projectionFields).length > 0 && !("_id" in projectionFields && projectionFields["_id"] === 0);
@@ -115,7 +111,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
         }
 
         // 🛑 Ensure isDeleted: false in the query to prevent fetching deleted records
-        const appointment = await PatientModel.findOne({ _id: id, isDeleted: false }, projectionFields);
+        const appointment = await AppointmentModel.findOne({ _id: id, isDeleted: false }, projectionFields);
 
         if (!appointment) {
             res.status(404).json({ status: 404, message: "Appointment not found or deleted" });

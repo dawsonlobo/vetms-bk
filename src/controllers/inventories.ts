@@ -219,15 +219,19 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params; // Extract ID from URL path
-    const { project = {} } = req.body; // Extract projection fields from request body
+    let { project = {} } = req.body; // Extract projection fields from request body
 
     if (!id) {
       res.status(400).json({ status: 400, message: 'Inventory ID is required' });
       return;
+    }
+
+    // Ensure `isDeleted` is excluded when no projection is specified
+    if (Object.keys(project).length === 0) {
+      project = { isDeleted: 0 }; // Explicitly exclude `isDeleted`
     }
 
     const inventoryItem = await InventoryModel.findOne({ _id: id, isDeleted: false }, project);

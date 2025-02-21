@@ -79,7 +79,11 @@ const AppointmentSchema: Schema = new Schema(
     schedule: { type: String, enum: ["SCHEDULED", "COMPLETED", "CANCELLED"], required: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
   },
-  { timestamps: true } // Automatically manages createdAt and updatedAt
+  {     timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+} // Automatically manages createdAt and updatedAt
 );
 
 // Export the Mongoose Model

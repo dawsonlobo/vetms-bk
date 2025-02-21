@@ -47,7 +47,7 @@ const router = Router()
  *             projectionExample:
  *               summary: Projection Example
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   name: 1
  *                   species: 1
@@ -56,8 +56,13 @@ const router = Router()
  *                   weight: 1
  *                   gender: 1
  *                   medicalHistory: 1
- *                   BMI: 1
+ *                   bmi: 1
  *                   bloodGroup: 1
+ *             filterExample:
+ *                summary: filter example
+ *                value:
+ *                  filter:
+ *                    name: "rammy" 
  *             singleDateExample:
  *               summary: Multi-date Example
  *               value:
@@ -171,7 +176,7 @@ const router = Router()
  *                         weight: 30.5
  *                         gender: "MALE"
  *                         medicalHistory: "No known issues"
- *                         BMI: 24.7
+ *                         bmi: 24.7
  *                         bloodGroup: "DEA 1.1+"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
@@ -183,7 +188,7 @@ const router = Router()
  *                         weight: 4.8
  *                         gender: "FEMALE"
  *                         medicalHistory: "Allergic to certain foods"
- *                         BMI: 22.1
+ *                         bmi: 22.1
  *                         bloodGroup: "A"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
@@ -223,7 +228,7 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   name: 1
  *     responses:
@@ -266,7 +271,9 @@ router.post('/getAll',
  *                            enum: ["MALE", "FEMALE"]
  *                            description: The gender of the patient
  *                          medicalHistory:
- *                            type: string
+ *                            type: array
+ *                            items:
+ *                              type: string
  *                            description: The medical history of the patient
  *                          BMI:
  *                            type: number
