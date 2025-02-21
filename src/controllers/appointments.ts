@@ -83,7 +83,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       },
     });
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    console.error('Error fetching appointments:', error);
     res.status(500).json({
       status: 500,
       message: 'Internal Server Error',

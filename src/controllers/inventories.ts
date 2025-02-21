@@ -150,6 +150,7 @@ export const deleteInventory = async (req: Request, res: Response, next: NextFun
 };
 
 
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -162,9 +163,9 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       fromDate, // Date range start
       toDate, // Date range end
     } = req.body;
-
+    
     let query: any = { isDeleted: false, ...filter }; // Ensure soft-deleted items are excluded
-
+    
     // Handle date filtering
     if (date) {
       query.createdAt = { $eq: new Date(date * 1000) }; // Convert epoch to date
@@ -174,7 +175,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
         $lte: new Date(toDate * 1000),
       };
     }
-
+    
     // Handle search logic
     if (search.length > 0) {
       const searchQueries = search.map(({ term, fields, startsWith }: any) => ({
@@ -184,23 +185,44 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       }));
       query.$and = query.$and ? [...query.$and, ...searchQueries] : searchQueries;
     }
-
+    
     // Handle pagination & sorting
     const { page = 1, itemsPerPage = 10, sortBy = ['createdAt'], sortDesc = [true] } = options;
     const sort: any = {};
     sortBy.forEach((field: string, index: number) => {
       sort[field] = sortDesc[index] ? -1 : 1;
     });
-
+    
     // Get total count before pagination
     const totalCount = await InventoryModel.countDocuments(query);
-
+    
+    // Handle projection properly
+    let finalProjection: any = {};
+    
+    if (Object.keys(projection).length > 0) {
+      // If specific fields are requested, use them but ensure isDeleted isn't included
+      // Check if it's an inclusion projection (values are 1)
+      const isInclusionProjection = Object.values(projection).some(value => value === 1);
+      
+      if (isInclusionProjection) {
+        // For inclusion, copy all fields except isDeleted
+        finalProjection = { ...projection };
+        delete finalProjection.isDeleted;
+      } else {
+        // For exclusion, make sure isDeleted is excluded
+        finalProjection = { ...projection, isDeleted: 0 };
+      }
+    } else {
+      // If no projection specified, return all fields except isDeleted
+      finalProjection = { isDeleted: 0 };
+    }
+    
     // Fetch paginated results
-    const tableData = await InventoryModel.find(query, projection)
+    const tableData = await InventoryModel.find(query, finalProjection)
       .sort(sort)
       .skip((page - 1) * itemsPerPage)
       .limit(itemsPerPage);
-
+    
     res.status(200).json({
       status: 200,
       message: 'Success',
@@ -218,7 +240,6 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     });
   }
 };
-
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params; // Extract ID from URL path

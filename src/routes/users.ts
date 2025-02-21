@@ -136,10 +136,6 @@ router.post('/create',
  *               value:
  *                 name: "Dr. Jane Doe"
  *                 role: "NURSE"
- *             SoftDeleteUser:
- *               summary: Example of marking a user as deleted
- *               value:
- *                 isDeleted: true
  *     responses:
  *       200:
  *         description: User updated successfully
