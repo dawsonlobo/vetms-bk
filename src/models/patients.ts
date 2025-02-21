@@ -124,7 +124,7 @@ const PatientSchema: Schema = new Schema(
     age: { type: Number, required: true },
     weight: { type: Number, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
-    medicalHistory: { type: String, required: true },
+    medicalHistory: { type: [String], required: true },
     BMI: { type: Number, required: true },
     bloodGroup: {
       type: String,
@@ -145,7 +145,12 @@ const PatientSchema: Schema = new Schema(
     },
     isDeleted: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  {    timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+
+  },
 );
 
 export const PatientModel: Model<IPatientModel> = mongoose.model<IPatientModel>(

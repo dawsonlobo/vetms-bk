@@ -1,3 +1,6 @@
+import { Router,Request,Response } from 'express';
+import {createInventory,updateInventory,deleteInventory,getAll,getOne} from '../controllers/inventories'
+const router = Router();
 /**
  * @swagger
  * /v1/admin/inventory/create:
@@ -78,7 +81,11 @@
  *                   data: "Inventory item created successfully"
  *                   toastMessage: "Item successfully added to inventory"
  */
-
+router.post('/create',
+    // passport.authenticate('bearer', { session: false }), 
+    createInventory, 
+    //exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/inventory/update/{id}:
@@ -129,10 +136,6 @@
  *                 name: "Premium Dog Food"
  *                 price: 34.99
  *                 quantity: 40
- *             Example 2:
- *               summary: Soft delete inventory item
- *               value:
- *                 isDeleted: true
  *     responses:
  *       200:
  *         description: Inventory item updated or marked as deleted successfully
@@ -162,14 +165,12 @@
  *                   message: "Success"
  *                   data: "Inventory item updated successfully"
  *                   toastMessage: "Item successfully updated"
- *               example2:
- *                 summary: Successful soft delete response
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data: "Inventory item marked as deleted"
- *                   toastMessage: "Item successfully deleted"
  */
+router.put('/update/:id', 
+    //passport.authenticate('bearer', { session: false }),
+     updateInventory, 
+    // exitPoint
+    );
 
 /**
  * @swagger
@@ -231,7 +232,11 @@
  *               message: "error"
  *               error: "Inventory item not found"
  */
-
+router.delete('/delete/:id',
+    //passport.authenticate('bearer', { session: false }),
+    deleteInventory, 
+    // exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/inventory/getAll:
@@ -384,7 +389,11 @@
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 /**
  * @swagger
  * /v1/admin/inventory/getOne/{id}:
@@ -466,3 +475,10 @@
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+
+     export default router;

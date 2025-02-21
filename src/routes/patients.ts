@@ -1,6 +1,9 @@
+import { Router,Request,Response } from 'express';
+import { getAll, getOne } from '../controllers/patients';
+const router = Router()
 /**
  * @swagger
- * /v1/admin/patients/all:
+ * /v1/admin/patients/getAll:
  *   post:
  *     tags:
  *       - admin/patients
@@ -185,10 +188,14 @@
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 /**
  * @swagger
- * /v1/admin/patient/{id}:
+ * /v1/admin/patients/getOne/{id}:
  *   post:
  *     tags:
  *       - admin/patients
@@ -299,3 +306,9 @@
  */
 
 
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+ export default router;
