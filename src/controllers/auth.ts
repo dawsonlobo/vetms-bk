@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { IUserDocument, User } from "../models/users";
+import { IUserDocument, UserModel } from "../models/users";
 
 dotenv.config();
 
