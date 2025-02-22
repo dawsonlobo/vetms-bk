@@ -1,5 +1,5 @@
 import { Router,Request,Response } from 'express';
-import { getAll, getOne } from '../controllers/payments';
+import { getAll, getOne } from '../../../controllers/v1/admin/payments';
 const router = Router()
 
 /**

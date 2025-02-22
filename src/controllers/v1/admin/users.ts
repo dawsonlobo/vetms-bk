@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import UserModel from '../models/users'; // Adjust path as needed
+import UserModel from '../../../models/users'; // Adjust path as needed
 import bcrypt from 'bcryptjs';
 import mongoose, { SortOrder } from 'mongoose';
+import { aggregateData } from "../../../utils/aggregation";
 
 const SALT_ROUNDS = 15; // Define salt rounds as 15
 
@@ -172,123 +173,68 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-        if (!req.body) {
-            res.status(400).json({ error: 'Request body is missing' });
-            return;
-        }
+  try {
+    const {
+      projection = {},
+      filter = {},
+      options = {},
+      search = [],
+      date,
+      fromDate,
+      toDate,
+    } = req.body;
 
-        const {
-            filter = {},
-            projection = '',
-            options,
-            pagination = {},
-            search,
-            date,
-            fromDate,
-            toDate,
-        } = req.body;
+    // Call reusable aggregation function
+    const { totalCount, tableData } = await aggregateData(
+    UserModel,
+      filter,
+      projection,
+      options,
+      search,
+      date,
+      fromDate,
+      toDate
+    );
 
-        let query: any = { ...filter, isDeleted: false }; // Ensure only non-deleted records
-
-        if (date) {
-            query.createdAt = { $eq: new Date(date * 1000) };
-        } else if (fromDate && toDate) {
-            query.createdAt = { $gte: new Date(fromDate * 1000), $lte: new Date(toDate * 1000) };
-        }
-
-        if (search && Array.isArray(search)) {
-            query.$or = search.flatMap(({ term, fields, startsWith }) =>
-                fields.map((field: string) => ({
-                    [field]: { $regex: startsWith ? `^${term}` : term, $options: 'i' },
-                }))
-            );
-        }
-
-        const page = Math.max(1, pagination.page || 1);
-        const itemsPerPage = Math.max(1, pagination.itemsPerPage || 10);
-        const skip = (page - 1) * itemsPerPage;
-
-        const sortOptions: { [key: string]: SortOrder } = options?.sortBy
-            ? { [String(options.sortBy)]: options.sortDesc ? -1 : 1 }
-            : {};
-
-        // Ensure projection is always a string before splitting
-        let projectionString = typeof projection === 'string' ? projection : '';
-        let projectionArray = projectionString.split(' ').filter((field: string) => field.trim() !== '');
-
-        if (projectionArray.length > 0) {
-            // Remove excluded fields
-            projectionArray = projectionArray.filter((field: string) => field !== 'isDeleted' && field !== 'password');
-        } else {
-            // If empty, exclude `isDeleted` and `password`
-            projectionArray = ['-isDeleted', '-password'];
-        }
-
-        const [totalCount, usersList] = await Promise.all([
-            UserModel.countDocuments(query).exec(),
-            UserModel.find(query)
-                .select(projectionArray.join(' ')) // Apply the corrected projection
-                .skip(skip)
-                .limit(itemsPerPage)
-                .sort(sortOptions)
-                .exec(),
-        ]);
-
-        res.status(200).json({
-            status: 200,
-            message: 'Success',
-            data: { totalCount, tableData: usersList },
-        });
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        next(error);
-    }
+    res.status(200).json({
+      status: 200,
+      message: "Success",
+      data: { totalCount, tableData },
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Internal Server Error",
+      error,
+    });
+  }
 };
-
 /**
  * Controller to fetch a single user by ID
  */
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { id } = req.params;
-      const { project = {} } = req.body;
-  
-      // Validate ObjectId
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        res.status(400).json({
-          status: 400,
-          message: 'Invalid user ID',
-        });
-        return;
-      }
-  
-      // Ensure projection is valid
-      let projectionFields = typeof project === 'string' ? project.split(' ') : project;
-  
-      // Fetch user while ensuring isDeleted is false
-      const user = await UserModel.findOne({ _id: id, isDeleted: false }, projectionFields);
-  
-      if (!user) {
-        res.status(404).json({
-          status: 404,
-          message: 'User not found or deleted',
-        });
-        return;
-      }
-  
-      res.status(200).json({
-        status: 200,
-        message: 'Success',
-        data: user,
-      });
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      res.status(500).json({
-        status: 500,
-        message: 'Internal Server Error',
-        error: error,
-      });
+  try {
+    const { id } = req.params;
+    const { projection } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+       res.status(400).json({ status: 400, message: "Invalid ID" });
     }
-  };
-  
+
+    const result = await aggregateData(UserModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+
+    if (!result.tableData.length) {
+      res.status(404).json({ status: 404, message: "Record not found or deleted" });
+    }
+
+    res.status(200).json({
+      status: 200,
+      message: "Success",
+      data: result.tableData[0], // Access the first element of tableData
+    });
+  } catch (error) {
+    console.error("Error fetching record:", error);
+    res.status(500).json({ status: 500, message: "Internal Server Error", error: error });
+  }
+};

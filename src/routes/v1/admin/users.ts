@@ -1,5 +1,5 @@
 import { Router,Request,Response } from 'express';
-import { getAll, getOne ,createUser,updateUser,deleteUser} from '../controllers/users';
+import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
 const router = Router()
 /**
 /**
@@ -313,6 +313,7 @@ router.delete('/delete/:id',
  *                   - term: "john"
  *                     fields: ["name", "email"]
  *                     startsWith: true
+ *                     endsWith: true
  *     responses:
  *       200:
  *         description: Get all users.
@@ -419,7 +420,7 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   createdAt: 1
  *     responses:

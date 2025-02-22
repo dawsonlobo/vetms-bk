@@ -1,5 +1,5 @@
 import { Router,Request,Response } from 'express';
-import {getAll,getOne} from '../controllers/appointments'
+import {getAll,getOne} from '../../../controllers/v1/admin/appointments'
 const router = Router();
 
 /**
@@ -93,6 +93,7 @@ const router = Router();
  *                   - term: "SCHEDULED"
  *                     fields: ["schedule"]
  *                     startsWith: true
+ *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all appointments.
