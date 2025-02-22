@@ -9,7 +9,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     const authHeader: string | undefined = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {  
-        return res.status(401).json({ status: 401, message: "Unauthorized", data: null });
+        return res.status(401).json({ status: 401, message: "Unauthorized", data: "Unauthorized" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -20,12 +20,12 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
         next();
     } catch (error) {
         if (error instanceof TokenExpiredError) {
-            return res.status(401).json({ status: 401, message: "Token expired", data: null });
+            return res.status(401).json({ status: 401, message: "Token expired", data: "Token expired" });
         }
         if (error instanceof JsonWebTokenError) {
-            return res.status(403).json({ status: 403, message: "Invalid token", data: null });
+            return res.status(403).json({ status: 403, message: "Invalid token", data: "Invalid token" });
         }
-        return res.status(500).json({ status: 500, message: "Internal server error", data: null });
+        return res.status(500).json({ status: 500, message: "Internal server error", data: "Internal server error" });
     }
 };
 
@@ -35,9 +35,9 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
 
     if (!authHeader?.startsWith("Bearer ")) {
         return res.status(401).json({
-            status: 401,
+            status: 400,
             message: "Unauthorized",
-            data: null,
+            data: 'Unauthorized',
             toastMessage: "Authentication required.",
         });
     }
@@ -50,9 +50,9 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
 
         if (!user || user.role !== UserRole.ADMIN) {
             return res.status(403).json({
-                status: 403,
+                status: 400,
                 message: "Forbidden",
-                data: null,
+                data: "Forbidden",
                 toastMessage: "Admin access required.",
             });
         }
@@ -64,7 +64,7 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
             return res.status(401).json({
                 status: 401,
                 message: "Token expired",
-                data: null,
+                data: "Token expired",
                 toastMessage: "Session expired. Please log in again.",
             });
         }
@@ -72,14 +72,14 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
             return res.status(403).json({
                 status: 403,
                 message: "Invalid token",
-                data: null,
+                data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
         }
         return res.status(500).json({
             status: 500,
             message: "Internal server error",
-            data: null,
+            data: "Internal server error",
         });
     }
 };

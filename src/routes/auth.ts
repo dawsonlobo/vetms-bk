@@ -337,7 +337,7 @@ router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAd
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/admin/auth/update", asyncHandler(updateAdminProfile));
+router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAdminProfile));
 
 /**
  * @swagger
@@ -408,6 +408,6 @@ router.put("/admin/auth/update", asyncHandler(updateAdminProfile));
 
 
 
-router.post("/admin/auth/refresh", asyncHandler(refreshTokenController));
+router.post("/admin/auth/refresh",asyncHandler(verifyAdmin), asyncHandler(refreshTokenController));
 
 export default router;
