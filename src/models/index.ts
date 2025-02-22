@@ -5,5 +5,6 @@ export async function initializeModels() {
     await import("./appointments")
     await import('./followUps')
     await import("./billings")
+    await import("./payments")
   }
   

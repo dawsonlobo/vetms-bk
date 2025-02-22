@@ -81,6 +81,9 @@ const FollowUpSchema = new Schema<IFollowUp>({
   prescription: { type: String, required: true },
   visitDate: { type: Date, required: true },
   isDeleted: { type: Boolean, default: false },
-},{timestamps:true});
+},{ timestamps: true,
+  bufferCommands: true,
+  versionKey: false,
+});
 
 export const FollowUp = model<IFollowUp>("followUps", FollowUpSchema);

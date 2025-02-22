@@ -47,7 +47,7 @@ const router = Router();
  *             projectionExample:
  *               summary: Projection Example
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   receptionistId: 1

@@ -1,6 +1,10 @@
+import { Router,Request,Response } from 'express';
+import { getAll, getOne } from '../controllers/payments';
+const router = Router()
+
 /**
  * @swagger
- * /v1/admin/payments/all:
+ * /v1/admin/payments/getAll:
  *   post:
  *     tags:
  *       - admin/payments
@@ -44,12 +48,12 @@
  *             projectionExample:
  *               summary: Projection Example
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   appointmentId: 1
  *                   amount: 1
  *                   paymentStatus: 1
- *                   reference_no: 1
+ *                   referenceNo: 1
  *                   createdAt: 1
  *                   updatedAt: 1
  *             singleDateExample:
@@ -144,7 +148,7 @@
  *                         appointmentId: "66b3279c39c21f7342c12000"
  *                         amount: 100.5
  *                         paymentStatus: "PAID"
- *                         reference_no: "PAY123456"
+ *                         referenceNo: "PAY123456"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -155,10 +159,14 @@
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 /**
  * @swagger
- * /v1/admin/payment/{id}:
+ * /v1/admin/payments/getOne/{id}:
  *   post:
  *     tags:
  *       - admin/payments
@@ -245,3 +253,9 @@
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+ export default router;
