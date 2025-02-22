@@ -59,7 +59,7 @@ export interface IPayment {
   appointmentId: mongoose.Types.ObjectId;
   amount: number;
   paymentStatus: "PENDING" | "PAID" | "CANCELLED";
-  reference_no: string;
+  referenceNo: string;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -74,10 +74,14 @@ const PaymentSchema: Schema = new Schema(
     appointmentId: { type: Schema.Types.ObjectId, ref: "appointments", required: true },
     amount: { type: Number, required: true },
     paymentStatus: { type: String, enum: ["PENDING", "PAID", "CANCELLED"], required: true },
-    reference_no: { type: String, required: true, unique: true },
+    referenceNo: { type: String, required: true, unique: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
   },
-  { timestamps: true } // Automatically manages createdAt and updatedAt
+  {  timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+} // Automatically manages createdAt and updatedAt
 );
 
 // Export the Mongoose Model

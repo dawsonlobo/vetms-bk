@@ -1,3 +1,6 @@
+import { Router,Request,Response } from 'express';
+import {getAll,getOne} from '../controllers/followUps'
+const router = Router();
 /**
  * @swagger
  * /v1/admin/followUps/getOne/{id}:
@@ -98,6 +101,12 @@
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+
 
 /**
  * @swagger
@@ -267,3 +276,10 @@
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
+
+    export default router;

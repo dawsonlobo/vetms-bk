@@ -289,6 +289,13 @@ router.delete('/delete/:id',
  *                 projection:
  *                   name: 1
  *                   price: 1
+ *             filterExample:
+ *               summary: Filter Example
+ *               value:
+ *                 filter:
+ *                   name: 
+ *                     $regex: "Premium"
+ *                     $options: "i"
  *             date:
  *               summary: Using Single Date Filter
  *               value:
@@ -316,7 +323,7 @@ router.delete('/delete/:id',
  *               summary: Search Example
  *               value:
  *                 search:
- *                   - term: "electronics"
+ *                   - term: "cat"
  *                     fields: ["name"]
  *                     startsWith: true
  *     responses:

@@ -1,6 +1,10 @@
+import { Router,Request,Response } from 'express';
+import {getAll,getOne} from '../controllers/appointments'
+const router = Router();
+
 /**
  * @swagger
- * /v1/admin/appointments/all:
+ * /v1/admin/appointments/getAll:
  *   post:
  *     tags:
  *       - admin/appointments
@@ -44,7 +48,7 @@
  *             projectionExample:
  *               summary: Projection Example
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   doctorId: 1
@@ -52,6 +56,13 @@
  *                   schedule: 1
  *                   createdAt: 1
  *                   updatedAt: 1
+ *             filterExample:
+ *               summary: Filter Example
+ *               value:
+ *                 filter:
+ *                   doctorId: "66b3279c39c21f7342c13333"
+ *                   schedule: "SCHEDULED"
+ *                   petId: { "$in": ["66b3279c39c21f7342c12222", "66b3279c39c21f7342c14444"] }
  *             singleDateExample:
  *               summary: Multi-date Example
  *               value:
@@ -155,10 +166,14 @@
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-
+router.post('/getAll',
+   // passport.authenticate('bearer', { session: false }),
+    getAll,
+    //exitPoint
+    );
 /**
  * @swagger
- * /v1/admin/appointment/{id}:
+ * /v1/admin/appointments/getOne/{id}:
  *   post:
  *     tags:
  *       - admin/appointments
@@ -250,3 +265,10 @@
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
+router.post('/getOne/:id',
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     //exitPoint
+     );
+
+     export default router;

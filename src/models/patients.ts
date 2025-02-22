@@ -125,7 +125,7 @@ const PatientSchema: Schema = new Schema(
     weight: { type: Number, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
     medicalHistory: { type: [String], required: true },
-    BMI: { type: Number, required: true },
+    bmi: { type: Number, required: true },
     bloodGroup: {
       type: String,
       enum: [

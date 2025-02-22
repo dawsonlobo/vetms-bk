@@ -59,22 +59,25 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   }
 };
 // Adjust the import path based on your project structure
-
 export const updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id: userId } = req.params; // Get userId from URL params
-    const { isDeleted, ...updateData } = req.body;
+    
+    // Extract only allowed fields to update (excluding sensitive fields like password and role)
+    const { name, email } = req.body;
 
-    // Log request parameters for debugging
-    console.log('User ID from URL:', userId);
-    console.log('isDeleted:', isDeleted);
-
-    // Step 1: Validate input
-    if (!updateData && isDeleted === undefined) {
+    
+    // Step 1: Prepare update fields with only allowed properties
+    const updateFields: any = {};
+    if (name !== undefined) updateFields.name = name;
+    if (email !== undefined) updateFields.email = email;
+    
+    // Validate if there are any fields to update
+    if (Object.keys(updateFields).length === 0) {
       res.status(400).json({ message: 'No valid fields provided for update.' });
       return;
     }
-
+    
     // Step 2: Check if user exists
     const userExists = await UserModel.findById(userId);
     if (!userExists) {
@@ -82,91 +85,91 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
       res.status(404).json({ message: 'User not found.' });
       return;
     }
-
-    // Step 3: Prepare the update fields
-    let updateFields: any = {};
-
-    if (Object.keys(updateData).length > 0) {
-      updateFields = { ...updateData };
-    }
-
-    // If isDeleted is passed, update it
-    if (isDeleted !== undefined) {
-      updateFields.isDeleted = isDeleted;
-    }
-
+    
     // Log the updateFields to verify the data being sent for update
-    console.log('Update Fields:', updateFields);
-
-    // Step 4: Update the user document
+    
+    // Step 3: Update the user document
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
       updateFields,
       { new: true, runValidators: true }
-    ).select('-password'); // Exclude password from response
-
+    ).select('-password -isDeleted'); // Exclude password from response
+    
     if (!updatedUser) {
       res.status(404).json({ message: 'User not found.' });
       return;
     }
-
-    // Step 5: Send success response
+    
+    // Step 4: Send success response
     res.status(200).json({
       status: 200,
       message: 'Success',
-      data: 'User updated successfully',
+      data: updatedUser,
       toastMessage: 'User successfully updated',
     });
   } catch (error) {
     console.error('Error updating user:', error);
-    res.status(400).json({ message: 'Error updating user', error });
+    res.status(500).json({ message: 'Error updating user', error });
   }
 };
-
 
 
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { id } = req.query;
+    try {
+        const { id } = req.query;
 
-    // Validate ObjectId
-    if (!id || !mongoose.Types.ObjectId.isValid(id as string)) {
-      res.status(400).json({
-        status: 400,
-        message: 'Invalid or missing user ID',
-        toastMessage: 'Invalid request',
-      });
-      return;
+        // Validate ObjectId
+        if (!id || !mongoose.Types.ObjectId.isValid(id as string)) {
+            res.status(400).json({
+                status: 400,
+                message: 'Invalid or missing user ID',
+                toastMessage: 'Invalid request',
+            });
+            return;
+        }
+
+        // Check if user exists AND is not already soft deleted
+        const user = await UserModel.findById(id);
+
+        if (!user) {
+            res.status(404).json({
+                status: 404,
+                message: 'User not found',
+                toastMessage: 'User does not exist',
+            });
+            return;
+        }
+
+        if (user.isDeleted) {
+            res.status(404).json({
+                status: 404,
+                message: 'User already deleted',
+                toastMessage: 'User does not exist',
+            });
+            return;
+        }
+
+        // Perform soft delete by setting isDeleted to true
+        user.isDeleted = true;
+        await user.save();
+
+        res.status(200).json({
+            status: 200,
+            message: 'Success',
+            data: 'User deleted successfully',
+            toastMessage: 'User successfully deleted',
+        });
+    } catch (error) {
+        console.error('Error soft deleting user:', error);
+        res.status(500).json({
+            status: 500,
+            message: 'Internal server error',
+            error: error,
+        });
     }
-
-    // Find user and delete
-    const deletedUser = await UserModel.findByIdAndDelete(id);
-
-    if (!deletedUser) {
-      res.status(404).json({
-        status: 404,
-        message: 'User not found',
-        toastMessage: 'User does not exist',
-      });
-      return;
-    }
-
-    res.status(200).json({
-      status: 200,
-      message: 'Success',
-      data: 'User deleted successfully',
-      toastMessage: 'User successfully deleted',
-    });
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({
-      status: 500,
-      message: 'Internal server error',
-      error: error,
-    });
-  }
 };
+
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -238,7 +241,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
             data: { totalCount, tableData: usersList },
         });
     } catch (error) {
-        console.error('Error fetching patients:', error);
+        console.error('Error fetching users:', error);
         next(error);
     }
 };

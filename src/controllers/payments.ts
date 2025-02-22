@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { PatientModel } from "../models/patients"; // Import the Patient model
+import { PaymentModel } from "../models/payments"; // Import the Patient model
 import mongoose, { SortOrder } from "mongoose";
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -44,31 +44,38 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     });
     
     // Get total count before pagination
-    const totalCount = await PatientModel.countDocuments(query);
+    const totalCount = await PaymentModel.countDocuments(query);
     
     // Handle projection properly
     let finalProjection: any = {};
     
-    if (Object.keys(projection).length > 0) {
-      // If specific fields are requested, use them but ensure isDeleted isn't included
-      // Check if it's an inclusion projection (values are 1)
-      const isInclusionProjection = Object.values(projection).some(value => value === 1);
+    // if (Object.keys(projection).length > 0) {
+    //   // If specific fields are requested, use them but ensure isDeleted isn't included
+    //   // Check if it's an inclusion projection (values are 1)
+    //   const isInclusionProjection = Object.values(projection).some(value => value === 1);
       
-      if (isInclusionProjection) {
-        // For inclusion, copy all fields except isDeleted
-        finalProjection = { ...projection };
+    //   if (isInclusionProjection) {
+    //     // For inclusion, copy all fields except isDeleted
+    //     finalProjection = { ...projection };
+    //     delete finalProjection.isDeleted;
+    //   } else {
+    //     // For exclusion, make sure isDeleted is excluded
+    //     finalProjection = { ...projection, isDeleted: 0 };
+    //   }
+    // } else {
+    //   // If no projection specified, return all fields except isDeleted
+    //   finalProjection = { isDeleted: 0 };
+    // }
+    if (Object.keys(projection).length > 0) {
+        finalProjection = { ...projection, appointmentId: 1 }; // Ensure inclusion
         delete finalProjection.isDeleted;
       } else {
-        // For exclusion, make sure isDeleted is excluded
-        finalProjection = { ...projection, isDeleted: 0 };
+        finalProjection = { appointmentId: 1, isDeleted: 0 }; // Default projection
       }
-    } else {
-      // If no projection specified, return all fields except isDeleted
-      finalProjection = { isDeleted: 0 };
-    }
+      
     
     // Fetch paginated results
-    const tableData = await PatientModel.find(query, finalProjection)
+    const tableData = await PaymentModel.find(query, finalProjection)
       .sort(sort)
       .skip((page - 1) * itemsPerPage)
       .limit(itemsPerPage);
@@ -82,7 +89,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       },
     });
   } catch (error) {
-    console.error('Error fetching patient:', error);
+    console.error('Error fetching payments:', error);
     res.status(500).json({
       status: 500,
       message: 'Internal Server Error',
@@ -91,17 +98,13 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-// Adjust path as needed
-
-// Ensure this path matches your project structure
-
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { id } = req.params;
         const { projection } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            res.status(400).json({ status: 400, message: "Invalid patient ID" });
+            res.status(400).json({ status: 400, message: "Invalid payment  ID" });
             return;
         }
 
@@ -115,10 +118,10 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
         }
 
         // 🛑 Ensure isDeleted: false in the query to prevent fetching deleted records
-        const appointment = await PatientModel.findOne({ _id: id, isDeleted: false }, projectionFields);
+        const appointment = await PaymentModel.findOne({ _id: id, isDeleted: false }, projectionFields);
 
         if (!appointment) {
-            res.status(404).json({ status: 404, message: "patient not found or deleted" });
+            res.status(404).json({ status: 404, message: "payment not found or deleted" });
             return;
         }
 
