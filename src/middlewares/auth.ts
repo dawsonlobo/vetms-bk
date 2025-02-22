@@ -1,25 +1,85 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import { config } from "../config/config"; // Correct import for config
+import UserModel from "../models/users";
+import { UserRole } from "../models/users"; // Import UserRole if it's an enum or type
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
+// Middleware to verify any authenticated user
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
+    const authHeader: string | undefined = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ status: 401, message: "Unauthorized", data: null });
+    if (!authHeader?.startsWith("Bearer ")) {  
+        return res.status(401).json({ status: 401, message: "Unauthorized", data: "Unauthorized" });
     }
 
     const token = authHeader.split(" ")[1];
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        (req as any).user = decoded;
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+        (req as any).user = decoded; // Attach decoded user details
         next();
     } catch (error) {
-        return res.status(403).json({ status: 403, message: "Invalid or expired token", data: null });
+        if (error instanceof TokenExpiredError) {
+            return res.status(401).json({ status: 401, message: "Token expired", data: "Token expired" });
+        }
+        if (error instanceof JsonWebTokenError) {
+            return res.status(403).json({ status: 403, message: "Invalid token", data: "Invalid token" });
+        }
+        return res.status(500).json({ status: 500, message: "Internal server error", data: "Internal server error" });
+    }
+};
+
+// Middleware to verify Admin user
+export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader: string | undefined = req.headers.authorization;
+
+    if (!authHeader?.startsWith("Bearer ")) {
+        return res.status(401).json({
+            status: 400,
+            message: "Unauthorized",
+            data: 'Unauthorized',
+            toastMessage: "Authentication required.",
+        });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    try {
+        const decoded: any = jwt.verify(token, config.JWT_SECRET);
+        const user = await UserModel.findById(decoded.id);
+
+        if (!user || user.role !== UserRole.ADMIN) {
+            return res.status(403).json({
+                status: 400,
+                message: "Forbidden",
+                data: "Forbidden",
+                toastMessage: "Admin access required.",
+            });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+            return res.status(401).json({
+                status: 401,
+                message: "Token expired",
+                data: "Token expired",
+                toastMessage: "Session expired. Please log in again.",
+            });
+        }
+        if (error instanceof JsonWebTokenError) {
+            return res.status(403).json({
+                status: 403,
+                message: "Invalid token",
+                data: "Invalid token",
+                toastMessage: "Session expired. Please log in again.",
+            });
+        }
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            data: "Internal server error",
+        });
     }
 };
