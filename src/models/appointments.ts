@@ -7,7 +7,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *     appointments:
  *       type: object
  *       required:
- *         - petId
+ *         - patientId
  *         - doctorId
  *         - date
  *         - schedule
@@ -17,7 +17,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           format: objectId
  *           description: Unique identifier for the appointment
  *           example: "507f1f77bcf86cd799439011"
- *         petId:
+ *         patientId:
  *           type: string
  *           format: objectId
  *           description: Unique identifier of the pet for the appointment
@@ -58,7 +58,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 
 // Define the Appointment Interface
 export interface IAppointment {
-  petId: mongoose.Types.ObjectId;
+  patientId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
   date: Date;
   schedule: "SCHEDULED" | "COMPLETED" | "CANCELLED";
@@ -73,8 +73,8 @@ export interface IAppointmentModel extends IAppointment, Document {}
 // Define the Mongoose Schema
 const AppointmentSchema: Schema = new Schema(
   {
-    petId: { type: Schema.Types.ObjectId, ref: "pets", required: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: "doctors", required: true },
+    patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     date: { type: Date, required: true },
     schedule: { type: String, enum: ["SCHEDULED", "COMPLETED", "CANCELLED"], required: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field

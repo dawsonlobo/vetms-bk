@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../models/appointments"; // Import Appointment model
 import { aggregateData } from "../utils/aggregation";
 
-
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -16,6 +15,50 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate,
     } = req.body;
 
+    const lookups = req.body?.lookupRequired ? [
+      {
+        $lookup: {
+          from: "patients", // Lookup patient details
+          localField: "patientId",
+          foreignField: "_id",
+          as: "patientDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
+      },
+      {
+        $lookup: {
+          from: "users", // Lookup doctor details
+          localField: "doctorId",
+          foreignField: "_id",
+          as: "doctorDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
+      }
+      // ,
+      // {
+      //   $project: { // Only return necessary fields
+      //     _id: 1,
+      //     date: 1,
+      //     schedule: 1,
+      //     isDeleted: 1,
+      //     "doctorDetails._id": 1,
+      //     "doctorDetails.name": 1,
+      //     "doctorDetails.email": 1,
+      //     "doctorDetails.role": 1,
+      //     "patientDetails._id": 1,
+      //     "patientDetails.name": 1,
+      //     "patientDetails.age": 1,
+      //     "patientDetails.species": 1
+      //   }
+      // }
+    ] : [];
+
+    //console.log("Lookup Pipeline:", JSON.stringify(lookups, null, 2)); // Debugging
+
     // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
       AppointmentModel,
@@ -25,7 +68,8 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
+      lookups
     );
 
     res.status(200).json({
@@ -46,25 +90,68 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const { projection } = req.body;
+    const { projection = {}, lookupRequired = false } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-       res.status(400).json({ status: 400, message: "Invalid ID" });
-    }
+    // Build lookup stages if lookupRequired is true
+    const lookups = lookupRequired
+      ? [
+          {
+            $lookup: {
+              from: "patients", // Lookup patient details
+              localField: "patientId",
+              foreignField: "_id",
+              as: "patientDetails"
+            }
+          },
+          { 
+            $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
+          },
+          {
+            $lookup: {
+              from: "users", // Lookup doctor details
+              localField: "doctorId",
+              foreignField: "_id",
+              as: "doctorDetails"
+            }
+          },
+          { 
+            $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
+          }
+        ]
+      : [];
 
-    const result = await aggregateData(AppointmentModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    // Add the match stage to find the specific document by _id
+    const aggregationPipeline = [
+      { $match: { _id: new mongoose.Types.ObjectId(id) } }, // Match the ID
+      ...lookups, // Add the lookup stages if needed
+      { $project: projection || {} }, // Apply the projection if provided
+    ];
 
-    if (!result.tableData.length) {
+    // Call aggregateData with the modified pipeline for a single record
+    const { totalCount, tableData } = await aggregateData(
+      AppointmentModel,
+      {}, // No filter is needed for `getOne`, since we already match by ID
+      projection,
+      {}, // Empty options
+      [], // No search is needed
+      undefined, // No date, fromDate, or toDate
+      undefined,
+      undefined,
+      aggregationPipeline // Pass the pipeline directly
+    );
+
+    if (!tableData.length) {
       res.status(404).json({ status: 404, message: "Record not found or deleted" });
+      return;
     }
 
     res.status(200).json({
       status: 200,
       message: "Success",
-      data: result.tableData[0], // Access the first element of tableData
+      data: tableData[0], // Access the first element of tableData
     });
   } catch (error) {
     console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error: error });
+    res.status(500).json({ status: 500, message: "Internal Server Error", error });
   }
 };
