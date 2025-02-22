@@ -83,9 +83,10 @@ const router = Router();
  *               summary: Search Example
  *               value:
  *                 search:
- *                   - term: "5000"
+ *                   - term: 500
  *                     fields: ["totalAmount"]
- *                     startsWith: true
+ *                     startsWith: false
+ *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all billings.
@@ -165,15 +166,18 @@ const router = Router();
  *                         doctorId: "66b3279c39c21f7342c19ab"
  *                         totalAmount: 5000.75
  *                         billItems:
- *                           - itemName: "Vaccination"
- *                             price: 2000.50
+ *                           - _id: 67b9605f11e553a30ad69f86
+ *                             name: "Vaccination"
+ *                             discrption: "Rabies vaccination"
  *                             quantity: 1
- *                           - itemName: "Deworming"
- *                             price: 1000.25
- *                             quantity: 1
- *                           - itemName: "Consultation Fee"
- *                             price: 2000.00
- *                             quantity: 1
+ *                             price: 2000
+ *                             amount: 2000
+ *                           - _id: 67b9605f11e553a30ad69f87
+ *                             name: "Deworming"
+ *                             discrption: "Deworming for puppies"
+ *                             quantity: 2
+ *                             price: 1500
+ *                             amount: 3000
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
@@ -182,12 +186,18 @@ const router = Router();
  *                         doctorId: "66b3279c39c21f7342c19ac"
  *                         totalAmount: 3000.50
  *                         billItems:
- *                           - itemName: "General Checkup"
+ *                           - _id: 67b9605f11e553a30ad69f88
+ *                             name: "General Checkup"
+ *                             description: "General checkup for pets"
+ *                             quantity: 1
  *                             price: 1500.00
+ *                             amount: 1500.00
+ *                           - _id: 67b9605f11e553a30ad69f89
+ *                             name: "Grooming"
+ *                             description: "Grooming for pets"
  *                             quantity: 1
- *                           - itemName: "Grooming"
  *                             price: 1500.50
- *                             quantity: 1
+ *                             amount: 1500.50
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
@@ -227,10 +237,15 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
+ *                   petId: 1
+ *                   receptionistId: 1
+ *                   doctorId: 1
  *                   totalAmount: 1
  *                   billItems: 1
+ *                   createdAt: 1
+ *                   updatedAt: 1
  *     responses:
  *       200:
  *         description: Get one billing record.
@@ -294,20 +309,26 @@ router.post('/getAll',
  *                   status: 200
  *                   message: "Success"
  *                   data:
- *                     _id: "66b3279c39c21f7342c1520b"
- *                     petId: "66b3279c39c21f7342c1520p"
- *                     receptionistId: "66b3279c39c21f7342c1520r"
- *                     doctorId: "66b3279c39c21f7342c1520d"
- *                     totalAmount: 250.75
+ *                     _id: "66b3279c39c21f7342c1520n"
+ *                     petId: "66b3279c39c21f7342c1520q"
+ *                     receptionistId: "66b3279c39c21f7342c178e"
+ *                     doctorId: "66b3279c39c21f7342c19ac"
+ *                     totalAmount: 3000.00
  *                     billItems:
- *                       - itemName: "Vaccination"
+ *                       - _id: 67b9605f11e553a30ad69f88
+ *                         name: "General Checkup"
+ *                         description: "General checkup for pets"
  *                         quantity: 1
- *                         price: 150.50
- *                       - itemName: "General Check-up"
+ *                         price: 1500.00
+ *                         amount: 1500.00
+ *                       - _id: 67b9605f11e553a30ad69f89
+ *                         name: "Grooming"
+ *                         description: "Grooming for pets"
  *                         quantity: 1
- *                         price: 100.25
- *                     createdAt: "2025-02-01T08:00:00Z"
- *                     updatedAt: "2025-02-01T08:00:00Z"
+ *                         price: 1500.50
+ *                         amount: 1500.50
+ *                     createdAt: "2025-02-02T08:30:00Z"
+ *                     updatedAt: "2025-02-02T08:30:00Z"
  */
 router.post('/getOne/:id',
     // passport.authenticate('bearer', { session: false }),

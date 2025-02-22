@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { config } from "../config/config";
 import UserModel, { IUserDocument } from "../models/users";
 import { RefreshToken } from "../models/refreshTokens";
@@ -246,6 +247,7 @@ export const logoutController = async (req: Request, res: Response) => {
 };
 
 // Admin Profile Controller
+
 export const getAdminProfile = async (req: Request, res: Response) => {
     try {
         const accessToken = req.headers.authorization?.split(" ")[1];
@@ -276,12 +278,13 @@ export const getAdminProfile = async (req: Request, res: Response) => {
         let projection = req.body.project || {};
         projection._id = 1; // Always include _id
 
-        // Fetch admin profile from UserModel with dynamic projection
-        const adminProfile = await UserModel.findById(decoded.id)
-            .select(projection) // Apply projection
-            .lean();
+        // Fetch admin profile using MongoDB aggregation
+        const adminProfile = await UserModel.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(decoded.id) } },
+            { $project: projection } // Apply dynamic projection
+        ]);
 
-        if (!adminProfile) {
+        if (!adminProfile.length) {
             return res.status(404).json({
                 status: 404,
                 message: "Admin profile not found",
@@ -298,7 +301,7 @@ export const getAdminProfile = async (req: Request, res: Response) => {
             status: 200,
             message: "Success",
             data: {
-                ...adminProfile, // Spread the dynamically selected fields
+                ...adminProfile[0], // Spread the first result since aggregation returns an array
                 access_token: accessToken,
                 refresh_token: refreshToken,
                 tokenExpiresAt: new Date(Date.now() + config.ACCESS_TOKEN_EXPIRY * 1000),
@@ -314,6 +317,7 @@ export const getAdminProfile = async (req: Request, res: Response) => {
         });
     }
 };
+
 
 export const updateAdminProfile = async (req: Request, res: Response) => {
     try {
