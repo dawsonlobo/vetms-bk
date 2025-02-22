@@ -194,7 +194,7 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   amount: 1
  *     responses:

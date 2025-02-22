@@ -326,6 +326,7 @@ router.delete('/delete/:id',
  *                   - term: "cat"
  *                     fields: ["name"]
  *                     startsWith: true
+ *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all inventory items.
@@ -430,7 +431,7 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   name: 1
  *                   price: 1
  *                   quantity: 1

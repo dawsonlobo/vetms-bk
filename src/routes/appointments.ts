@@ -60,9 +60,7 @@ const router = Router();
  *               summary: Filter Example
  *               value:
  *                 filter:
- *                   doctorId: "66b3279c39c21f7342c13333"
  *                   schedule: "SCHEDULED"
- *                   petId: { "$in": ["66b3279c39c21f7342c12222", "66b3279c39c21f7342c14444"] }
  *             singleDateExample:
  *               summary: Multi-date Example
  *               value:
@@ -93,6 +91,7 @@ const router = Router();
  *                   - term: "SCHEDULED"
  *                     fields: ["schedule"]
  *                     startsWith: true
+ *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all appointments.
@@ -201,7 +200,7 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   doctorId: 1

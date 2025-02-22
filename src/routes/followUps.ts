@@ -30,7 +30,7 @@ const router = Router();
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   diagnosis: 1

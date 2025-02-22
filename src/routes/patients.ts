@@ -93,6 +93,7 @@ const router = Router()
  *                   - term: "Golden Retriever"
  *                     fields: ["breed"]
  *                     startsWith: true
+ *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all patients.
