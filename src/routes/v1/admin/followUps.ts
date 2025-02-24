@@ -1,5 +1,5 @@
 import { Router,Request,Response } from 'express';
-import {getAll,getOne} from '../controllers/followUps'
+import {getAll,getOne} from '../../../controllers/v1/admin/followUps'
 const router = Router();
 /**
  * @swagger

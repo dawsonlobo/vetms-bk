@@ -2,10 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { config } from "../config/config";
-import UserModel, { IUserDocument } from "../models/users";
-import { RefreshToken } from "../models/refreshTokens";
-import { AccessToken } from "../models/accessTokens";
+import { config } from "../../../config/config";
+import UserModel, { IUserDocument } from "../../../models/users";
+import { RefreshToken } from "../../../models/refreshTokens";
+import { AccessToken } from "../../../models/accessTokens";
 
 if (!config.JWT_SECRET) {
     throw new Error("Missing JWT_SECRET in configuration");

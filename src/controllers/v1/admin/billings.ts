@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import { BillingModel } from "../models/billings";
-import { aggregateData } from "../utils/aggregation";
+import { BillingModel } from "../../../models/billings";
+import { aggregateData } from "../../../utils/aggregation";
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

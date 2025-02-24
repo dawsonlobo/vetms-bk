@@ -1,5 +1,5 @@
 import { Router,Request,Response } from 'express';
-import {getAll,getOne} from '../controllers/billings'
+import {getAll,getOne} from '../../../controllers/v1/admin/billings'
 const router = Router();
 /**
  * @swagger

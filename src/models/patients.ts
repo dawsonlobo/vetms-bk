@@ -95,7 +95,7 @@ export interface IPatient {
   weight: number;
   gender: "MALE" | "FEMALE";
   medicalHistory: string;
-  BMI: number;
+  bmi: number;
   bloodGroup:
     | "DEA 1.1+"
     | "DEA 1.1-"

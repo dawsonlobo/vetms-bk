@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from "express";
-import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../controllers/auth";
-import { verifyAdmin } from "../middlewares/auth";
+import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../../../controllers/v1/admin/auth";
+import { verifyAdmin } from "../../../middlewares/auth";
 
 const router = Router();
 
