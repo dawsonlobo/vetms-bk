@@ -17,7 +17,7 @@ import billings from './routes/v1/admin/billings'
 import payments from './routes/v1/admin/payments'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
- //import ngrok from "ngrok";//testing
+ //import ngrok from "ngrok";
 dotenv.config();
 
 const app = express();
