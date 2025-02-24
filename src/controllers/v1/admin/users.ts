@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from '../../../models/users'; // Adjust path as needed
 import bcrypt from 'bcryptjs';
 import mongoose, { SortOrder } from 'mongoose';
+import { config } from '../../../config/config';
 import { aggregateData } from "../../../utils/aggregation";
 
-const SALT_ROUNDS = 15; // Define salt rounds as 15
+//const SALT_ROUNDS = 15; // Define salt rounds as 15
 
 export const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -32,7 +33,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     }
 
     // Hash password before saving (Using 15 salt rounds)
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, config.ROUNDS);
 
     // Create new user
     const newUser = new UserModel({

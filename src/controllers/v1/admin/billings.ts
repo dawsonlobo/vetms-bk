@@ -54,23 +54,17 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-    // Determine if projection includes fields (1 for inclusion, 0 for exclusion)
-    const isInclusionProjection = Object.values(projection).includes(1);
+    const objectId = new mongoose.Types.ObjectId(id); // ✅ Convert string to ObjectId
 
-    // Fetch the bill with correct projection
-    const bill = await BillingModel.findOne(
-      { _id: id, isDeleted: false },
-      isInclusionProjection ? { ...projection } : { ...projection, isDeleted: 0 } // Ensure no mixed 1s and 0s
-    );
+    // Fetch bill using aggregateData
+    const { tableData } = await aggregateData(BillingModel, { _id: objectId, isDeleted: false }, projection);
 
-    if (!bill) {
+    if (!tableData || tableData.length === 0) {
       res.status(404).json({ status: 404, message: "Billing record not found or deleted" });
       return;
     }
 
-    // Convert to object and remove `isDeleted`
-    const billObj = bill.toObject();
-    delete billObj.isDeleted;
+    const billObj = tableData[0];
 
     res.status(200).json({
       status: 200,

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction, Router } from "express";
 import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../../../controllers/v1/admin/auth";
 import { verifyAdmin } from "../../../middlewares/auth";
+//import { entryPoint } from "../../../middlewares/entrypoint";
+//import { exitPoint } from "../../../middlewares/exitpoint";
 
 const router = Router();
 
@@ -80,7 +82,11 @@ const asyncHandler = (
  */
 
 
-router.post("/admin/auth/login", loginController);
+router.post("/admin/auth/login",
+    //entryPoint, 
+    loginController
+    //,exitPoint
+    );
 
 
 

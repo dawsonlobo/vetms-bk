@@ -46,5 +46,32 @@ export const config: AppConfig = {
   JWT_SECRET: getEnvVariable("JWT_SECRET"),
   ACCESS_TOKEN_EXPIRY: parseInt(getEnvVariable("ACCESS_TOKEN_EXPIRY", true, "604800")), // 7 days
   REFRESH_TOKEN_EXPIRY: parseInt(getEnvVariable("REFRESH_TOKEN_EXPIRY", true, "31536000")), // 1 year
-  ROUNDS: parseInt(getEnvVariable("ROUNDS", true, "15")),
+  ROUNDS: parseInt(getEnvVariable("ROUNDS", true, "10")),
 };
+
+export const seedUsers = [
+  {
+    email: "admin@example.com",
+    name: "Admin User",
+    role: "ADMIN",
+    password: "Admin@123",
+  },
+  {
+    email: "doctor@example.com",
+    name: "Dr. John Doe",
+    role: "DOCTOR",
+    password: "Doctor@123",
+  },
+  {
+    email: "nurse@example.com",
+    name: "Nurse Jane",
+    role: "NURSE",
+    password: "Nurse@123",
+  },
+  {
+    email: "receptionist@example.com",
+    name: "Receptionist Mike",
+    role: "RECEPTIONIST",
+    password: "Reception@123",
+  },
+];

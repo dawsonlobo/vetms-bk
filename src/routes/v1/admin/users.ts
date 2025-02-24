@@ -1,5 +1,12 @@
-import { Router,Request,Response } from 'express';
+import { Router,Request,Response,NextFunction } from 'express';
 import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
+import { authenticateAdmin } from '../../../middlewares/auth';
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 const router = Router()
 /**
 /**
@@ -84,7 +91,7 @@ const router = Router()
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
-router.post('/create',
+router.post('/create',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }), 
     createUser, 
     //exitPoint
@@ -170,7 +177,7 @@ router.post('/create',
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
-router.put('/update/:id', 
+router.put('/update/:id', asyncHandler(authenticateAdmin),
     //passport.authenticate('bearer', { session: false }),
      updateUser, 
     // exitPoint
@@ -226,7 +233,7 @@ router.put('/update/:id',
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
 */
-router.delete('/delete/:id',
+router.delete('/delete/:id',asyncHandler(authenticateAdmin),
     //passport.authenticate('bearer', { session: false }),
     deleteUser, 
     // exitPoint
@@ -385,7 +392,7 @@ router.delete('/delete/:id',
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
 
-router.post('/getAll',
+router.post('/getAll',asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
@@ -475,7 +482,7 @@ router.post('/getAll',
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */
 
-router.post('/getOne/:id',
+router.post('/getOne/:id',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }),
      getOne,
      //exitPoint

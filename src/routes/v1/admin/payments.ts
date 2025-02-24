@@ -1,5 +1,12 @@
-import { Router,Request,Response } from 'express';
+import { Router,Request,Response,NextFunction } from 'express';
 import { getAll, getOne } from '../../../controllers/v1/admin/payments';
+import { authenticateAdmin } from '../../../middlewares/auth';
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 const router = Router()
 
 /**
@@ -159,7 +166,7 @@ const router = Router()
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',
+router.post('/getAll',asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
@@ -187,14 +194,14 @@ router.post('/getAll',
  *           schema:
  *             type: object
  *             properties:
- *               project:
+ *               projection:
  *                 type: object
  *                 description: Fields to include or exclude in the response
  *           examples:
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   amount: 1
  *     responses:
@@ -253,7 +260,7 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getOne/:id',
+router.post('/getOne/:id',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }),
      getOne,
      //exitPoint

@@ -100,6 +100,17 @@ export const refreshTokenController = async (req: Request, res: Response, next: 
             });
         }
 
+        // Check if access token exists in database
+        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+        if (!storedAccessToken) {
+            return res.status(403).json({
+                status: 403,
+                message: "Invalid access token",
+                data: "Invalid access token",
+                toastMessage: "Please log in again.",
+            });
+        }
+
         let decoded: any;
         try {
             decoded = jwt.verify(refresh_token, JWT_SECRET);
@@ -260,8 +271,31 @@ export const getAdminProfile = async (req: Request, res: Response) => {
                 toastMessage: "Please log in again.",
             });
         }
+        
+        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+        if (!storedAccessToken) {
+            return res.status(403).json({
+                status: 403,
+                message: "Invalid or expired access token",
+                data: "Invalid or expired access token",
+                toastMessage: "Please log in again.",
+            });
+        }
 
-        // Decode the access token to get user ID
+        // // Verify the JWT token
+        // let decoded: any;
+        // try {
+        //     decoded = jwt.verify(accessToken, config.JWT_SECRET);
+        // } catch (error) {
+        //     return res.status(403).json({
+        //         status: 403,
+        //         message: "Invalid or expired token",
+        //         data: null,
+        //         toastMessage: "Session expired. Please log in again.",
+        //     });
+        // }
+
+        //Decode the access token to get user ID
         let decoded: any;
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
@@ -328,6 +362,15 @@ export const updateAdminProfile = async (req: Request, res: Response) => {
                 status: 401,
                 message: "Unauthorized",
                 data: "Unauthorized",
+                toastMessage: "Please log in again.",
+            });
+        }
+        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+        if (!storedAccessToken) {
+            return res.status(403).json({
+                status: 403,
+                message: "Invalid or expired access token",
+                data: "Invalid or expired access token",
                 toastMessage: "Please log in again.",
             });
         }
