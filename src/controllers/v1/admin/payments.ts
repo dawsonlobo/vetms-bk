@@ -43,25 +43,37 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const { projection } = req.body;
+    const { projection = {} } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-       res.status(400).json({ status: 400, message: "Invalid ID" });
+      res.status(400).json({ status: 400, message: "Invalid Payment ID" });
+      return;
     }
 
-    const result = await aggregateData(PaymentModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    const objectId = new mongoose.Types.ObjectId(id); // ✅ Convert string to ObjectId
 
-    if (!result.tableData.length) {
-      res.status(404).json({ status: 404, message: "Record not found or deleted" });
+    // Fetch payment using aggregateData
+    const { tableData } = await aggregateData(PaymentModel, { _id: objectId, isDeleted: false }, projection);
+
+    if (!tableData || tableData.length === 0) {
+      res.status(404).json({ status: 404, message: "Payment record not found or deleted" });
+      return;
     }
+
+    const paymentObj = tableData[0];
 
     res.status(200).json({
       status: 200,
       message: "Success",
-      data: result.tableData[0], // Access the first element of tableData
+      data: paymentObj,
     });
   } catch (error) {
-    console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error: error });
+    console.error("Error fetching Payment record:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Internal Server Error",
+      error,
+    });
   }
 };
+

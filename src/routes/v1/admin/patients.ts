@@ -1,5 +1,12 @@
-import { Router,Request,Response } from 'express';
+import { Router,Request,Response,NextFunction } from 'express';
 import { getAll, getOne } from '../../../controllers/v1/admin/patients';
+import { authenticateAdmin } from '../../../middlewares/auth';
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 const router = Router()
 /**
  * @swagger
@@ -194,7 +201,7 @@ const router = Router()
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',
+router.post('/getAll',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }),
      getAll,
      //exitPoint
@@ -314,7 +321,7 @@ router.post('/getAll',
   */
  
  
- router.post('/getOne/:id',
+ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
      // passport.authenticate('bearer', { session: false }),
       getOne,
       //exitPoint

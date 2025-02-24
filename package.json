@@ -6,11 +6,12 @@
   "directories": {
     "doc": "docs"
   },
-  "scripts": {
-    "start": "npm run build:live",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts"
-  },
+ "scripts": {
+  "start": "npm run build:live",
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts",
+  "seed": "nodemon --watch \"src/seeds/**\" --ext \"ts\" --exec \"ts-node src/seeds/seed.ts\""
+}, 
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dawsonlobo/vetms-bk.git"

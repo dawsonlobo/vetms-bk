@@ -73,7 +73,7 @@ export interface IFollowUp extends Document {
   isDeleted?: boolean;
 }
 
-const FollowUpSchema = new Schema<IFollowUp>({
+const FollowUpSchema: Schema= new Schema({
   petId: { type: Schema.Types.ObjectId, ref: "Pet", required: true },
   doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   diagnosis: { type: String, required: true },

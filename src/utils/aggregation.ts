@@ -55,15 +55,32 @@ export const aggregateData = async (
   });
 
   // Projection
-  let finalProjection: any = { isDeleted: 0 };
-  if (Object.keys(projection).length > 0) {
-    const isInclusionProjection = Object.values(projection).some(
-      (value) => value === 1
-    );
-    finalProjection = isInclusionProjection
-      ? { ...projection }
-      : { ...projection, isDeleted: 0 };
+let finalProjection: Record<string, number> = { isDeleted: 0 };
+
+if (Object.keys(projection).length > 0) {
+  const isInclusionProjection = Object.values(projection).some((value) => value === 1);
+  const isExclusionProjection = Object.values(projection).every((value) => value === 0);
+
+  if (isInclusionProjection) {
+    finalProjection = { ...projection };
+  } else if (isExclusionProjection) {
+    finalProjection = { ...projection, isDeleted: 0 };
   }
+
+  // Remove any field that is explicitly set to `0`
+  Object.keys(finalProjection).forEach((key) => {
+    if (finalProjection[key] === 0) {
+      delete finalProjection[key];
+    }
+  });
+}
+
+// Ensure `_id` is included if missing
+if (finalProjection._id === undefined) {
+  finalProjection._id = 1;
+}
+
+
 
   // Aggregation Pipeline
   const pipeline: any[] = [{ $match: query }];

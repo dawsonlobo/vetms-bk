@@ -1,6 +1,14 @@
-import { Router,Request,Response } from 'express';
+import { Router,Request,Response, NextFunction } from 'express';
 import {getAll,getOne} from '../../../controllers/v1/admin/followUps'
 const router = Router();
+import { authenticateAdmin } from '../../../middlewares/auth';
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
+
 /**
  * @swagger
  * /v1/admin/followUps/getOne/{id}:
@@ -30,7 +38,7 @@ const router = Router();
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   diagnosis: 1
@@ -101,7 +109,8 @@ const router = Router();
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',
+router.post('/getOne/:id',asyncHandler(authenticateAdmin),
+
     // passport.authenticate('bearer', { session: false }),
      getOne,
      //exitPoint
@@ -276,7 +285,7 @@ router.post('/getOne/:id',
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',
+router.post('/getAll',asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint

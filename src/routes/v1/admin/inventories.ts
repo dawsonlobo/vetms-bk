@@ -1,5 +1,12 @@
-import { Router,Request,Response } from 'express';
+import { Router,Request,Response,NextFunction } from 'express';
 import {createInventory,updateInventory,deleteInventory,getAll,getOne} from '../../../controllers/v1/admin/inventories'
+import { authenticateAdmin } from '../../../middlewares/auth';
+
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 const router = Router();
 /**
  * @swagger
@@ -81,7 +88,7 @@ const router = Router();
  *                   data: "Inventory item created successfully"
  *                   toastMessage: "Item successfully added to inventory"
  */
-router.post('/create',
+router.post('/create',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }), 
     createInventory, 
     //exitPoint
@@ -166,7 +173,7 @@ router.post('/create',
  *                   data: "Inventory item updated successfully"
  *                   toastMessage: "Item successfully updated"
  */
-router.put('/update/:id', 
+router.put('/update/:id', asyncHandler(authenticateAdmin),
     //passport.authenticate('bearer', { session: false }),
      updateInventory, 
     // exitPoint
@@ -232,7 +239,7 @@ router.put('/update/:id',
  *               message: "error"
  *               error: "Inventory item not found"
  */
-router.delete('/delete/:id',
+router.delete('/delete/:id',asyncHandler(authenticateAdmin),
     //passport.authenticate('bearer', { session: false }),
     deleteInventory, 
     // exitPoint
@@ -397,7 +404,7 @@ router.delete('/delete/:id',
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',
+router.post('/getAll',asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
@@ -483,7 +490,7 @@ router.post('/getAll',
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',
+router.post('/getOne/:id',asyncHandler(authenticateAdmin),
     // passport.authenticate('bearer', { session: false }),
      getOne,
      //exitPoint
