@@ -7,6 +7,7 @@
     "doc": "docs"
   },
  "scripts": {
+  "build": "tsc",
   "start": "npm run build:live",
   "test": "echo \"Error: no test specified\" && exit 1",
   "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts",
