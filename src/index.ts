@@ -22,7 +22,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json()); // Enable JSON parsing
-app.use(passport.initialize()); // Initialize Passport.js
+app.use(passport.initialize()); // Initialize Passport.JS
 
 // Connect to MongoDB
 mongoose
