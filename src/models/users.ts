@@ -59,6 +59,7 @@ export enum UserRole {
   }
   
   export interface IUser {
+    _id?: mongoose.Types.ObjectId;
     name: string;
     email: string;
     password: string;
@@ -69,7 +70,9 @@ export enum UserRole {
   }
   
   
-  export interface IUserDocument extends IUser, Document {}
+  export interface IUserDocument extends IUser, Document {
+    _id: mongoose.Types.ObjectId; 
+  }
   
   const UserSchema: Schema = new Schema(
     {

@@ -1,12 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import mongoose from "mongoose";
 import { config } from "../../../config/config";
 import UserModel, { IUserDocument } from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
-
+import {ErrorCodes} from "../../../models/models"
+//import { generateTokens } from "../../../passport/jwt"
 if (!config.JWT_SECRET) {
     throw new Error("Missing JWT_SECRET in configuration");
 }
@@ -14,162 +17,162 @@ if (!config.JWT_SECRET) {
 const { JWT_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 // Login Controller
-export const loginController = async (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate(
-        "local",
-        { session: false },
-        async (err: Error | null, user: IUserDocument | false, info?: { message?: string }) => {
-            if (err) return next(err);
-            if (!user) {
-                return res.status(401).json({
-                    status: 401,
-                    message: "Authentication failed",
-                    data: "Authentication failed",
-                    toastMessage: info?.message ?? "Invalid credentials, please try again",
-                });
-            }
-
-            try {
-                const accessToken = jwt.sign(
-                    { id: user._id, role: user.role },
-                    JWT_SECRET,
-                    { expiresIn: ACCESS_TOKEN_EXPIRY }
-                );
-
-                const refreshToken = jwt.sign(
-                    { id: user._id },
-                    JWT_SECRET,
-                    { expiresIn: REFRESH_TOKEN_EXPIRY }
-                );
-
-                await RefreshToken.deleteMany({ userId: user._id });
-                await RefreshToken.create({ userId: user._id, token: refreshToken });
-                await AccessToken.create({ userId: user._id, token: accessToken });
-
-                return res.status(200).json({
-                    status: 200,
-                    message: "Success",
-                    data: {
-                        _id: user._id,
-                        name: user.name,
-                        email: user.email,
-                        role: user.role,
-                        createdAt: user.createdAt,
-                        updatedAt: user.updatedAt,
-                        access_token: accessToken,
-                        refresh_token: refreshToken,
-                        tokenExpiresAt: new Date(Date.now() + ACCESS_TOKEN_EXPIRY * 1000),
-                    },
-                    toastMessage: "Login successful",
-                });
-            } catch (tokenError) {
-                console.error("Token generation error:", tokenError);
-                return res.status(500).json({
-                    status: 500,
-                    message: "Internal server error",
-                    data: "Internal server error",
-                    toastMessage: "An error occurred during login. Please try again later.",
-                });
-            }
-        }
-    )(req, res, next);
-};
-
-// Refresh Token Controller
-export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
+export const loginController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const { email, password } = req.body;
+  
     try {
-        const { refresh_token } = req.body;
-        const accessToken = req.headers.authorization?.split(" ")[1];
-
-        if (!refresh_token || !accessToken) {
-            return res.status(400).json({
-                status: 400,
-                message: "Refresh token and access token are required",
-                data: "Refresh token and access token are required",
-                toastMessage: "Session expired. Please log in again.",
-            });
-        }
-
-        const storedToken = await RefreshToken.findOne({ token: refresh_token });
-        if (!storedToken) {
-            return res.status(403).json({
-                status: 403,
-                message: "Invalid or expired refresh token",
-                data: "Invalid or expired refresh token",
-                toastMessage: "Please log in again.",
-            });
-        }
-
-        // Check if access token exists in database
-        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
-        if (!storedAccessToken) {
-            return res.status(403).json({
-                status: 403,
-                message: "Invalid access token",
-                data: "Invalid access token",
-                toastMessage: "Please log in again.",
-            });
-        }
-
-        let decoded: any;
-        try {
-            decoded = jwt.verify(refresh_token, JWT_SECRET);
-        } catch (error) {
-            await RefreshToken.deleteOne({ token: refresh_token });
-            return res.status(403).json({
-                status: 403,
-                message: "Invalid or expired refresh token",
-                data: "Invalid or expired refresh token",
-                toastMessage: "Please log in again.",
-            });
-        }
-
-        const user = await UserModel.findById(decoded.id);
+        // Find user by email
+        const user = await UserModel.findOne({ email });
         if (!user) {
-            await RefreshToken.deleteOne({ token: refresh_token });
-            return res.status(404).json({
-                status: 404,
-                message: "User not found",
-                data: "User not found",
-                toastMessage: "User no longer exists.",
-            });
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User not found or verified",
+                log: "User not found",
+                toastMessage: "Invalid email or password",
+            };
+            next();
+            return;
         }
-
-        await AccessToken.deleteOne({ token: accessToken });
-
-        const newAccessToken = jwt.sign(
-            { id: user._id, role: user.role },
-            JWT_SECRET,
-            { expiresIn: ACCESS_TOKEN_EXPIRY }
-        );
-
-        await AccessToken.create({ userId: user._id, token: newAccessToken });
-
-        return res.status(200).json({
-            status: 200,
-            message: "Tokens refreshed successfully",
+  
+        // Validate password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1012],
+                data: "Failed to login",
+                toastMessage: "Invalid email or password",
+            };
+            next();
+            return;
+        }
+  
+        // Generate Tokens
+        const { accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt } = generateTokens(user.id);
+  
+        // Save tokens in the database
+        await AccessToken.create({ token: accessToken, userId: user.id, accessExpiresAt: accessTokenExpiresAt });
+        await RefreshToken.create({ token: refreshToken, userId: user.id, refreshExpiresAt: refreshTokenExpiresAt });
+  
+        // User details to return
+        const userInfo = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+  
+        // Success response
+        req.apiStatus = {
+            isSuccess: true,
             data: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
-                access_token: newAccessToken,
-                refresh_token: refresh_token,
-                tokenExpiresAt: new Date(Date.now() + ACCESS_TOKEN_EXPIRY * 1000),
-            }
-        });
+                access_token: accessToken,
+                ACCESS_TOKEN_EXPIRY,
+                refresh_token: refreshToken,
+                REFRESH_TOKEN_EXPIRY,
+                user: userInfo,
+            },
+            toastMessage: "Login successful",
+        };
+        next();
     } catch (error) {
-        console.error("Refresh token error:", error);
-        return res.status(500).json({
-            status: 500,
-            message: "Internal server error",
-            data: "Internal server error",
-            toastMessage: "An error occurred while refreshing the token. Please try again later.",
-        });
+        console.error("Login error:", error);
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1010],
+            data: error instanceof Error ? error.message : JSON.stringify(error),
+            toastMessage: "Internal server error",
+        };
+        next();
     }
 };
+
+
+// Refresh Token Controller
+export async function refreshTokenController(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { refresh_token: refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1001],
+          data: "Refresh token is required",
+          toastMessage: "Session expired. Please log in again.",
+        };
+        return next();
+      }
+  
+      // Verify refresh token
+      const decoded = verifyRefreshToken(refreshToken);
+      if (!decoded) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1012],
+          data: "Invalid or expired refresh token",
+          toastMessage: "Please log in again.",
+        };
+        return next();
+      }
+  
+      // Check if refresh token exists in DB
+      const tokenFromDb = await RefreshToken.findOne({ token: refreshToken });
+      if (!tokenFromDb) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1012],
+          data: "Refresh token not found",
+          toastMessage: "Refresh token not found. Please log in again.",
+        };
+        return next();
+      }
+  
+      // Fetch user details
+      const user = await UserModel.findById(decoded.id);
+      if (!user) {
+        await RefreshToken.deleteOne({ token: refreshToken });
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1012],
+          data: "User not found",
+          toastMessage: "User no longer exists.",
+        };
+        return next();
+      }
+  
+      // Generate new tokens
+      const { accessToken, accessExpiresAt } = generateAccessToken(user._id);
+      const { refreshToken: newRefreshToken, refreshExpiresAt } = generateRefreshToken(user._id);
+  
+      // Replace old refresh token in DB
+      await RefreshToken.findOneAndUpdate({ token: refreshToken }, { token: newRefreshToken });
+  
+      // Send response
+      req.apiStatus = {
+        isSuccess: true,
+        data: {
+          access_token: accessToken,
+          accessExpiresAt,
+          refresh_token: newRefreshToken,
+          refreshExpiresAt,
+        },
+        toastMessage: "Token refreshed successfully",
+      };
+      next();
+    } catch (error) {
+      console.error("Refresh token error:", error);
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1010],
+        data: "Failed to refresh token",
+        toastMessage: "An error occurred while refreshing the token. Please try again later.",
+      };
+      next();
+    }
+  }
 
 // Logout Controller
 export const logoutController = async (req: Request, res: Response) => {
