@@ -144,8 +144,8 @@ export async function refreshTokenController(req: Request, res: Response, next: 
       }
   
       // Generate new tokens
-      const { accessToken, accessExpiresAt } = generateAccessToken(user._id);
-      const { refreshToken: newRefreshToken, refreshExpiresAt } = generateRefreshToken(user._id);
+      const { accessToken, accessExpiresAt } = generateAccessToken(String(user._id));
+      const { refreshToken: newRefreshToken, refreshExpiresAt } = generateRefreshToken(String(user._id));
   
       // Replace old refresh token in DB
       await RefreshToken.findOneAndUpdate({ token: refreshToken }, { token: newRefreshToken });

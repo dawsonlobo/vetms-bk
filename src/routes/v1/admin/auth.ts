@@ -134,7 +134,7 @@ router.post("/admin/auth/login",
  */
 
 
-router.post("/admin/auth/logout", verifyAdmin, auth.logoutController);
+// router.post("/admin/auth/logout", verifyAdmin, auth.logoutController);
 /**
  * @swagger
  * /v1/admin/auth/profile:
@@ -278,7 +278,7 @@ router.post("/admin/auth/logout", verifyAdmin, auth.logoutController);
  */
 
 
-router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAdminProfile));
+// router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAdminProfile));
 
 /**
  * @swagger
@@ -345,7 +345,7 @@ router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAd
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAdminProfile));
+// router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAdminProfile));
 
 /**
  * @swagger
@@ -416,6 +416,6 @@ router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAd
 
 
 
-router.post("/admin/auth/refresh",asyncHandler(verifyAdmin), asyncHandler(refreshTokenController));
+// router.post("/admin/auth/refresh",asyncHandler(verifyAdmin), asyncHandler(refreshTokenController));
 
 export default router;
