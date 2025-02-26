@@ -4,15 +4,25 @@
 branch=$(git rev-parse --abbrev-ref HEAD)
 
 # Check if package.json is already staged (prevents infinite loop)
-if [ "$branch" = "dev" ] && ! git diff --cached --quiet -- package.json; then
-    echo "Bumping version..."
-    npm version patch --no-git-tag-version
-    git add package.json package-lock.json
-    git commit -m "chore: bump version [skip ci]" --no-verify  # Prevents triggering Husky again
-    git push
+if [ "$branch" = "dev" ]; then
+    echo "Checking if version bump is needed..."
+
+    # Check if the last commit message contains "[skip ci]" to prevent looping
+    last_commit_msg=$(git log -1 --pretty=%B)
+
+    if echo "$last_commit_msg" | grep -q "chore: bump version"; then
+        echo "Version was already bumped in the last commit, skipping..."
+    else
+        echo "Bumping version..."
+        npm version patch --no-git-tag-version
+        git add package.json package-lock.json
+        git commit -m "chore: bump version [skip ci]" --no-verify  # Prevents triggering Husky again
+        git push
+    fi
 else
-    echo "Not on dev branch or package.json already staged, skipping version bump."
+    echo "Not on dev branch, skipping version bump."
 fi
+
 
 # Run lint, build, and spell check if scripts exist
 # if npm run | grep -q "lint"; then
