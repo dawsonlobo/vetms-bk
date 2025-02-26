@@ -3,7 +3,6 @@
 # Get the current branch
 branch=$(git rev-parse --abbrev-ref HEAD)
 
-# Run npm version patch only on dev branch
 # Check if package.json is already staged (prevents infinite loop)
 if [ "$branch" = "dev" ] && ! git diff --cached --quiet -- package.json; then
     echo "Bumping version..."
