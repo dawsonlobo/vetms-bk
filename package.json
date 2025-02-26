@@ -7,11 +7,13 @@
     "doc": "docs"
   },
   "scripts": {
+    "lint": "eslint . --ext .ts",
     "build": "tsc",
     "start": "npm run build:live",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts",
-    "seed": "nodemon --watch \"src/seeds/**\" --ext \"ts\" --exec \"ts-node src/seeds/seed.ts\""
+    "seed": "nodemon --watch \"src/seeds/**\" --ext \"ts\" --exec \"ts-node src/seeds/seed.ts\"",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,13 @@
   "bugs": {
     "url": "https://github.com/dawsonlobo/vetms-bk/issues"
   },
+  "lint-staged": {
+    "**/*.{ts,tsx}": [
+      "npm run lint",
+      "npm run build --if-present",
+      "npx cspell --no-progress --no-summary"
+    ]
+  },
   "homepage": "https://github.com/dawsonlobo/vetms-bk#readme",
   "dependencies": {
     "@types/lodash": "^4.17.15",
@@ -30,6 +39,7 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
+    "eslint": "^9.21.0",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
@@ -61,6 +71,10 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",
     "@types/uniqid": "^5.3.4",
+    "cspell": "^8.17.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "standard-version": "^9.5.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
   }

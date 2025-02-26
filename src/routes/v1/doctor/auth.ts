@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Router } from "express";
 // import { loginController, refreshTokenController, logoutController, getDoctorProfile, updateDoctorProfile } from "../../../controllers/v1/doctor/auth";
 import * as doctor from "../../../controllers/v1/doctor/auth";
-import { authenticateDoctor } from "../../../middlewares/auth";
+// import { authenticateDoctor } from "../../../middlewares/auth";
 //import { entryPoint } from "../../../middlewares/entrypoint";
 //import { exitPoint } from "../../../middlewares/exitpoint";
 
@@ -135,7 +135,7 @@ router.post("/doctor/auth/login",
  */
 
 
-router.post("/doctor/auth/logout", authenticateDoctor, doctor.logoutController);
+// router.post("/doctor/auth/logout", authenticateDoctor, doctor.logoutController);
 /**
  * @swagger
  * /v1/doctor/auth/profile:
@@ -279,7 +279,7 @@ router.post("/doctor/auth/logout", authenticateDoctor, doctor.logoutController);
  */
 
 
-router.post("/doctor/auth/profile",authenticateDoctor , doctor.getDoctorProfile);
+// router.post("/doctor/auth/profile",authenticateDoctor , doctor.getDoctorProfile);
 
 /**
  * @swagger
@@ -346,7 +346,7 @@ router.post("/doctor/auth/profile",authenticateDoctor , doctor.getDoctorProfile)
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/doctor/auth/update",authenticateDoctor, doctor.updateDoctorProfile);
+// router.put("/doctor/auth/update",authenticateDoctor, doctor.updateDoctorProfile);
 
 /**
  * @swagger
@@ -417,6 +417,6 @@ router.put("/doctor/auth/update",authenticateDoctor, doctor.updateDoctorProfile)
 
 
 
-router.post("/doctor/auth/refresh",authenticateDoctor, doctor.refreshTokenController);
+// router.post("/doctor/auth/refresh",authenticateDoctor, doctor.refreshTokenController);
 
 export default router;

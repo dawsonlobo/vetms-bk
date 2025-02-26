@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Get the current branch
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Run npm version patch only on dev branch
+if [ "$branch" = "dev" ]; then
+    echo "Bumping version..."
+    npm version patch --no-git-tag-version
+    git add package.json package-lock.json
+    git commit -m "chore: bump version [skip ci]"
+    git push
+else
+    echo "Not on dev branch, skipping version bump."
+fi
+
+# Run lint, build, and spell check if scripts exist
+# if npm run | grep -q "lint"; then
+#     npm run lint
+# else
+#     echo "Skipping lint: script not found"
+# fi
+
+if npm run | grep -q "build"; then
+    npm run build --if-present
+else
+    echo "Skipping build: script not found"
+fi
+
+# Run cspell on all files (Fixes incorrect usage)
+# if command -v cspell >/dev/null 2>&1; then
+#     git diff --cached --name-only | grep -E '\.(ts|tsx|js|md|json|yml|yaml)$' | xargs -r npx cspell --no-progress --no-summary
+# else
+#     echo "Skipping spell check: cspell not found"
+# fi
