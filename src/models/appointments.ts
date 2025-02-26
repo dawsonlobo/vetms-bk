@@ -11,6 +11,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *         - doctorId
  *         - date
  *         - schedule
+ *         - status
  *       properties:
  *         _id:
  *           type: string
@@ -38,8 +39,21 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *             - SCHEDULED
  *             - COMPLETED
  *             - CANCELLED
- *           description: Status of the appointment
+ *           description: Status of the appointment schedule
  *           example: "SCHEDULED"
+ *         status:
+ *           type: string
+ *           enum:
+ *             - PENDING
+ *             - CANCELLED
+ *             - ATTENDED
+ *             - NOT_ATTENDED
+ *           description: Status of the appointment
+ *           example: "PENDING"
+ *         remarks:
+ *           type: string
+ *           description: Additional comments or notes about the appointment
+ *           example: "Patient requested a follow-up next week."
  *         isDeleted:
  *           type: boolean
  *           description: Indicates if the appointment record is marked as deleted
@@ -58,10 +72,12 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 
 // Define the Appointment Interface
 export interface IAppointment {
-  petId: mongoose.Types.ObjectId;
+  patientId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
   date: Date;
   schedule: "SCHEDULED" | "COMPLETED" | "CANCELLED";
+  status: "PENDING" | "CANCELLED" | "ATTENDED" | "NOT_ATTENDED";
+  remarks?: string;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -73,17 +89,20 @@ export interface IAppointmentModel extends IAppointment, Document {}
 // Define the Mongoose Schema
 const AppointmentSchema: Schema = new Schema(
   {
-    petId: { type: Schema.Types.ObjectId, ref: "pets", required: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: "doctors", required: true },
+    patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     date: { type: Date, required: true },
     schedule: { type: String, enum: ["SCHEDULED", "COMPLETED", "CANCELLED"], required: true },
-    isDeleted: { type: Boolean, default: false }, // Added isDeleted field
+    status: { type: String, enum: ["PENDING", "CANCELLED", "ATTENDED", "NOT_ATTENDED"], required: true },
+    remarks: { type: String, default: "" }, // Added remarks field
+    isDeleted: { type: Boolean, default: false }, 
   },
-  {     timestamps: true,
+  {     
+    timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
-} // Automatically manages createdAt and updatedAt
+  } 
 );
 
 // Export the Mongoose Model

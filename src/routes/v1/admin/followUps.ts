@@ -40,7 +40,7 @@ const asyncHandler = (
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   diagnosis: 1
  *                   createdAt: 1
  *     responses:
@@ -63,7 +63,7 @@ const asyncHandler = (
  *                       type: string
  *                       format: ObjectId
  *                       description: Unique ID of the follow-up record
- *                     petId:
+ *                     patientId:
  *                       type: string
  *                       format: ObjectId
  *                       description: Unique ID of the pet associated with the follow-up
@@ -100,7 +100,7 @@ const asyncHandler = (
  *                   message: "Success"
  *                   data:
  *                     _id: "6512c5f3e4b09a12d8f42b68"
- *                     petId: "6512c5f3e4b09a12d8f42b69"
+ *                     patientId: "6512c5f3e4b09a12d8f42b69"
  *                     doctorId: "6512c5f3e4b09a12d8f42b70"
  *                     diagnosis: "Skin infection due to allergy"
  *                     treatment: "Antibiotic injection and medicated shampoo"
@@ -167,7 +167,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *               summary: Projection Example
  *               value:
  *                 projection:
- *                   petId: 1
+ *                   patientId: 1
  *                   doctorId: 1
  *             date:
  *               summary: Using Single Date Filter
@@ -230,7 +230,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                           _id:
  *                             type: string
  *                             description: Unique follow-up ID
- *                           petId:
+ *                           patientId:
  *                             type: string
  *                             description: Pet ID
  *                           doctorId:
@@ -267,7 +267,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                     totalCount: 2
  *                     tableData:
  *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         petId: "66b3279c39c21f7342c125b4"
+ *                         patientId: "66b3279c39c21f7342c125b4"
  *                         doctorId: "66b3279c39c21f7342c152c5"
  *                         diagnosis: "Flu"
  *                         treatment: "Rest and fluids"
@@ -276,7 +276,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                         createdAt: "2025-02-05T07:30:00Z"
  *                         updatedAt: "2025-02-06T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c152c5"
- *                         petId: "65a3279c39c21f7342c125b4"
+ *                         patientId: "65a3279c39c21f7342c125b4"
  *                         doctorId: "65b437ac48d21e8343d256c7"
  *                         diagnosis: "Skin Infection"
  *                         treatment: "Antibiotic cream"
@@ -285,7 +285,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',asyncHandler(authenticateAdmin),
+router.post('/getAll',//asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import { AppointmentModel } from "../../../models/appointments"; // Import Appointment model
+import { AppointmentModel } from "../../../models/appointments"; 
+import { CONSTANTS } from "../../../config/constant";
+
 import { aggregateData } from "../../../utils/aggregation";
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -17,7 +19,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     const lookups = req.body?.lookupRequired ? [
       {
         $lookup: {
-          from: "patients", // Lookup patient details
+          from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, // Lookup patient details
           localField: "patientId",
           foreignField: "_id",
           as: "patientDetails"
@@ -28,7 +30,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       },
       {
         $lookup: {
-          from: "users", // Lookup doctor details
+          from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup doctor details
           localField: "doctorId",
           foreignField: "_id",
           as: "doctorDetails"
@@ -37,23 +39,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       { 
         $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
       }
-      // ,
-      // {
-      //   $project: { // Only return necessary fields
-      //     _id: 1,
-      //     date: 1,
-      //     schedule: 1,
-      //     isDeleted: 1,
-      //     "doctorDetails._id": 1,
-      //     "doctorDetails.name": 1,
-      //     "doctorDetails.email": 1,
-      //     "doctorDetails.role": 1,
-      //     "patientDetails._id": 1,
-      //     "patientDetails.name": 1,
-      //     "patientDetails.age": 1,
-      //     "patientDetails.species": 1
-      //   }
-      // }
+
     ] : [];
 
     //console.log("Lookup Pipeline:", JSON.stringify(lookups, null, 2)); // Debugging

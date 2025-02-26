@@ -90,7 +90,7 @@ export interface IBillItem {
 
 // Define the Billing Interface
 export interface IBilling {
-  petId: mongoose.Types.ObjectId;
+  patientId: mongoose.Types.ObjectId;
   receptionistId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
   totalAmount: number;
@@ -114,9 +114,9 @@ const BillItemSchema: Schema = new Schema({
 
 const BillingSchema: Schema = new Schema(
   {
-    petId: { type: Schema.Types.ObjectId, ref: "pets", required: true },
-    receptionistId: { type: Schema.Types.ObjectId, ref: "receptionists", required: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: "doctors", required: true },
+    patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
+    receptionistId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     totalAmount: { type: Number, required: true },
     billItems: { type: [BillItemSchema], required: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
