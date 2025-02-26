@@ -1,12 +1,9 @@
 import { Router,Request,Response,NextFunction } from 'express';
 import {createInventory,updateInventory,deleteInventory,getAll,getOne} from '../../../controllers/v1/admin/inventories'
 import { authenticateAdmin } from '../../../middlewares/auth';
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
 
-const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-};
 const router = Router();
 /**
  * @swagger
@@ -88,10 +85,11 @@ const router = Router();
  *                   data: "Inventory item created successfully"
  *                   toastMessage: "Item successfully added to inventory"
  */
-router.post('/create',asyncHandler(authenticateAdmin),
+router.post('/create',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }), 
     createInventory, 
-    //exitPoint
+    exitPoint
     );
 /**
  * @swagger
@@ -173,10 +171,11 @@ router.post('/create',asyncHandler(authenticateAdmin),
  *                   data: "Inventory item updated successfully"
  *                   toastMessage: "Item successfully updated"
  */
-router.put('/update/:id', asyncHandler(authenticateAdmin),
+router.put('/update/:id', 
+    entryPoint,
     //passport.authenticate('bearer', { session: false }),
      updateInventory, 
-    // exitPoint
+     exitPoint
     );
 
 /**
@@ -239,10 +238,11 @@ router.put('/update/:id', asyncHandler(authenticateAdmin),
  *               message: "error"
  *               error: "Inventory item not found"
  */
-router.delete('/delete/:id',asyncHandler(authenticateAdmin),
+router.delete('/delete/:id',
+    entryPoint,
     //passport.authenticate('bearer', { session: false }),
     deleteInventory, 
-    // exitPoint
+     exitPoint
     );
 /**
  * @swagger
@@ -404,7 +404,8 @@ router.delete('/delete/:id',asyncHandler(authenticateAdmin),
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',asyncHandler(authenticateAdmin),
+router.post('/getAll',
+    entryPoint,
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
@@ -490,10 +491,11 @@ router.post('/getAll',asyncHandler(authenticateAdmin),
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',asyncHandler(authenticateAdmin),
+router.post('/getOne/:id',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }),
      getOne,
-     //exitPoint
+     exitPoint
      );
 
      export default router;

@@ -1,12 +1,8 @@
 import { Router,Request,Response,NextFunction } from 'express';
 import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
 import { authenticateAdmin } from '../../../middlewares/auth';
-
-const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-};
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
 const router = Router()
 /**
 /**
@@ -91,10 +87,11 @@ const router = Router()
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
-router.post('/create',asyncHandler(authenticateAdmin),
+router.post('/create',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }), 
     createUser, 
-    //exitPoint
+    exitPoint
     );
 /**
  * @swagger
@@ -177,10 +174,11 @@ router.post('/create',asyncHandler(authenticateAdmin),
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
-router.put('/update/:id', asyncHandler(authenticateAdmin),
+router.put('/update/:id',
+     entryPoint,
     //passport.authenticate('bearer', { session: false }),
-     updateUser, 
-    // exitPoint
+     updateUser,
+    exitPoint
     );
 
 /**
@@ -233,10 +231,11 @@ router.put('/update/:id', asyncHandler(authenticateAdmin),
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
 */
-router.delete('/delete/:id',asyncHandler(authenticateAdmin),
+router.delete('/delete/:id',
+    entryPoint,
     //passport.authenticate('bearer', { session: false }),
     deleteUser, 
-    // exitPoint
+     exitPoint
     );
 /**
  * @swagger
@@ -392,10 +391,11 @@ router.delete('/delete/:id',asyncHandler(authenticateAdmin),
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
 
-router.post('/getAll',asyncHandler(authenticateAdmin),
+router.post('/getAll',
+    entryPoint,
    // passport.authenticate('bearer', { session: false }),
     getAll,
-    //exitPoint
+    exitPoint
     );
 /**
  * @swagger
@@ -482,9 +482,10 @@ router.post('/getAll',asyncHandler(authenticateAdmin),
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */
 
-router.post('/getOne/:id',asyncHandler(authenticateAdmin),
+router.post('/getOne/:id',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }),
      getOne,
-     //exitPoint
+     exitPoint
      );
  export default router;

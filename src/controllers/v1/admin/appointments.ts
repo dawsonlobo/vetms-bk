@@ -4,6 +4,7 @@ import { AppointmentModel } from "../../../models/appointments";
 import { CONSTANTS } from "../../../config/constant";
 
 import { aggregateData } from "../../../utils/aggregation";
+import { ErrorCodes } from "../../../models/models";
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -57,19 +58,21 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       lookups
     );
 
-    res.status(200).json({
-      status: 200,
-      message: "Success",
+   
+    req.apiStatus = {
+      isSuccess: true,
       data: { totalCount, tableData },
-    });
+      message: "Success",
+    };
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
       message: "Internal Server Error",
-      error,
-    });
-  }
+      toastMessage: "Something went wrong. Please try again.",
+    };
+  } next();
 };
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -126,17 +129,29 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     );
 
     if (!tableData.length) {
-      res.status(404).json({ status: 404, message: "Record not found or deleted" });
+      req.apiStatus = {
+        isSuccess: false,
+        message: "Record not found or deleted",
+        toastMessage: "No record found",
+      };
+      next();
       return;
     }
 
-    res.status(200).json({
-      status: 200,
+
+    req.apiStatus = {
+      isSuccess: true,
+      data: tableData[0],
       message: "Success",
-      data: tableData[0], // Access the first element of tableData
-    });
+    };
   } catch (error) {
     console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error });
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
+      message: "Internal Server Error",
+      toastMessage: "Something went wrong. Please try again.",
+    };
   }
+   next();
 };

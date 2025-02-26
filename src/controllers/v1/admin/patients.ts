@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { PatientModel } from "../../../models/patients"; // Import the Patient model
-import mongoose, { SortOrder } from "mongoose";
+import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
+import { ErrorCodes } from "../../../models/models";
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -26,23 +28,22 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate
     );
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-    });
+    };
+    return next();
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
-      message: "Internal Server Error",
-      error,
-    });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    return next();
   }
 };
-// Adjust path as needed
-
-// Ensure this path matches your project structure
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -50,22 +51,38 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     const { projection } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-       res.status(400).json({ status: 400, message: "Invalid ID" });
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1003],
+        toastMessage: "Invalid ID",
+      };
+      return next();
     }
 
     const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
 
     if (!result.tableData.length) {
-      res.status(404).json({ status: 404, message: "Record not found or deleted" });
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1004],
+        toastMessage: "Record not found or deleted",
+      };
+      return next();
     }
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: result.tableData[0], // Access the first element of tableData
-    });
+    };
+    return next();
   } catch (error) {
     console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error: error });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    return next();
   }
 };
