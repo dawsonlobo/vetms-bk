@@ -6,7 +6,7 @@ import path from "path";
 import { config } from "./config/config";
 import { initializeModels } from "./models/index";
 import { swaggerUi, swaggerSpec } from "./swagger";
-import "./config/passport"; // Ensure passport is configured before routes
+import "./passport/passport"; // Ensure passport is configured before routes
 import auth from "./routes/v1/admin/auth"; // Use the correct route file
 import patients from './routes/v1/admin/patients'
 import users from './routes/v1/admin/users'

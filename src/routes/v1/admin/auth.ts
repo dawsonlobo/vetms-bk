@@ -1,12 +1,17 @@
 import { Request, Response, NextFunction, Router } from "express";
 // import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../../../controllers/v1/admin/auth";
-import * as auth from "../../../controllers/v1/admin/auth";
+import passport from "../../../passport/passport";
+import * as auth from "../../../controllers/v1/admin/auth"
 //import * as au from "../../../middlewares/auth"
-import { verifyAdmin } from "../../../middlewares/auth";
+//import { verifyAdmin } from "../../../middlewares/auth";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { exitPoint } from "../../../middlewares/exitpoint";
 //import { entryPoint } from "../../../middlewares/entrypoint";
 //import { exitPoint } from "../../../middlewares/exitpoint";
 
 const router = Router();
+
+
 
 // const asyncHandler = (
 //     fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
@@ -84,11 +89,7 @@ const router = Router();
  */
 
 
-router.post("/admin/auth/login",
-    //entryPoint, 
-    auth.loginController
-    //,exitPoint
-    );
+router.post("/admin/auth/login",entryPoint, auth.loginController,exitPoint);
 
 
 
@@ -134,7 +135,7 @@ router.post("/admin/auth/login",
  */
 
 
-// router.post("/admin/auth/logout", verifyAdmin, auth.logoutController);
+router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),auth.logoutController,exitPoint);
 /**
  * @swagger
  * /v1/admin/auth/profile:
@@ -278,7 +279,7 @@ router.post("/admin/auth/login",
  */
 
 
-// router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAdminProfile));
+router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }), auth.getAdminProfile,exitPoint);
 
 /**
  * @swagger
@@ -345,7 +346,7 @@ router.post("/admin/auth/login",
  *                   type: string
  *                   example: "Updated successfully"
  */
-// router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAdminProfile));
+router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { session: false }), auth.updateAdminProfile,exitPoint);
 
 /**
  * @swagger
@@ -416,6 +417,6 @@ router.post("/admin/auth/login",
 
 
 
-// router.post("/admin/auth/refresh",asyncHandler(verifyAdmin), asyncHandler(refreshTokenController));
+router.post("/admin/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }), auth.refreshTokenController,exitPoint);
 
 export default router;

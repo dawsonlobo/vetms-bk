@@ -4,7 +4,7 @@ import * as Helper from "../utils/helper";
 
 declare global {
   namespace Express {
-    interface Request {
+    export interface Request {
       apiStatus?: {
         isSuccess?: boolean;
         message?: string;
