@@ -1,14 +1,11 @@
 import { Request, Response, NextFunction, Router } from "express";
 import { getAll, getOne, upsertBilling } from "../../../controllers/v1/admin/billings";
 import { authenticateAdmin } from "../../../middlewares/auth";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
 
 const router = Router();
 
-const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
 /**
  * @swagger
  * /v1/admin/billings/upsert:
@@ -114,8 +111,12 @@ const asyncHandler = (
  *                   type: "string"
  *                   example: "Billing updated successfully"
  */
-router.post('/upsert',upsertBilling);
-
+router.post('/upsert',
+  entryPoint,
+    // passport.authenticate('bearer', { session: false }),
+     upsertBilling,
+     exitPoint
+     );
 
 /**
  * @swagger
@@ -317,8 +318,13 @@ router.post('/upsert',upsertBilling);
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post('/getAll',//asyncHandler(authenticateAdmin),
- getAll);
+router.post('/getAll',
+  entryPoint,
+    // passport.authenticate('bearer', { session: false }),
+     getAll,
+     exitPoint
+     );
+
 
 
 /**
@@ -444,9 +450,10 @@ router.post('/getAll',//asyncHandler(authenticateAdmin),
  *                     createdAt: "2025-02-02T08:30:00Z"
  *                     updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post('/getOne/:id',asyncHandler(authenticateAdmin),
+router.post('/getOne/:id',
+  entryPoint,
     // passport.authenticate('bearer', { session: false }),
      getOne,
-     //exitPoint
+     exitPoint
      );
      export default router;

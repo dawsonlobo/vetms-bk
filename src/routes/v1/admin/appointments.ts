@@ -1,5 +1,8 @@
 import { Router,Request,Response } from 'express';
 import {getAll,getOne} from '../../../controllers/v1/admin/appointments'
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
+
 const router = Router();
 
 /**
@@ -169,9 +172,10 @@ const router = Router();
  */
 
 router.post('/getAll',
+   entryPoint,
    // passport.authenticate('bearer', { session: false }),
     getAll,
-    //exitPoint
+    exitPoint
     );
 
 /**
@@ -270,9 +274,10 @@ router.post('/getAll',
  */
 
 router.post('/getOne/:id',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }),
      getOne,
-     //exitPoint
+     exitPoint
      );
 
      export default router;

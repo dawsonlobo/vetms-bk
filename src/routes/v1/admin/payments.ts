@@ -1,12 +1,8 @@
 import { Router,Request,Response,NextFunction } from 'express';
 import { getAll, getOne } from '../../../controllers/v1/admin/payments';
 import { authenticateAdmin } from '../../../middlewares/auth';
-
-const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-};
+import { entryPoint } from '../../../middlewares/entrypoint';
+import { exitPoint } from '../../../middlewares/exitpoint';
 const router = Router()
 
 /**
@@ -166,10 +162,11 @@ const router = Router()
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',asyncHandler(authenticateAdmin),
+router.post('/getAll',
+    entryPoint,
    // passport.authenticate('bearer', { session: false }),
     getAll,
-    //exitPoint
+    exitPoint
     );
 /**
  * @swagger
@@ -260,9 +257,10 @@ router.post('/getAll',asyncHandler(authenticateAdmin),
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getOne/:id',asyncHandler(authenticateAdmin),
+router.post('/getOne/:id',
+    entryPoint,
     // passport.authenticate('bearer', { session: false }),
      getOne,
-     //exitPoint
+     exitPoint
      );
  export default router;
