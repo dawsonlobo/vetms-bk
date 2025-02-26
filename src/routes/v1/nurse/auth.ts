@@ -1,27 +1,25 @@
 import { Request, Response, NextFunction, Router } from "express";
-// import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../../../controllers/v1/admin/auth";
-import * as auth from "../../../controllers/v1/admin/auth";
-//import * as au from "../../../middlewares/auth"
-import { verifyAdmin } from "../../../middlewares/auth";
+import { loginController, refreshTokenController, logoutController, getNurseProfile, updateNurseProfile } from "../../../controllers/v1/nurse/auth";
+import { verifyNurse } from "../../../middlewares/auth";
 //import { entryPoint } from "../../../middlewares/entrypoint";
 //import { exitPoint } from "../../../middlewares/exitpoint";
 
 const router = Router();
 
-// const asyncHandler = (
-//     fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-// ) => (req: Request, res: Response, next: NextFunction) => {
-//     Promise.resolve(fn(req, res, next)).catch(next);
-// };
+const asyncHandler = (
+    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 
 /**
  * @swagger
- * /v1/admin/auth/login:
+ * /v1/nurse/auth/login:
  *   post:
  *     summary: login
- *     tags: [admin/auth]
+ *     tags: [nurse/auth]
  *     security:
- *       - adminBearerAuth: []
+ *        - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -31,10 +29,10 @@ const router = Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: "alex@example.com"
+ *                 example: "nurse@example.com"
  *               password:
  *                 type: string
- *                 example: "admin123"
+ *                 example: "Nurse@123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -57,13 +55,13 @@ const router = Router();
  *                       example: "6512c5f3e4b09a12d8f42b68"
  *                     name:
  *                       type: string
- *                       example: "Alex"
+ *                       example: "Nurse Jane"
  *                     email:
  *                       type: string
- *                       example: "alex@example.com"
+ *                       example: "nurse@example.com"
  *                     role:
  *                       type: string
- *                       example: "ADMIN"
+ *                       example: "NURSE"
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -84,9 +82,9 @@ const router = Router();
  */
 
 
-router.post("/admin/auth/login",
+router.post("/nurse/auth/login",
     //entryPoint, 
-    auth.loginController
+    loginController
     //,exitPoint
     );
 
@@ -95,12 +93,12 @@ router.post("/admin/auth/login",
 
 /**
  * @swagger
- * /v1/admin/auth/logout:
+ * /v1/nurse/auth/logout:
  *   post:
  *     summary: logout
- *     tags: [admin/auth]
+ *     tags: [nurse/auth]
  *     security:
- *       - adminBearerAuth: []
+ *        - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -127,22 +125,22 @@ router.post("/admin/auth/login",
  *                   example: "Success"
  *                 data:
  *                   type: string
- *                   example: "Admin logged out successfully"
+ *                   example: "Nurse logged out successfully"
  *                 toastMessage:
  *                   type: string
- *                   example: "Admin logged out successfully"
+ *                   example: "Nurse logged out successfully"
  */
 
 
-// router.post("/admin/auth/logout", verifyAdmin, auth.logoutController);
+router.post("/nurse/auth/logout", asyncHandler(verifyNurse), asyncHandler(logoutController));
 /**
  * @swagger
- * /v1/admin/auth/profile:
+ * /v1/nurse/auth/profile:
  *   post:
- *     summary: Get user profile 
- *     tags: [admin/auth]
+ *     summary: Get nurse profile 
+ *     tags: [nurse/auth]
  *     security:
- *       - adminBearerAuth: []
+ *        - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -226,13 +224,13 @@ router.post("/admin/auth/login",
  *                       example: "6512c5f3e4b09a12d8f42b68"
  *                     name:
  *                       type: string
- *                       example: "Admin User"
+ *                       example: "Nurse User"
  *                     email:
  *                       type: string
- *                       example: "admin@example.com"
+ *                       example: "nurse@example.com"
  *                     role:
  *                       type: string
- *                       example: "ADMIN"
+ *                       example: "NURSE"
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -259,9 +257,9 @@ router.post("/admin/auth/login",
  *                   message: "Success"
  *                   data:
  *                     _id: "6512c5f3e4b09a12d8f42b68"
- *                     name: "Admin User"
- *                     email: "admin@example.com"
- *                     role: "ADMIN"
+ *                     name: "Nurse User"
+ *                     email: "nurse@example.com"
+ *                     role: "NURSE"
  *                     createdAt: "2024-02-05T12:00:00Z"
  *                     updatedAt: "2024-02-06T15:30:00Z"
  *                     access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -278,16 +276,16 @@ router.post("/admin/auth/login",
  */
 
 
-// router.post("/admin/auth/profile", asyncHandler(verifyAdmin), asyncHandler(getAdminProfile));
+router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNurseProfile));
 
 /**
  * @swagger
- * /v1/admin/auth/update:
+ * /v1/nurse/auth/update:
  *   put:
  *     summary: Update user profile 
- *     tags: [admin/auth]
+ *     tags: [nurse/auth]
  *     security:
- *       - adminBearerAuth: []
+ *        - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -297,14 +295,14 @@ router.post("/admin/auth/login",
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Alex"
+ *                 example: "Nurse Jane"
  *               email:
  *                 type: string
- *                 example: "alex@example.com"
+ *                 example: "nurse@example.com"
  *               role:
  *                 type: string
  *                 enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
- *                 example: "DOCTOR"
+ *                 example: "NURSE"
  *               isDeleted:
  *                 type: boolean
  *                 example: false
@@ -316,9 +314,9 @@ router.post("/admin/auth/login",
  *             fullUpdate:
  *               summary: Full profile update
  *               value:
- *                 name: "Alex"
- *                 email: "alex@example.com"
- *                 role: "DOCTOR"
+ *                 name: "Nurse Jane"
+ *                 email: "nurse@example.com"
+ *                 role: "NURSE"
  *                 isDeleted: false
  *             partialUpdate:
  *               summary: Update only isDeleted status
@@ -345,16 +343,16 @@ router.post("/admin/auth/login",
  *                   type: string
  *                   example: "Updated successfully"
  */
-// router.put("/admin/auth/update",asyncHandler(verifyAdmin), asyncHandler(updateAdminProfile));
+router.put("/nurse/auth/update",asyncHandler(verifyNurse), asyncHandler(updateNurseProfile));
 
 /**
  * @swagger
- * /v1/admin/auth/refresh:
+ * /v1/nurse/auth/refresh:
  *   post:
  *     summary: Refresh user token 
- *     tags: [admin/auth]
+ *     tags: [nurse/auth]
  *     security:
- *       - adminBearerAuth: []
+ *        - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -387,13 +385,13 @@ router.post("/admin/auth/login",
  *                       example: "6512c5f3e4b09a12d8f42b68"
  *                     name:
  *                       type: string
- *                       example: "Admin User"
+ *                       example: "nurse User"
  *                     email:
  *                       type: string
- *                       example: "admin@example.com"
+ *                       example: "nurse@example.com"
  *                     role:
  *                       type: string
- *                       example: "ADMIN"
+ *                       example: "NURSE"
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -416,6 +414,6 @@ router.post("/admin/auth/login",
 
 
 
-// router.post("/admin/auth/refresh",asyncHandler(verifyAdmin), asyncHandler(refreshTokenController));
+router.post("/nurse/auth/refresh",asyncHandler(verifyNurse), asyncHandler(refreshTokenController));
 
 export default router;

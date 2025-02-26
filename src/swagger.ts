@@ -31,6 +31,12 @@ const options: swaggerJSDoc.Options = {
           bearerFormat: "JWT",
           description: "Specify the user token",
         },
+        nurseBearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Specify the nurse token",
+        },
         genericBearerAuth: {
           type: "http",
           scheme: "bearer",
@@ -43,6 +49,7 @@ const options: swaggerJSDoc.Options = {
       {
         adminBearerAuth: [],
         userBearerAuth: [],
+        nurseBearerAuth: [],
         genericBearerAuth: [],
       },
     ],
