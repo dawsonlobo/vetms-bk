@@ -3,6 +3,55 @@ import mongoose from "mongoose";
 import { BillingModel } from "../../../models/billings";
 import { aggregateData } from "../../../utils/aggregation";
 import {CONSTANTS } from "../../../config/constant"
+
+export const upsertBilling = async (req: Request, res: Response): Promise<void> => {
+  try {
+      const { _id, ...billingData } = req.body;
+
+      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
+          res.status(400).json({
+              status: 400,
+              message: "Invalid Billing ID",
+              toastMessage: "Invalid Billing ID provided",
+          });
+          return;
+      }
+
+      let isUpdate = Boolean(_id);
+      let billingRecord;
+
+      if (isUpdate) {
+          billingRecord = await BillingModel.findByIdAndUpdate(_id, billingData, { new: true }).exec();
+      } else {
+          billingRecord = await new BillingModel(billingData).save();
+      }
+
+      if (!billingRecord) {
+          res.status(404).json({
+              status: 404,
+              message: "Billing record not found",
+              toastMessage: "Billing record not found",
+          });
+          return;
+      }
+
+      res.status(200).json({
+          status: 200,
+          message: "Success",
+          data: isUpdate ? "Billing record updated successfully" : "Billing record added successfully",
+          toastMessage: isUpdate ? "Billing record updated successfully" : "Billing record added successfully",
+      });
+
+  } catch (error) {
+      console.error("Error in createUpdateBilling:", error);
+      res.status(500).json({
+          status: 500,
+          message: "Internal Server Error",
+          toastMessage: "Something went wrong. Please try again.",
+      });
+  }
+};
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
