@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { CONSTANTS } from "../config/constant";
 
 /**
  * @swagger
@@ -7,10 +8,9 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *     appointments:
  *       type: object
  *       required:
- *         - petId
+ *         - patientId
  *         - doctorId
  *         - date
- *         - schedule
  *         - status
  *       properties:
  *         _id:
@@ -18,35 +18,33 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           format: objectId
  *           description: Unique identifier for the appointment
  *           example: "507f1f77bcf86cd799439011"
- *         petId:
+ *         patientId:
  *           type: string
  *           format: objectId
- *           description: Unique identifier of the pet for the appointment
+ *           description: Unique identifier of the patient for the appointment
  *           example: "60d5ec49f72b4c0015d3b456"
  *         doctorId:
  *           type: string
  *           format: objectId
  *           description: Unique identifier of the doctor for the appointment
  *           example: "60d5ec49f72b4c0015d3b123"
+ *         nurseId:
+ *           type: string
+ *           format: objectId
+ *           nullable: true
+ *           description: Unique identifier of the assigned nurse (if applicable)
+ *           example: "60d5ec49f72b4c0015d3b789"
  *         date:
  *           type: string
  *           format: date
  *           description: Date of the appointment
  *           example: "2025-03-10"
- *         schedule:
- *           type: string
- *           enum: 
- *             - SCHEDULED
- *             - COMPLETED
- *             - CANCELLED
- *           description: Status of the appointment schedule
- *           example: "SCHEDULED"
  *         status:
  *           type: string
- *           enum:
+ *           enum: 
  *             - PENDING
  *             - CANCELLED
- *             - ATTENDED
+ *             - COMPLETED
  *             - NOT_ATTENDED
  *           description: Status of the appointment
  *           example: "PENDING"
@@ -54,6 +52,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           type: string
  *           description: Additional comments or notes about the appointment
  *           example: "Patient requested a follow-up next week."
+ *           default: ""
  *         isDeleted:
  *           type: boolean
  *           description: Indicates if the appointment record is marked as deleted
@@ -74,9 +73,9 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 export interface IAppointment {
   patientId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
+  nurseId?: mongoose.Types.ObjectId; // Added nurseId (optional)
   date: Date;
-  schedule: "SCHEDULED" | "COMPLETED" | "CANCELLED";
-  status: "PENDING" | "CANCELLED" | "ATTENDED" | "NOT_ATTENDED";
+  status: keyof typeof CONSTANTS.APPOINTMENT_STATUS; // Updated to use constants dynamically
   remarks?: string;
   isDeleted?: boolean;
   createdAt?: Date;
@@ -91,10 +90,10 @@ const AppointmentSchema: Schema = new Schema(
   {
     patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
     doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    nurseId: { type: Schema.Types.ObjectId, ref: "users" }, // Optional field
     date: { type: Date, required: true },
-    schedule: { type: String, enum: ["SCHEDULED", "COMPLETED", "CANCELLED"], required: true },
-    status: { type: String, enum: ["PENDING", "CANCELLED", "ATTENDED", "NOT_ATTENDED"], required: true },
-    remarks: { type: String, default: "" }, // Added remarks field
+    status: { type: String, enum: Object.values(CONSTANTS.APPOINTMENT_STATUS), required: true },
+    remarks: { type: String, default: "" }, // Default value set to an empty string
     isDeleted: { type: Boolean, default: false }, 
   },
   {     

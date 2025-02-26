@@ -7,7 +7,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *     billings:
  *       type: object
  *       required:
- *         - petId
+ *         - patientId
  *         - receptionistId
  *         - doctorId
  *         - totalAmount
@@ -18,7 +18,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           format: objectId
  *           description: Unique identifier for the bill
  *           example: "507f1f77bcf86cd799439011"
- *         petId:
+ *         patientId:
  *           type: string
  *           format: objectId
  *           description: Unique identifier of the pet

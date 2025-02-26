@@ -6,7 +6,7 @@ import { Schema, model, Document } from "mongoose";
  *     followUp:
  *       type: object
  *       required:
- *         - petId
+ *         - patientId
  *         - doctorId
  *         - diagnosis
  *         - treatment
@@ -18,7 +18,7 @@ import { Schema, model, Document } from "mongoose";
  *           format: ObjectId
  *           description: Unique ID of the follow-up record
  *           example: "6512c5f3e4b09a12d8f42b68"
- *         petId:
+ *         patientId:
  *           type: string
  *           format: ObjectId
  *           description: Unique ID of the pet associated with the follow-up
