@@ -118,7 +118,7 @@ router.post("/createupdate",followUp.createUpdateFollowUp);
  *     tags: 
  *        - doctor/followups
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token
+ *       - doctorBearerAuth: []  # Requires a bearer token
  *     parameters:
  *       - in: path
  *         name: id
@@ -227,7 +227,7 @@ router.post("/getone",followUp.getOne);
  *     tags: 
  *       - doctor/followups
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -292,7 +292,7 @@ router.post("/delete/:id",followUp.deleteFollowUp);
  *       - doctor/followups
  *     summary: Get all follow-ups
  *     security:
- *       - adminBearerAuth: []  # Requires authentication
+ *       - doctorBearerAuth: []  # Requires authentication
  *     requestBody:
  *       required: true
  *       content:

@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments"; // Import Appointment model
 import { aggregateData } from "../../../utils/aggregation";
 
+
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {

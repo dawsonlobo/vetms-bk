@@ -19,7 +19,7 @@ const router = Router();
  *     summary: login
  *     tags: [doctor/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -29,10 +29,13 @@ const router = Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: "alex@example.com"
+ *                 example: "aleyx@example.com"
  *               password:
  *                 type: string
- *                 example: "admin123"
+ *                 example: "Doctor@123"
+ *           example:
+ *              email: "aleyx@example.com"
+ *              password: "Doctor@123"  
  *     responses:
  *       200:
  *         description: Login successful
@@ -98,7 +101,7 @@ router.post("/doctor/auth/login",
  *     summary: logout
  *     tags: [doctor/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -140,7 +143,7 @@ router.post("/doctor/auth/logout", authenticateDoctor, doctor.logoutController);
  *     summary: Get user profile 
  *     tags: [doctor/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -285,7 +288,7 @@ router.post("/doctor/auth/profile",authenticateDoctor , doctor.getDoctorProfile)
  *     summary: Update user profile 
  *     tags: [doctor/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -352,7 +355,7 @@ router.put("/doctor/auth/update",authenticateDoctor, doctor.updateDoctorProfile)
  *     summary: Refresh user token 
  *     tags: [doctor/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - doctorBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

@@ -1,16 +1,27 @@
-import { Router,Request,Response } from 'express';
-import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/receptionist/appointments'
+import { Router,Request,Response, NextFunction } from 'express';
+import * as appointment from '../../../controllers/v1/doctor/appointments'
 const router = Router();
+
+
+
+
 
 /**
  * @swagger
- * /v1/receptionist/appointments/create:
+ * /v1/doctor/appointments/update/{_id}:
  *   post:
  *     tags:
- *       - receptionist/appointments
- *     summary: Create/Update an appointment record
+ *       - doctor/appointments
+ *     summary: Update an appointment record
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token for this route
+ *       - doctorBearerAuth: []  # Requires a bearer token for this route
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the appointment to retrieve
  *     requestBody:
  *       required: true
  *       content:
@@ -18,15 +29,12 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - petId
+ *               - patientId
  *               - doctorId
  *               - date
  *               - schedule
  *             properties:
- *               _id:
- *                 type: string
- *                 description: The unique ID of the appointment (for updates)
- *               petId:
+ *               v:
  *                 type: string
  *                 description: The ID of the pet for the appointment
  *               doctorId:
@@ -40,22 +48,11 @@ const router = Router();
  *                 type: string
  *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
  *                 description: Status of the appointment
- *               isDeleted:
- *                 type: boolean
- *                 description: Whether the appointment record is deleted
  *           examples:
- *             createAppointment:
- *               summary: Example request body for creating an appointment
- *               value:
- *                 petId: "66b3279c39c21f7342c100c4"
- *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-01T10:00:00.000Z"
- *                 schedule: "SCHEDULED"
  *             updateAppointment:
  *               summary: Example request body for updating an appointment
  *               value:
- *                 _id: "66b3279c39c21f7342c100c6"
- *                 petId: "66b3279c39c21f7342c100c4"
+ *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
  *                 date: "2025-03-05T14:00:00.000Z"
  *                 schedule: "COMPLETED"
@@ -81,13 +78,6 @@ const router = Router();
  *                   type: string
  *                   description: The message that is sent
  *             examples:
- *               createExample:
- *                 summary: Successful response for creating an appointment
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data: "Appointment added successfully"
- *                   toastMessage: "Appointment added successfully"
  *               updateExample:
  *                 summary: Successful response for updating an appointment
  *                 value:
@@ -96,194 +86,37 @@ const router = Router();
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.post('/create', createUpdate);
+
+router.post("/update/:_id",appointment.Update);
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**
  * @swagger
- * /v1/receptionist/appointments/getAll:
+ * /v1/doctor/appointments/getOne/{id}:
  *   post:
- *     tags:
- *       - receptionist/appointments
+ *     summary: Get one appointment 
+ *     tags: 
+ *        - doctor/appointments
  *     security:
- *       - adminBearerAuth: []
- *     summary: Get all 
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: "object"
- *             properties:
- *               projection:
- *                 type: object
- *                 description: Fields to include in the response (projection)
- *               filter:
- *                 type: object
- *                 description: Filters to apply when retrieving appointments
- *               options:
- *                 type: object
- *                 description: Options for pagination and sorting
- *               pagination:
- *                 type: object
- *                 description: Pagination settings for the response
- *               search:
- *                 type: array
- *                 description: Search settings for the request
- *                 items:
- *                   type: object
- *               date:
- *                 type: integer
- *                 description: The specific date in Unix timestamp format
- *               fromDate:
- *                 type: integer
- *                 description: The starting date in Unix timestamp format
- *               toDate:
- *                 type: integer
- *                 description: The ending date in Unix timestamp format
- *           examples:
- *             projectionExample:
- *               summary: Projection Example
- *               value:
- *                 projection:
- *                   _id: 1
- *                   petId: 1
- *                   doctorId: 1
- *                   date: 1
- *                   schedule: 1
- *                   createdAt: 1
- *                   updatedAt: 1
- *             filterExample:
- *               summary: Filter Example
- *               value:
- *                 filter:
- *                   doctorId: "66b3279c39c21f7342c13333"
- *                   schedule: "SCHEDULED"
- *                   petId: { "$in": ["66b3279c39c21f7342c12222", "66b3279c39c21f7342c14444"] }
- *             singleDateExample:
- *               summary: Multi-date Example
- *               value:
- *                 date: 1738658701
- *             multiDateExample:
- *               summary: Single-date Example
- *               value:
- *                 fromDate: 1707036301
- *                 toDate: 1738658701
- *             pagination:
- *               summary: Pagination Example
- *               value:
- *                 options:
- *                   page: 1
- *                   itemsPerPage: 10
- *             sortExample:
- *               summary: Sort Example
- *               value:
- *                 options:
- *                   sortBy:
- *                     - "createdAt"
- *                   sortDesc:
- *                     - true
- *             searchExample:
- *               summary: Search Example
- *               value:
- *                 search:
- *                   - term: "SCHEDULED"
- *                     fields: ["schedule"]
- *                     startsWith: true
- *     responses:
- *       200:
- *         description: Get all appointments.
- *         content:
- *           application/json:
- *             schema:
- *               type: "object"
- *               properties:
- *                 status:
- *                   type: "integer"
- *                   format: "int64"
- *                 message:
- *                   type: "string"
- *                 data:
- *                   type: "object"
- *                   properties:
- *                     totalCount:
- *                       type: "integer"
- *                       description: Total number of appointments
- *                     tableData:
- *                       type: "array"
- *                       items:
- *                         type: "object"
- *                         properties:
- *                           _id:
- *                             type: "string"
- *                             description: The unique ID of the appointment
- *                           petId:
- *                             type: "string"
- *                             description: The ID of the pet
- *                           doctorId:
- *                             type: "string"
- *                             description: The ID of the doctor
- *                           date:
- *                             type: "string"
- *                             format: "date-time"
- *                             description: The date and time of the appointment
- *                           schedule:
- *                             type: "string"
- *                             enum: ["SCHEDULED", "COMPLETED", "CANCELLED"]
- *                             description: The current status of the appointment
- *                           createdAt:
- *                             type: "string"
- *                             format: "date-time"
- *                             description: Timestamp when the appointment was created
- *                           updatedAt:
- *                             type: "string"
- *                             format: "date-time"
- *                             description: Timestamp when the appointment was last updated
- *             examples:
- *               example1:
- *                 summary: "Successful response with data"
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data:
- *                     totalCount: 2
- *                     tableData:
- *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         petId: "66b3279c39c21f7342c12222"
- *                         doctorId: "66b3279c39c21f7342c13333"
- *                         date: "2025-02-01T08:00:00Z"
- *                         schedule: "SCHEDULED"
- *                         createdAt: "2025-02-01T08:00:00Z"
- *                         updatedAt: "2025-02-01T08:00:00Z"
- *                     -   _id: "66b3279c39c21f7342c1520n"
- *                         petId: "66b3279c39c21f7342c14444"
- *                         doctorId: "66b3279c39c21f7342c15555"
- *                         date: "2025-02-02T10:30:00Z"
- *                         schedule: "COMPLETED"
- *                         createdAt: "2025-02-02T08:00:00Z"
- *                         updatedAt: "2025-02-02T08:00:00Z"
- */
-router.post('/getAll',
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    //exitPoint
-    );
-/**
- * @swagger
- * /v1/receptionist/appointments/getOne/{id}:
- *   post:
- *     tags:
- *       - receptionist/appointments
- *     security:
- *       - adminBearerAuth: []
- *     summary: Get one 
+ *       - doctorBearerAuth: []  # Requires a bearer token
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The unique identifier of the appointment to retrieve
+ *         description: The unique identifier of the follow-up record to retrieve
  *     requestBody:
  *       required: true
  *       content:
@@ -298,17 +131,15 @@ router.post('/getAll',
  *             projectionExample:
  *               summary: Example with projection
  *               value:
- *                 project:
+ *                 projection:
  *                   _id: 1
  *                   petId: 1
  *                   doctorId: 1
  *                   date: 1
  *                   schedule: 1
- *                   createdAt: 1
- *                   updatedAt: 1
  *     responses:
  *       200:
- *         description: Get one appointment.
+ *         description: Get one follow-up record.
  *         content:
  *           application/json:
  *             schema:
@@ -324,68 +155,136 @@ router.post('/getAll',
  *                   properties:
  *                     _id:
  *                       type: string
- *                       description: The unique ID of the appointment
+ *                       format: ObjectId
+ *                       description: Unique ID of the follow-up record
  *                     petId:
  *                       type: string
- *                       description: The ID of the pet associated with the appointment
+ *                       format: ObjectId
+ *                       description: Unique ID of the pet associated with the follow-up
  *                     doctorId:
  *                       type: string
- *                       description: The ID of the doctor assigned to the appointment
+ *                       format: ObjectId
+ *                       description: Unique ID of the doctor responsible for the follow-up
  *                     date:
  *                       type: string
- *                       format: date-time
- *                       description: The date and time of the appointment
+ *                       description: Diagnosis of the pet's condition
  *                     schedule:
  *                       type: string
- *                       enum: ["SCHEDULED", "COMPLETED", "CANCELLED"]
- *                       description: The status of the appointment
+ *                       description: Treatment provided to the pet
  *                     createdAt:
  *                       type: string
  *                       format: date-time
- *                       description: Timestamp when the appointment was created
+ *                       description: Timestamp when the follow-up record was created
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
- *                       description: Timestamp when the appointment was last updated
+ *                       description: Timestamp when the follow-up record was last updated
  *             examples:
- *               get-one-appointment:
+ *               get-one-followup:
  *                 summary: Successful response
  *                 value:
  *                   status: 200
  *                   message: "Success"
  *                   data:
- *                     _id: "66b3279c39c21f7342c1520a"
- *                     petId: "66b3279c39c21f7342c1520p"
- *                     doctorId: "66b3279c39c21f7342c1520d"
- *                     date: "2025-02-19T10:00:00Z"
+ *                     _id: "6512c5f3e4b09a12d8f42b68"
+ *                     petId: "6512c5f3e4b09a12d8f42b69"
+ *                     doctorId: "6512c5f3e4b09a12d8f42b70"
+ *                     date: 2025-03-01T10:00:00.000+00:00
  *                     schedule: "SCHEDULED"
- *                     createdAt: "2025-02-01T08:00:00Z"
- *                     updatedAt: "2025-02-01T08:00:00Z"
+ *                     createdAt: "2024-02-10T12:00:00Z"
+ *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     //exitPoint
-     );
+
+router.post("/getone/:id",appointment.getOne);
+
+
+
+
 /**
  * @swagger
- * /v1/receptionist/appointments/delete/{id}:
- *   delete:
- *     tags:
- *       - receptionist/appointments
- *     summary: Delete an appointment
+ * /v1/doctor/appointments/getall:
+ *   post:
+ *     tags: 
+ *       - doctor/appointments
+ *     summary: Get all appointments
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique identifier of the appointment to delete
+ *       - doctorBearerAuth: []  # Requires authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               projection:
+ *                 type: object
+ *                 description: Fields to include in the response
+ *               filter:
+ *                 type: object
+ *                 description: Filters to apply when retrieving follow-ups
+ *               options:
+ *                 type: object
+ *                 description: Options for pagination and sorting
+ *               pagination:
+ *                 type: object
+ *                 description: Pagination settings
+ *               search:
+ *                 type: array
+ *                 description: Search settings for the request
+ *                 items:
+ *                   type: object
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Specific date filter
+ *               fromDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Starting date filter
+ *               toDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Ending date filter
+ *           examples:
+ *             projection:
+ *               summary: Projection Example
+ *               value:
+ *                 projection:
+ *                   petId: 1
+ *                   doctorId: 1
+ *             date:
+ *               summary: Using Single Date Filter
+ *               value:
+ *                 date: 1738758000  # Epoch timestamp for 2025-02-05T07:00:00Z
+ *             dateRange:
+ *               summary: Using Date Range Filter (Epoch Time)
+ *               value:
+ *                 fromDate: 1738368000  # Epoch timestamp for 2025-02-01T00:00:00Z
+ *                 toDate: 1739222399  # Epoch timestamp for 2025-02-10T23:59:59Z
+ *             pagination:
+ *               summary: Pagination Example
+ *               value:
+ *                 options:
+ *                   page: 1
+ *                   itemsPerPage: 10
+ *             sortExample:
+ *               summary: Sort Example
+ *               value:
+ *                 options:
+ *                   sortBy:
+ *                     - "date"
+ *                   sortDesc:
+ *                     - true
+ *             searchExample:
+ *               summary: Search Example
+ *               value:
+ *                 search:
+ *                   - term: "CANCELLED"
+ *                     fields: ["schedule"]
+ *                     startsWith: true
  *     responses:
  *       200:
- *         description: Appointment deleted successfully
+ *         description: Get all follow-ups.
  *         content:
  *           application/json:
  *             schema:
@@ -395,24 +294,76 @@ router.post('/getOne/:id',
  *                   type: integer
  *                   format: int64
  *                   description: Status code
+ *                   example: 200
  *                 message:
  *                   type: string
- *                   description: Message describing the result of the operation
+ *                   description: Response message
+ *                   example: "Success"
  *                 data:
- *                   type: string
- *                   description: The data that is sent
- *                 toastMessage:
- *                   type: string
- *                   description: The message that is sent
+ *                   type: object
+ *                   properties:
+ *                     totalCount:
+ *                       type: integer
+ *                       description: Total number of follow-ups
+ *                     tableData:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                             format: ObjectId
+ *                             description: Unique ID of the follow-up record
+ *                           petId:
+ *                             type: string
+ *                             format: ObjectId
+ *                             description: Unique ID of the pet associated with the follow-up
+ *                           doctorId:
+ *                             type: string
+ *                             format: ObjectId
+ *                             description: Unique ID of the doctor responsible for the follow-up
+ *                           date:
+ *                             type: string
+ *                             description: Diagnosis of the pet's condition
+ *                           schedule:
+ *                             type: string
+ *                             description: Treatment provided to the pet
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                             description: Timestamp when the follow-up record was created
+ *                           updatedAt:
+ *                             type: string
+ *                             format: date-time
+ *                             description: Timestamp when the follow-up record was last updated
  *             examples:
- *               delete:
- *                 summary: Successful
+ *               example1:
+ *                 summary: "Successful response with follow-up data"
  *                 value:
  *                   status: 200
  *                   message: "Success"
- *                   data: "Appointment deleted successfully"
- *                   toastMessage: "Appointment deleted successfully"
+ *                   data:
+ *                     totalCount: 2
+ *                     tableData:
+ *                     -   _id: "66b3279c39c21f7342c125b4"
+ *                         petId: "6512c5f3e4b09a12d8f42b69"
+ *                         doctorId: "6512c5f3e4b09a12d8f42b70"
+ *                         date: 2025-03-01T10:00:00.000+00:00
+ *                         schedule: "SCHEDULED"
+ *                         createdAt: "2024-02-10T12:00:00Z"
+ *                         updatedAt: "2024-02-11T15:30:00Z" 
+ *                     -   _id: "67b9b29b0b78abeac1a39dbb"
+ *                         petId: "6512c5f3e4b09a12d8f42b69"
+ *                         doctorId: "6512c5f3e4b09a12d8f42b70"
+ *                         date: 2025-03-01T10:00:00.000+00:00
+ *                         schedule: "CANCELLED"
+ *                         createdAt: "2024-02-10T12:00:00Z"
+ *                         updatedAt: "2024-02-11T15:30:00Z" 
  */
-router.delete('/delete/:id', deleteAppointment);
 
-     export default router;
+router.post("/getall",appointment.getAll);
+
+
+
+
+export default router;

@@ -12,6 +12,7 @@ import patients from './routes/v1/admin/patients'
 import users from './routes/v1/admin/users'
 import inventories from './routes/v1/admin/inventories'
 import appointments from './routes/v1/admin/appointments'
+import doctorappointments from './routes/v1/doctor/appoitments'
 import followUps from './routes/v1/admin/followUps'
 import doctorFollowUps from './routes/v1/doctor/followUps'
 import billings from './routes/v1/admin/billings'
@@ -35,9 +36,11 @@ mongoose
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-app.use('/v1',auth)
-app.use('/v1',doctors)
-app.use('/v1/doctor/followups',doctorFollowUps)
+  app.use('/v1',doctors)
+  app.use('/v1/doctor/followups',doctorFollowUps)
+  app.use('/v1/doctor/appointments',doctorappointments)
+  
+  app.use('/v1',auth)
 app.use('/v1/admin/patients',patients)
 app.use('/v1/admin/users',users)
 app.use('/v1/admin/inventory',inventories)
