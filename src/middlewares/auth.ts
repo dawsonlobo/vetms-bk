@@ -4,30 +4,6 @@ import { config } from "../config/config"; // Correct import for config
 import { UserRole } from "../models/users";
 import { AccessToken } from "../models/accessTokens"; // Import UserRole if it's an enum or type
 
-//General authentication for any user (not role-specific)
-// export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-//     const authHeader: string | undefined = req.headers.authorization;
-
-//     if (!authHeader?.startsWith("Bearer ")) {  
-//         return res.status(401).json({ status: 401, message: "Unauthorized", data: "Unauthorized" });
-//     }
-
-//     const token = authHeader.split(" ")[1];
-
-//     try {
-//         const decoded = jwt.verify(token, config.JWT_SECRET);
-//         (req as any).user = decoded; // Attach decoded user details
-//         next();
-//     } catch (error) {
-//         if (error instanceof TokenExpiredError) {
-//             return res.status(401).json({ status: 401, message: "Token expired", data: "Token expired" });
-//         }
-//         if (error instanceof JsonWebTokenError) {
-//             return res.status(403).json({ status: 403, message: "Invalid token", data: "Invalid token" });
-//         }
-//         return res.status(500).json({ status: 500, message: "Internal server error", data: "Internal server error" });
-//     }
-// };
 
 // Middleware to verify Admin user
 export async function verifyAdmin(req: Request, res: Response, next: NextFunction) {
