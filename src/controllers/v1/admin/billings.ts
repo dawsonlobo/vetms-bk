@@ -3,47 +3,57 @@ import mongoose from "mongoose";
 import { BillingModel } from "../../../models/billings";
 import { aggregateData } from "../../../utils/aggregation";
 import {CONSTANTS } from "../../../config/constant"
-
 export const upsertBilling = async (req: Request, res: Response): Promise<void> => {
   try {
       const { _id, ...billingData } = req.body;
 
-      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
-          res.status(400).json({
-              status: 400,
-              message: "Invalid Billing ID",
-              toastMessage: "Invalid Billing ID provided",
+      if (_id) {
+          // Validate the ObjectId
+          if (!mongoose.Types.ObjectId.isValid(_id)) {
+              res.status(400).json({
+                  status: 400,
+                  message: "Invalid Billing ID",
+                  toastMessage: "Invalid Billing ID provided",
+              });
+              return;
+          }
+
+          // Check if the billing record exists
+          const existingBilling = await BillingModel.findById(_id).exec();
+          if (!existingBilling) {
+              res.status(404).json({
+                  status: 404,
+                  message: "Billing record not found",
+                  toastMessage: "Billing record not found",
+              });
+              return;
+          }
+
+          // If exists, update the billing record
+          const updatedBilling = await BillingModel.findByIdAndUpdate(_id, billingData, { new: true }).exec();
+
+          res.status(200).json({
+              status: 200,
+              message: "Billing record updated successfully",
+              data: updatedBilling,
+              toastMessage: "Billing record updated successfully",
           });
+
           return;
       }
 
-      let isUpdate = Boolean(_id);
-      let billingRecord;
+      // If no _id is provided, create a new billing record
+      const newBilling = await new BillingModel(billingData).save();
 
-      if (isUpdate) {
-          billingRecord = await BillingModel.findByIdAndUpdate(_id, billingData, { new: true }).exec();
-      } else {
-          billingRecord = await new BillingModel(billingData).save();
-      }
-
-      if (!billingRecord) {
-          res.status(404).json({
-              status: 404,
-              message: "Billing record not found",
-              toastMessage: "Billing record not found",
-          });
-          return;
-      }
-
-      res.status(200).json({
-          status: 200,
-          message: "Success",
-          data: isUpdate ? "Billing record updated successfully" : "Billing record added successfully",
-          toastMessage: isUpdate ? "Billing record updated successfully" : "Billing record added successfully",
+      res.status(201).json({
+          status: 201,
+          message: "Billing record created successfully",
+          data: newBilling,
+          toastMessage: "Billing record created successfully",
       });
 
   } catch (error) {
-      console.error("Error in createUpdateBilling:", error);
+      console.error("Error in upsertBilling:", error);
       res.status(500).json({
           status: 500,
           message: "Internal Server Error",
@@ -51,6 +61,7 @@ export const upsertBilling = async (req: Request, res: Response): Promise<void> 
       });
   }
 };
+
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
