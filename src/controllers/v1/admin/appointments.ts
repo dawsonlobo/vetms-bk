@@ -4,6 +4,9 @@ import { AppointmentModel } from "../../../models/appointments";
 import { CONSTANTS } from "../../../config/constant";
 
 import { aggregateData } from "../../../utils/aggregation";
+
+
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {

@@ -167,11 +167,13 @@ const router = Router();
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
+
 router.post('/getAll',
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
     );
+
 /**
  * @swagger
  * /v1/admin/appointments/getOne/{id}:
@@ -266,6 +268,7 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
+
 router.post('/getOne/:id',
     // passport.authenticate('bearer', { session: false }),
      getOne,

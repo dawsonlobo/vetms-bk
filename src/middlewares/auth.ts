@@ -33,16 +33,17 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 };
 
 // Middleware to verify Admin user
-export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
+export async function verifyAdmin  (req: Request, res: Response, next: NextFunction):Promise<void> {
     const authHeader: string | undefined = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-        return res.status(401).json({
+        res.status(401).json({
             status: 400,
             message: "Unauthorized",
             data: 'Unauthorized',
             toastMessage: "Authentication required.",
         });
+        return
     }
 
     const token = authHeader.split(" ")[1];
@@ -52,38 +53,42 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
         const user = await UserModel.findById(decoded.id);
 
         if (!user || user.role !== UserRole.ADMIN) {
-            return res.status(403).json({
+            res.status(403).json({
                 status: 400,
                 message: "Forbidden",
                 data: "Forbidden",
                 toastMessage: "Admin access required.",
             });
+            return 
         }
 
         req.user = user;
         next();
     } catch (error) {
         if (error instanceof TokenExpiredError) {
-            return res.status(401).json({
+            res.status(401).json({
                 status: 401,
                 message: "Token expired",
                 data: "Token expired",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return
         }
         if (error instanceof JsonWebTokenError) {
-            return res.status(403).json({
+            res.status(403).json({
                 status: 403,
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return 
         }
-        return res.status(500).json({
+        res.status(500).json({
             status: 500,
             message: "Internal server error",
             data: "Internal server error",
         });
+        return
     }
 };
 

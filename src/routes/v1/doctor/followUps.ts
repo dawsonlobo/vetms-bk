@@ -1,22 +1,124 @@
 import { Router,Request,Response, NextFunction } from 'express';
-import {getAll,getOne} from '../../../controllers/v1/admin/followUps'
+import * as followUp from '../../../controllers/v1/doctor/followUps'
 const router = Router();
-import { authenticateAdmin } from '../../../middlewares/auth';
 
-const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-};
+
+/**
+ * @swagger
+ *paths:
+ *  /v1/doctor/followUps/createupdate:
+ *    post:
+ *      summary: Create a new follow-up record
+ *      tags: 
+ *        - doctor/followups
+ *      security:
+ *        - doctorBearerAuth: []
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              required:
+ *                - patientId
+ *                - doctorId
+ *                - diagnosis
+ *                - treatment
+ *                - prescription
+ *                - visitDate
+ *              properties:
+ *                patientId:
+ *                  type: string
+ *                  format: ObjectId
+ *                  description: Unique ID of the pet associated with the follow-up
+ *                doctorId:
+ *                  type: string
+ *                  format: ObjectId
+ *                  description: Unique ID of the doctor responsible for the follow-up
+ *                diagnosis:
+ *                  type: string
+ *                  description: Diagnosis of the pet's condition
+ *                treatment:
+ *                  type: string
+ *                  description: Treatment provided to the pet
+ *                prescription:
+ *                  type: string
+ *                  description: Prescribed medications for the pet
+ *                visitDate:
+ *                  type: string
+ *                  format: date
+ *                  description: Date of the follow-up visit
+ *            examples:
+ *              create example:
+ *                summary: Example of a follow-up record
+ *                value:
+ *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  doctorId: "67bc480859691058622faf3e"
+ *                  diagnosis: "Skin infection due to allergy"
+ *                  treatment: "Antibiotic injection and medicated shampoo"
+ *                  prescription: "Amoxicillin 250mg, Antihistamines"
+ *                  visitDate: "2024-02-10"
+ *              update example:
+ *                summary: Another example of a follow-up record
+ *                value:
+ *                  id: "67bdace8322f42e09ffb8a18"
+ *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  doctorId: "67bc480859691058622faf3e"
+ *                  diagnosis: "Ear infection"
+ *                  treatment: "Ear drops and pain relief medication"
+ *                  prescription: "Otibiotic ointment, Ibuprofen"
+ *                  visitDate: "2024-03-15"
+ *      responses:
+ *        201:
+ *          description: Follow-up record created successfully
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  status:
+ *                    type: integer
+ *                    format: int64
+ *                    description: Status code
+ *                  message:
+ *                    type: string
+ *                    description: Message describing the result of the operation
+ *                  data:
+ *                    type: string
+ *                    description: The response data
+ *                  toastMessage:
+ *                    type: string
+ *                    description: The toast message
+ *              examples:
+ *                create example:
+ *                  summary: Successful follow-up record creation response
+ *                  value:
+ *                    status: 201
+ *                    message: "Success"
+ *                    data: "Follow-up record created successfully"
+ *                    toastMessage: "Follow-up recorded successfully"
+ *                update example:
+ *                  summary: Successful follow-up record creation response
+ *                  value:
+ *                    status: 201
+ *                    message: "Success"
+ *                    data: "Follow-up record created successfully"
+ *                    toastMessage: "Follow-up recorded successfully"
+ */
+
+
+
+router.post("/createupdate",followUp.createUpdateFollowUp);
 
 /**
  * @swagger
  * /v1/admin/followUps/getOne/{id}:
  *   post:
  *     summary: Get one follow-up 
- *     tags: [admin/followUps]
+ *     tags: 
+ *        - doctor/followups
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token
+ *       - doctorBearerAuth: []  # Requires a bearer token
  *     parameters:
  *       - in: path
  *         name: id
@@ -112,23 +214,85 @@ const asyncHandler = (
 
 
 
-router.post('/getOne/:id',asyncHandler(authenticateAdmin),
 
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     //exitPoint
-     );
+router.post("/getone",followUp.getOne);
+
 
 
 /**
  * @swagger
- * /v1/admin/followUps/getAll:
+ * /v1/doctor/followups/delete/{id}:
  *   post:
- *     tags:
- *       - admin/followups
+ *     summary: Delete a follow-up record
+ *     tags: 
+ *       - doctor/followups
+ *     security:
+ *       - doctorBearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the follow-up record to be deleted
+ *     responses:
+ *       200:
+ *         description: Follow-up record deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                   description: Status code
+ *                 message:
+ *                   type: string
+ *                   description: Message describing the result of the operation
+ *                 data:
+ *                   type: string
+ *                   description: The response data
+ *                 toastMessage:
+ *                   type: string
+ *                   description: The toast message
+ *             example:
+ *               status: 200
+ *               message: "Success"
+ *               data: "Follow-up record deleted successfully"
+ *               toastMessage: "Follow-up successfully deleted"
+ *       404:
+ *         description: Follow-up record not found or already deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ *             example:
+ *               status: 404
+ *               message: "error"
+ *               error: "Follow-up record not found or already deleted"
+ */
+
+router.post("/delete/:id",followUp.deleteFollowUp);
+
+
+/**
+ * @swagger
+ * /v1/admin/followUps/getall:
+ *   post:
+ *     tags: 
+ *       - doctor/followups
  *     summary: Get all follow-ups
  *     security:
- *       - adminBearerAuth: []  # Requires authentication
+ *       - doctorBearerAuth: []  # Requires authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -170,7 +334,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *               summary: Projection Example
  *               value:
  *                 projection:
- *                   patientId: 1
+ *                   petId: 1
  *                   doctorId: 1
  *             date:
  *               summary: Using Single Date Filter
@@ -233,7 +397,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                           _id:
  *                             type: string
  *                             description: Unique follow-up ID
- *                           patientId:
+ *                           petId:
  *                             type: string
  *                             description: Pet ID
  *                           doctorId:
@@ -270,7 +434,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                     totalCount: 2
  *                     tableData:
  *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         patientId: "66b3279c39c21f7342c125b4"
+ *                         petId: "66b3279c39c21f7342c125b4"
  *                         doctorId: "66b3279c39c21f7342c152c5"
  *                         diagnosis: "Flu"
  *                         treatment: "Rest and fluids"
@@ -279,7 +443,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                         createdAt: "2025-02-05T07:30:00Z"
  *                         updatedAt: "2025-02-06T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c152c5"
- *                         patientId: "65a3279c39c21f7342c125b4"
+ *                         petId: "65a3279c39c21f7342c125b4"
  *                         doctorId: "65b437ac48d21e8343d256c7"
  *                         diagnosis: "Skin Infection"
  *                         treatment: "Antibiotic cream"
@@ -289,10 +453,6 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
 
-router.post('/getAll',asyncHandler(authenticateAdmin),
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    //exitPoint
-    );
+router.post("/getall",followUp.getAll);
 
-    export default router;
+export default router;

@@ -37,23 +37,30 @@ const options: swaggerJSDoc.Options = {
           bearerFormat: "JWT",
           description: "Specify the nurse token",
         },
-        genericBearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description: "Enter any role's token",
-        },
+      },
+      doctorBearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "Specify the nurse token",
+      },
+      genericBearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "Enter any role's token",
       },
     },
-    security: [
-      {
-        adminBearerAuth: [],
-        userBearerAuth: [],
-        nurseBearerAuth: [],
-        genericBearerAuth: [],
-      },
-    ],
   },
+  security: [
+    {
+      adminBearerAuth: [],
+      userBearerAuth: [],
+      nurseBearerAuth: [],
+      genericBearerAuth: [],
+      doctorBearerAuth: []
+    },
+  ],
   apis: [
     "./src/routes/**/*.ts", // Routes folder
     "./src/models/*.ts", // Models of db

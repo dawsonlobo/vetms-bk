@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 import { FollowUp} from "../../../models/followUps"; // Import Appointment model
 import { aggregateData } from "../../../utils/aggregation";
 import {CONSTANTS} from "../../../config/constant";
+
+
+
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -79,7 +83,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-    const objectId = new mongoose.Types.ObjectId(id); // ✅ Convert string to ObjectId
+    const objectId = new mongoose.Types.ObjectId(id);
 
     // Ensure projection fields are properly formatted
     //const formattedProjection = Object.keys(projection).length ? projection : { _id: 1 }; // Default projection
@@ -108,3 +112,6 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     });
   }
 };
+
+
+
