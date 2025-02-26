@@ -32,9 +32,9 @@ const router = Router();
  *               - patientId
  *               - doctorId
  *               - date
- *               - schedule
+ *               - status
  *             properties:
- *               v:
+ *               _id:
  *                 type: string
  *                 description: The ID of the pet for the appointment
  *               doctorId:
@@ -44,7 +44,7 @@ const router = Router();
  *                 type: string
  *                 format: date-time
  *                 description: The scheduled date and time of the appointment
- *               schedule:
+ *               status:
  *                 type: string
  *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
  *                 description: Status of the appointment
@@ -55,7 +55,7 @@ const router = Router();
  *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
  *                 date: "2025-03-05T14:00:00.000Z"
- *                 schedule: "COMPLETED"
+ *                 status: "COMPLETED"
  *     responses:
  *       200:
  *         description: Appointment record created/updated successfully
@@ -88,15 +88,6 @@ const router = Router();
  */
 
 router.post("/update/:_id",appointment.Update);
-
-
-
-
-
-
-
-
-
 
 
 
@@ -136,7 +127,7 @@ router.post("/update/:_id",appointment.Update);
  *                   petId: 1
  *                   doctorId: 1
  *                   date: 1
- *                   schedule: 1
+ *                   status: 1
  *     responses:
  *       200:
  *         description: Get one follow-up record.
@@ -168,7 +159,7 @@ router.post("/update/:_id",appointment.Update);
  *                     date:
  *                       type: string
  *                       description: Diagnosis of the pet's condition
- *                     schedule:
+ *                     status:
  *                       type: string
  *                       description: Treatment provided to the pet
  *                     createdAt:
@@ -190,7 +181,7 @@ router.post("/update/:_id",appointment.Update);
  *                     petId: "6512c5f3e4b09a12d8f42b69"
  *                     doctorId: "6512c5f3e4b09a12d8f42b70"
  *                     date: 2025-03-01T10:00:00.000+00:00
- *                     schedule: "SCHEDULED"
+ *                     status: "SCHEDULED"
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
@@ -280,7 +271,7 @@ router.post("/getone/:id",appointment.getOne);
  *               value:
  *                 search:
  *                   - term: "CANCELLED"
- *                     fields: ["schedule"]
+ *                     fields: ["status"]
  *                     startsWith: true
  *     responses:
  *       200:
@@ -325,8 +316,9 @@ router.post("/getone/:id",appointment.getOne);
  *                           date:
  *                             type: string
  *                             description: Diagnosis of the pet's condition
- *                           schedule:
+ *                           status:
  *                             type: string
+ *                             enum: [SCHEDULED, COMPLETED, CANCELLED]
  *                             description: Treatment provided to the pet
  *                           createdAt:
  *                             type: string
@@ -349,14 +341,14 @@ router.post("/getone/:id",appointment.getOne);
  *                         petId: "6512c5f3e4b09a12d8f42b69"
  *                         doctorId: "6512c5f3e4b09a12d8f42b70"
  *                         date: 2025-03-01T10:00:00.000+00:00
- *                         schedule: "SCHEDULED"
+ *                         status: "SCHEDULED"
  *                         createdAt: "2024-02-10T12:00:00Z"
  *                         updatedAt: "2024-02-11T15:30:00Z" 
  *                     -   _id: "67b9b29b0b78abeac1a39dbb"
  *                         petId: "6512c5f3e4b09a12d8f42b69"
  *                         doctorId: "6512c5f3e4b09a12d8f42b70"
  *                         date: 2025-03-01T10:00:00.000+00:00
- *                         schedule: "CANCELLED"
+ *                         status: "CANCELLED"
  *                         createdAt: "2024-02-10T12:00:00Z"
  *                         updatedAt: "2024-02-11T15:30:00Z" 
  */

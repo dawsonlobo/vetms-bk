@@ -14,7 +14,7 @@ export const Update = async (req: Request, res: Response): Promise<void> => {
     try {
       
         const{_id}=req.params;
-        const { patientId, doctorId, date, schedule } = req.body;
+        const { patientId, doctorId, date, status } = req.body;
 
 
         const existingUser = await UserModel.findOne({ _id: new ObjectId(doctorId) });
@@ -41,7 +41,7 @@ export const Update = async (req: Request, res: Response): Promise<void> => {
               const existingApointment=await AppointmentModel.findOne({_id:new ObjectId(_id)});
               if(existingApointment){
 
-              const updateFields = { patientId, doctorId, date, schedule };
+              const updateFields = { patientId, doctorId, date, status };
               
             //   if (updateFields.isDeleted) {
             //     delete updateFields.isDeleted;
@@ -73,8 +73,6 @@ export const Update = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
 };
-
-
 
 
 

@@ -34,10 +34,11 @@
  *           type: string
  *           description: Breed of the pet
  *           example: "Golden Retriever"
- *         age:
- *           type: number
- *           description: Age of the pet in years
- *           example: 3
+ *         DOB:
+ *           type: string
+ *           format: date
+ *           description: Date of birth of the patient
+ *           example: "1990-05-15"
  *         weight:
  *           type: number
  *           description: Weight of the pet in kilograms
@@ -91,7 +92,7 @@ export interface IPatient {
   name: string;
   species: string;
   breed: string;
-  age: number;
+  DOB: Date;
   weight: number;
   gender: "MALE" | "FEMALE";
   medicalHistory: string;
@@ -121,7 +122,7 @@ const PatientSchema: Schema = new Schema(
     name: { type: String, required: true },
     species: { type: String, required: true },
     breed: { type: String, required: true },
-    age: { type: Number, required: true },
+    DOB: { type: Date, required: true },
     weight: { type: Number, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
     medicalHistory: { type: [String], required: true },
