@@ -7,7 +7,7 @@ import { config } from "./config/config";
 import { initializeModels } from "./models/index";
 import { swaggerUi, swaggerSpec } from "./swagger";
 import "./config/passport"; // Ensure passport is configured before routes
-import auth from "./routes/v1/admin/auth"; // Use the correct route file
+import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
 import patients from './routes/v1/admin/patients'
 import users from './routes/v1/admin/users'
 import inventories from './routes/v1/admin/inventories'
@@ -17,6 +17,7 @@ import billings from './routes/v1/admin/billings'
 import payments from './routes/v1/admin/payments'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
+import nurseAuth from "./routes/v1/nurse/auth"; 
  //import ngrok from "ngrok";//
 dotenv.config();
 
@@ -33,7 +34,7 @@ mongoose
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-app.use('/v1',auth)
+app.use('/v1',adminAuth)
 app.use('/v1/admin/patients',patients)
 app.use('/v1/admin/users',users)
 app.use('/v1/admin/inventory',inventories)
@@ -41,11 +42,10 @@ app.use('/v1/admin/appointments',appointments)
 app.use('/v1/admin/followUps',followUps)
 app.use('/v1/admin/billings',billings)
 app.use('/v1/admin/payments',payments)
-
-
 app.use('/v1/receptionist/patients',rPatients);
 app.use('/v1/receptionist/appointments',rAppointments);
 app.use(express.urlencoded({ extended: true }));
+app.use('/v1',nurseAuth)
 // app.use((req, res, next) => {
 //   res.setHeader("ngrok-skip-browser-warning", "true");
 //   next();
