@@ -10,6 +10,7 @@ import { CONSTANTS } from "../config/constant";
  *       required:
  *         - patientId
  *         - doctorId
+ *         - nurseId
  *         - date
  *         - status
  *       properties:
@@ -109,3 +110,4 @@ export const AppointmentModel: Model<IAppointmentModel> = mongoose.model<IAppoin
   "appointments",
   AppointmentSchema
 );
+  
