@@ -1,97 +1,39 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { config } from "../config/config"; // Correct import for config
-import UserModel from "../models/users";
-import { UserRole } from "../models/users";
+import UserModel, { UserRole } from "../models/users";
 import { AccessToken } from "../models/accessTokens"; // Import UserRole if it's an enum or type
-import { RefreshToken } from "../models/refreshTokens";
 
-// Middleware to verify any authenticated user
-//General authentication for any user (not role-specific)
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader: string | undefined = req.headers.authorization;
-
-    if (!authHeader?.startsWith("Bearer ")) {  
-        return res.status(401).json({ status: 401, message: "Unauthorized", data: "Unauthorized" });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    try {
-        const decoded = jwt.verify(token, config.JWT_SECRET);
-        (req as any).user = decoded; // Attach decoded user details
-        next();
-    } catch (error) {
-        if (error instanceof TokenExpiredError) {
-            return res.status(401).json({ status: 401, message: "Token expired", data: "Token expired" });
-        }
-        if (error instanceof JsonWebTokenError) {
-            return res.status(403).json({ status: 403, message: "Invalid token", data: "Invalid token" });
-        }
-        return res.status(500).json({ status: 500, message: "Internal server error", data: "Internal server error" });
-    }
-};
 
 // Middleware to verify Admin user
-export async function verifyAdmin  (req: Request, res: Response, next: NextFunction):Promise<void> {
-    const authHeader: string | undefined = req.headers.authorization;
+export async function verifyAdmin(req: Request, res: Response, next: NextFunction) {
+    console.log("Req User in verifyAdmin:", req.user); // Debugging
 
-    if (!authHeader?.startsWith("Bearer ")) {
+    if (!req.user) {
         res.status(401).json({
-            status: 400,
+            status: 401,
             message: "Unauthorized",
-            data: 'Unauthorized',
-            toastMessage: "Authentication required.",
+            data: "User authentication failed.",
+            toastMessage: "Please log in to continue.",
         });
-        return
+        return;
     }
 
-    const token = authHeader.split(" ")[1];
+    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
 
-    try {
-        const decoded: any = jwt.verify(token, config.JWT_SECRET);
-        const user = await UserModel.findById(decoded.id);
-
-        if (!user || user.role !== UserRole.ADMIN) {
-            res.status(403).json({
-                status: 400,
-                message: "Forbidden",
-                data: "Forbidden",
-                toastMessage: "Admin access required.",
-            });
-            return 
-        }
-
-        req.user = user;
-        next();
-    } catch (error) {
-        if (error instanceof TokenExpiredError) {
-            res.status(401).json({
-                status: 401,
-                message: "Token expired",
-                data: "Token expired",
-                toastMessage: "Session expired. Please log in again.",
-            });
-            return
-        }
-        if (error instanceof JsonWebTokenError) {
-            res.status(403).json({
-                status: 403,
-                message: "Invalid token",
-                data: "Invalid token",
-                toastMessage: "Session expired. Please log in again.",
-            });
-            return 
-        }
-        res.status(500).json({
-            status: 500,
-            message: "Internal server error",
-            data: "Internal server error",
+    if (user.role !== UserRole.ADMIN) {
+        res.status(403).json({
+            status: 403,
+            message: "Forbidden",
+            data: "Admin access required.",
+            toastMessage: "You do not have permission to access this resource.",
         });
-        return
+        return;
     }
-};
 
+    next();
+
+}
 
 //Specifically ensures that the token exists in the database and is valid for an admin user
 export const authenticateAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -256,70 +198,3 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         });
     }
 };
-
-// export const authenticateAdmin = async (req: Request, res: Response, next: NextFunction) => {
-//     const authHeader: string | undefined = req.headers.authorization;
-
-//     if (!authHeader?.startsWith("Bearer ")) {
-//         return res.status(401).json({
-//             status: 401,
-//             message: "Unauthorized",
-//             data: "Unauthorized",
-//             toastMessage: "Authentication required.",
-//         });
-//     }
-
-//     const token = authHeader.split(" ")[1];
-
-//     try {
-//         // Verify token
-//         const decoded: any = jwt.verify(token, config.JWT_SECRET);
-
-//         // Check if the token exists in DB (for extra security)
-//         const storedAccessToken = await AccessToken.findOne({ token });
-//         if (!storedAccessToken) {
-//             return res.status(403).json({
-//                 status: 403,
-//                 message: "Invalid or expired access token",
-//                 data: "Invalid or expired access token",
-//                 toastMessage: "Please log in again.",
-//             });
-//         }
-
-//         // Fetch the user and check role
-//         const user = await UserModel.findById(decoded.id);
-//         if (!user || user.role !== UserRole.ADMIN) {
-//             return res.status(403).json({
-//                 status: 403,
-//                 message: "Forbidden",
-//                 data: "Forbidden",
-//                 toastMessage: "Admin access required.",
-//             });
-//         }
-
-//         req.user = user;
-//         next();
-//     } catch (error) {
-//         if (error instanceof TokenExpiredError) {
-//             return res.status(401).json({
-//                 status: 401,
-//                 message: "Token expired",
-//                 data: "Token expired",
-//                 toastMessage: "Session expired. Please log in again.",
-//             });
-//         }
-//         if (error instanceof JsonWebTokenError) {
-//             return res.status(403).json({
-//                 status: 403,
-//                 message: "Invalid token",
-//                 data: "Invalid token",
-//                 toastMessage: "Session expired. Please log in again.",
-//             });
-//         }
-//         return res.status(500).json({
-//             status: 500,
-//             message: "Internal server error",
-//             data: "Internal server error",
-//         });
-//     }
-// };

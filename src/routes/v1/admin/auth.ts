@@ -1,23 +1,10 @@
 import { Request, Response, NextFunction, Router } from "express";
-// import { loginController, refreshTokenController, logoutController, getAdminProfile, updateAdminProfile } from "../../../controllers/v1/admin/auth";
 import passport from "../../../passport/passport";
 import * as auth from "../../../controllers/v1/admin/auth"
-//import * as au from "../../../middlewares/auth"
-//import { verifyAdmin } from "../../../middlewares/auth";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
-//import { entryPoint } from "../../../middlewares/entrypoint";
-//import { exitPoint } from "../../../middlewares/exitpoint";
-
 const router = Router();
-
-
-
-// const asyncHandler = (
-//     fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-// ) => (req: Request, res: Response, next: NextFunction) => {
-//     Promise.resolve(fn(req, res, next)).catch(next);
-// };
+import { verifyAdmin } from "../../../middlewares/auth";
 
 // /**
 //  * @swagger
@@ -135,7 +122,7 @@ router.post("/admin/auth/login",entryPoint, auth.loginController,exitPoint);
 //  */
 
 
-router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),auth.logoutController,exitPoint);
+router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin,auth.logoutController,exitPoint);
 /**
  * @swagger
  * /v1/admin/auth/profile:
@@ -279,7 +266,7 @@ router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { s
  */
 
 
-router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }), auth.getAdminProfile,exitPoint);
+router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.getAdminProfile,exitPoint);
 
 /**
  * @swagger
@@ -305,7 +292,7 @@ router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *               role:
  *                 type: string
  *                 enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
- *                 example: "DOCTOR"
+ *                 example: "ADMIN"
  *               isDeleted:
  *                 type: boolean
  *                 example: false
@@ -346,7 +333,7 @@ router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { session: false }), auth.updateAdminProfile,exitPoint);
+router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.updateAdminProfile,exitPoint);
 
 // /**
 //  * @swagger
@@ -417,6 +404,6 @@ router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { ses
 
 
 
-router.post("/admin/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }), auth.refreshTokenController,exitPoint);
+router.post("/admin/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.refreshTokenController,exitPoint);
 
 export default router;
