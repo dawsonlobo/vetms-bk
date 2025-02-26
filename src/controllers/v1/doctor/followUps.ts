@@ -63,7 +63,7 @@ export async function createFollowUp(req: Request, res: Response, next: NextFunc
 
 
 
-export async function getAll  (req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const {
       projection = {},
@@ -75,11 +75,18 @@ export async function getAll  (req: Request, res: Response, next: NextFunction):
       toDate,
     } = req.body;
 
+    // Remove isDeleted from projection to ensure it's never included
+    const sanitizedProjection = { ...projection };
+    delete sanitizedProjection.isDeleted;
+
+    // Ensure deleted records are not included in the filter
+    const sanitizedFilter = { ...filter, isDeleted: false };
+
     // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
       FollowUp,
-      filter,
-      projection,
+      sanitizedFilter,
+      sanitizedProjection,
       options,
       search,
       date,
@@ -103,6 +110,7 @@ export async function getAll  (req: Request, res: Response, next: NextFunction):
 };
 
 
+
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
@@ -113,13 +121,14 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-    const objectId = new mongoose.Types.ObjectId(id); //  Convert string to ObjectId
+    const objectId = new mongoose.Types.ObjectId(id); // Convert string to ObjectId
 
-    // Ensure projection fields are properly formatted
-    //const formattedProjection = Object.keys(projection).length ? projection : { _id: 1 }; // Default projection
+    // Remove isDeleted from projection to ensure it's never included
+    const sanitizedProjection = { ...projection };
+    delete sanitizedProjection.isDeleted;
 
     // Fetch follow-up data using aggregation
-    const { tableData } = await aggregateData(FollowUp, { _id: objectId, isDeleted: false }, projection);
+    const { tableData } = await aggregateData(FollowUp, { _id: objectId, isDeleted: false }, sanitizedProjection);
 
     if (!tableData || tableData.length === 0) {
       res.status(404).json({ status: 404, message: "FollowUp record not found or deleted" });
@@ -131,7 +140,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     res.status(200).json({
       status: 200,
       message: "Success",
-      data: followUpObj, // Only includes fields from projection
+      data: followUpObj, // Only includes fields from sanitizedProjection
     });
   } catch (error) {
     console.error("Error fetching FollowUp record:", error);
@@ -142,6 +151,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     });
   }
 };
+
 
 
 
@@ -189,3 +199,5 @@ export async function deleteFollowUp(req: Request, res: Response, next: NextFunc
         });
     }
 }
+
+

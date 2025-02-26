@@ -109,6 +109,9 @@ const asyncHandler = (
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
+
+
+
 router.post('/getOne/:id',asyncHandler(authenticateAdmin),
 
     // passport.authenticate('bearer', { session: false }),
