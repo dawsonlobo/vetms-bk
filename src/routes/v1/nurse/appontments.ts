@@ -1,6 +1,6 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router,Request,Response } from 'express';
 import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/nurse/appointments';
-import { body, validationResult } from "express-validator";
+
 const router = Router();
 
 /**
@@ -97,27 +97,7 @@ const router = Router();
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.post(
-    "/create",
-    [
-      body("petId").isMongoId().withMessage("Valid petId is required"),
-      body("doctorId").isMongoId().withMessage("Valid doctorId is required"),
-      body("date").isISO8601().withMessage("Valid date is required"),
-      body("schedule")
-        .isIn(["SCHEDULED", "COMPLETED", "CANCELLED"])
-        .withMessage('Schedule must be one of ["SCHEDULED", "COMPLETED", "CANCELLED"]'),
-      (req: Request, res: Response, next: NextFunction) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          return res.status(400).json({ status: 400, message: "Validation Error", errors: errors.array() });
-        }
-        next();
-      },
-    ],
-    createUpdate
-  );
-  
-  
+router.post('/create', createUpdate);
 
 
 /**
