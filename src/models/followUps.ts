@@ -62,7 +62,7 @@ import { Schema, model, Document } from "mongoose";
  */
 
 export interface IFollowUp extends Document {
-  petId: Schema.Types.ObjectId;
+  patientId: Schema.Types.ObjectId;
   doctorId: Schema.Types.ObjectId;
   diagnosis: string;
   treatment: string;
@@ -74,7 +74,7 @@ export interface IFollowUp extends Document {
 }
 
 const FollowUpSchema: Schema= new Schema({
-  petId: { type: Schema.Types.ObjectId, ref: "Pet", required: true },
+  patientId: { type: Schema.Types.ObjectId, ref: "Pet", required: true },
   doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   diagnosis: { type: String, required: true },
   treatment: { type: String, required: true },

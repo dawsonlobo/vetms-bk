@@ -33,16 +33,17 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 };
 
 // Middleware to verify Admin user
-export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
+export async function verifyAdmin  (req: Request, res: Response, next: NextFunction):Promise<void> {
     const authHeader: string | undefined = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-        return res.status(401).json({
+        res.status(401).json({
             status: 400,
             message: "Unauthorized",
             data: 'Unauthorized',
             toastMessage: "Authentication required.",
         });
+        return
     }
 
     const token = authHeader.split(" ")[1];
@@ -52,38 +53,42 @@ export const verifyAdmin = async (req: Request, res: Response, next: NextFunctio
         const user = await UserModel.findById(decoded.id);
 
         if (!user || user.role !== UserRole.ADMIN) {
-            return res.status(403).json({
+            res.status(403).json({
                 status: 400,
                 message: "Forbidden",
                 data: "Forbidden",
                 toastMessage: "Admin access required.",
             });
+            return 
         }
 
         req.user = user;
         next();
     } catch (error) {
         if (error instanceof TokenExpiredError) {
-            return res.status(401).json({
+            res.status(401).json({
                 status: 401,
                 message: "Token expired",
                 data: "Token expired",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return
         }
         if (error instanceof JsonWebTokenError) {
-            return res.status(403).json({
+            res.status(403).json({
                 status: 403,
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return 
         }
-        return res.status(500).json({
+        res.status(500).json({
             status: 500,
             message: "Internal server error",
             data: "Internal server error",
         });
+        return
     }
 };
 
@@ -142,6 +147,88 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
     }
 };
 
+
+
+
+export async function authenticateDoctor  (req: Request, res: Response, next: NextFunction) :Promise<void> {
+    try {
+        // Extract the token from headers
+        const accessToken = req.headers.authorization?.split(" ")[1];
+
+        if (!accessToken) {
+            res.status(401).json({
+                status: 401,
+                message: "Unauthorized",
+                data: "Unauthorized",
+                toastMessage: "Please log in again.",
+            });
+            return
+        }
+
+        // Check if the token exists in the database (ensures accessToken is valid)
+        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+        if (!storedAccessToken) {
+            res.status(403).json({
+                status: 403,
+                message: "Invalid or expired access token",
+                data: "Invalid or expired access token",
+                toastMessage: "Please log in again.",
+            });
+            return
+        }
+
+        // Decode and verify the JWT token
+        let decoded: any;
+        try {
+            decoded = jwt.verify(accessToken, config.JWT_SECRET);
+        } catch (error) {
+            res.status(403).json({
+                status: 403,
+                message: "Invalid token",
+                data: "Invalid token",
+                toastMessage: "Session expired. Please log in again.",
+            });
+            return
+        }
+
+        // Fetch user from the database
+        const user = await UserModel.findById(decoded.id);
+        if (!user) {
+            res.status(404).json({
+                status: 404,
+                message: "User not found",
+                data: "User not found",
+                toastMessage: "User does not exist.",
+            });
+            return
+        }
+
+        // Ensure user has role "doctor"
+        if (user.role !== "DOCTOR") {
+            res.status(403).json({
+                status: 403,
+                message: "Access denied",
+                data: "Only doctors are allowed",
+                toastMessage: "You are not authorized to access this resource.",
+            });
+            return
+        }
+
+        // Attach the decoded user ID and role to the request for further use
+        req.user = { id: user._id, role: user.role };
+
+        next(); // Proceed to the next middleware or controller
+    } catch (error) {
+        console.error("Error in authentication middleware:", error);
+        res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            data: "Internal server error",
+            toastMessage: "An error occurred while verifying authentication.",
+        });
+        return 
+    }
+};
 
 // export const authenticateAdmin = async (req: Request, res: Response, next: NextFunction) => {
 //     const authHeader: string | undefined = req.headers.authorization;

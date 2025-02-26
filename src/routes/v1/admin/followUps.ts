@@ -285,6 +285,7 @@ router.post('/getOne/:id',asyncHandler(authenticateAdmin),
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
+
 router.post('/getAll',asyncHandler(authenticateAdmin),
    // passport.authenticate('bearer', { session: false }),
     getAll,

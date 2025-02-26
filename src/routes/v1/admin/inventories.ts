@@ -8,6 +8,7 @@ const asyncHandler = (
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 const router = Router();
+
 /**
  * @swagger
  * /v1/admin/inventory/create:

@@ -1,13 +1,110 @@
 import { Router,Request,Response } from 'express';
-import {getAll,getOne} from '../../../controllers/v1/admin/appointments'
+import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/receptionist/appointments'
 const router = Router();
 
 /**
  * @swagger
- * /v1/admin/appointments/getAll:
+ * /v1/receptionist/appointments/create:
  *   post:
  *     tags:
- *       - admin/appointments
+ *       - receptionist/appointments
+ *     summary: Create/Update an appointment record
+ *     security:
+ *       - adminBearerAuth: []  # Requires a bearer token for this route
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - petId
+ *               - doctorId
+ *               - date
+ *               - schedule
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: The unique ID of the appointment (for updates)
+ *               petId:
+ *                 type: string
+ *                 description: The ID of the pet for the appointment
+ *               doctorId:
+ *                 type: string
+ *                 description: The ID of the doctor assigned to the appointment
+ *               date:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The scheduled date and time of the appointment
+ *               schedule:
+ *                 type: string
+ *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
+ *                 description: Status of the appointment
+ *               isDeleted:
+ *                 type: boolean
+ *                 description: Whether the appointment record is deleted
+ *           examples:
+ *             createAppointment:
+ *               summary: Example request body for creating an appointment
+ *               value:
+ *                 petId: "66b3279c39c21f7342c100c4"
+ *                 doctorId: "66b3279c39c21f7342c100c5"
+ *                 date: "2025-03-01T10:00:00.000Z"
+ *                 schedule: "SCHEDULED"
+ *             updateAppointment:
+ *               summary: Example request body for updating an appointment
+ *               value:
+ *                 _id: "66b3279c39c21f7342c100c6"
+ *                 petId: "66b3279c39c21f7342c100c4"
+ *                 doctorId: "66b3279c39c21f7342c100c5"
+ *                 date: "2025-03-05T14:00:00.000Z"
+ *                 schedule: "COMPLETED"
+ *     responses:
+ *       200:
+ *         description: Appointment record created/updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                   description: Status code
+ *                 message:
+ *                   type: string
+ *                   description: Message describing the result of the operation
+ *                 data:
+ *                   type: object
+ *                   description: The created or updated appointment record
+ *                 toastMessage:
+ *                   type: string
+ *                   description: The message that is sent
+ *             examples:
+ *               createExample:
+ *                 summary: Successful response for creating an appointment
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data: "Appointment added successfully"
+ *                   toastMessage: "Appointment added successfully"
+ *               updateExample:
+ *                 summary: Successful response for updating an appointment
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data: "Appointment record updated successfully"
+ *                   toastMessage: "Appointment record updated successfully"
+ */
+router.post('/create', createUpdate);
+
+
+/**
+ * @swagger
+ * /v1/receptionist/appointments/getAll:
+ *   post:
+ *     tags:
+ *       - receptionist/appointments
  *     security:
  *       - adminBearerAuth: []
  *     summary: Get all 
@@ -93,7 +190,6 @@ const router = Router();
  *                   - term: "SCHEDULED"
  *                     fields: ["schedule"]
  *                     startsWith: true
- *                     endsWith: false
  *     responses:
  *       200:
  *         description: Get all appointments.
@@ -167,19 +263,17 @@ const router = Router();
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-
 router.post('/getAll',
    // passport.authenticate('bearer', { session: false }),
     getAll,
     //exitPoint
     );
-
 /**
  * @swagger
- * /v1/admin/appointments/getOne/{id}:
+ * /v1/receptionist/appointments/getOne/{id}:
  *   post:
  *     tags:
- *       - admin/appointments
+ *       - receptionist/appointments
  *     security:
  *       - adminBearerAuth: []
  *     summary: Get one 
@@ -268,11 +362,57 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-
 router.post('/getOne/:id',
     // passport.authenticate('bearer', { session: false }),
      getOne,
      //exitPoint
      );
+/**
+ * @swagger
+ * /v1/receptionist/appointments/delete/{id}:
+ *   delete:
+ *     tags:
+ *       - receptionist/appointments
+ *     summary: Delete an appointment
+ *     security:
+ *       - adminBearerAuth: []  # Requires a bearer token
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the appointment to delete
+ *     responses:
+ *       200:
+ *         description: Appointment deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                   description: Status code
+ *                 message:
+ *                   type: string
+ *                   description: Message describing the result of the operation
+ *                 data:
+ *                   type: string
+ *                   description: The data that is sent
+ *                 toastMessage:
+ *                   type: string
+ *                   description: The message that is sent
+ *             examples:
+ *               delete:
+ *                 summary: Successful
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data: "Appointment deleted successfully"
+ *                   toastMessage: "Appointment deleted successfully"
+ */
+router.delete('/delete/:id', deleteAppointment);
 
      export default router;
