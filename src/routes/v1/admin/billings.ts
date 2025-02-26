@@ -1,13 +1,122 @@
 import { Request, Response, NextFunction, Router } from "express";
-import {getAll,getOne} from '../../../controllers/v1/admin/billings'
+import { getAll, getOne, upsertBilling } from "../../../controllers/v1/admin/billings";
+import { authenticateAdmin } from "../../../middlewares/auth";
+
 const router = Router();
-import { authenticateAdmin } from '../../../middlewares/auth';
 
 const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
 ) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+  Promise.resolve(fn(req, res, next)).catch(next);
 };
+/**
+ * @swagger
+ * /v1/admin/billings/upsert:
+ *   post:
+ *     tags:
+ *       - admin/billings
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Upsert a billing record 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: "object"
+ *             properties:
+ *               _id:
+ *                 type: "string"
+ *                 description: The unique ID of the billing record (if updating)
+ *                 example: "65d1234567abcdef12345678"
+ *               patientId:
+ *                 type: "string"
+ *                 description: The ID of the patient associated with the billing
+ *                 example: "65d9ab12cd34ef56789abcd1"
+ *               receptionistId:
+ *                 type: "string"
+ *                 description: The ID of the receptionist handling the billing
+ *                 example: "65d9abcd1234ef56789abcdef"
+ *               doctorId:
+ *                 type: "string"
+ *                 description: The ID of the doctor associated with the billing
+ *                 example: "65d9abcdef123456789abcde"
+ *               totalAmount:
+ *                 type: "number"
+ *                 format: "float"
+ *                 description: The total amount billed
+ *                 example: 1500.75
+ *               billItems:
+ *                 type: "array"
+ *                 description: List of items in the bill
+ *                 items:
+ *                   type: "object"
+ *                   properties:
+ *                     name:
+ *                       type: "string"
+ *                       description: Name of the billed item
+ *                       example: "general checkup"
+ *                     description:
+ *                       type: "string"
+ *                       description: Description of the billed item
+ *                       example: "normal checkup of pet"
+ *                     price:
+ *                       type: "number"
+ *                       format: "float"
+ *                       description: Price of the billed item
+ *                       example: 500.25
+ *                     quantity:
+ *                       type: "integer"
+ *                       description: Quantity of the billed item
+ *                       example: 1
+ *                     amount:
+ *                       type: "number"
+ *                       format: "float"
+ *                       description: Amount for the billed item
+ *                       example: 500.25
+ *     responses:
+ *       201:
+ *         description: Billing record created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: "object"
+ *               properties:
+ *                 status:
+ *                   type: "integer"
+ *                   example: 201
+ *                 message:
+ *                   type: "string"
+ *                   example: "Success"
+ *                 data:
+ *                   type: "string"
+ *                   example: "Billing record created successfully"
+ *                 toastMessage:
+ *                   type: "string"
+ *                   example: "Billing successfully added"
+ *       200:
+ *         description: Billing record updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: "object"
+ *               properties:
+ *                 status:
+ *                   type: "integer"
+ *                   example: 200
+ *                 message:
+ *                   type: "string"
+ *                   example: "Success"
+ *                 data:
+ *                   type: "string"
+ *                   example: "Billing record updated successfully"
+ *                 toastMessage:
+ *                   type: "string"
+ *                   example: "Billing updated successfully"
+ */
+router.post('/upsert',upsertBilling);
+
+
 /**
  * @swagger
  * /v1/admin/billings/getAll:
