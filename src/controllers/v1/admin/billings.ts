@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { BillingModel } from "../../../models/billings";
 import { aggregateData } from "../../../utils/aggregation";
-
+import {CONSTANTS } from "../../../config/constant"
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -15,6 +15,43 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate,
     } = req.body;
 
+    const lookups = req.body?.lookupRequired ? [
+      {
+        $lookup: {
+          from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, // Lookup patient details
+          localField: "patientId",
+          foreignField: "_id",
+          as: "patientDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
+      },
+      {
+        $lookup: {
+          from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup doctor details
+          localField: "doctorId",
+          foreignField: "_id",
+          as: "doctorDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
+      },
+      {
+        $lookup: {
+          from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup receptionist details
+          localField: "receptionistId",
+          foreignField: "_id",
+          as: "receptionistDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$receptionistDetails", preserveNullAndEmptyArrays: true } 
+      }
+    ] : [];
+
+    // Now, call aggregateData only once
     const { totalCount, tableData } = await aggregateData(
       BillingModel,
       filter,
@@ -23,19 +60,17 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
+      lookups
     );
 
     res.status(200).json({
       status: 200,
       message: "Success",
-      data: {
-        totalCount,
-        tableData,
-      },
+      data: { totalCount, tableData },
     });
   } catch (error) {
-    console.error("Error fetching bills:", error);
+    console.error("Error fetching data:", error);
     res.status(500).json({
       status: 500,
       message: "Internal Server Error",

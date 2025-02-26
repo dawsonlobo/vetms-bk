@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { FollowUp} from "../../../models/followUps"; // Import Appointment model
 import { aggregateData } from "../../../utils/aggregation";
-
+import {CONSTANTS} from "../../../config/constant";
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -15,7 +15,32 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate,
     } = req.body;
 
-    // Call reusable aggregation function
+    const lookups = req.body?.lookupRequired ? [
+      {
+        $lookup: {
+          from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, // Lookup patient details
+          localField: "patientId",
+          foreignField: "_id",
+          as: "patientDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
+      },
+      {
+        $lookup: {
+          from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup doctor details
+          localField: "doctorId",
+          foreignField: "_id",
+          as: "doctorDetails"
+        }
+      },
+      { 
+        $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
+      }
+    ] : [];
+
+    // Now, call aggregateData only once
     const { totalCount, tableData } = await aggregateData(
       FollowUp,
       filter,
@@ -24,7 +49,8 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
+      lookups
     );
 
     res.status(200).json({
@@ -41,6 +67,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     });
   }
 };
+
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {

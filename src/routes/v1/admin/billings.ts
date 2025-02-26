@@ -56,7 +56,7 @@ const asyncHandler = (
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   receptionistId: 1
  *                   doctorId: 1
  *                   totalAmount: 1
@@ -121,7 +121,7 @@ const asyncHandler = (
  *                           _id:
  *                             type: "string"
  *                             description: The unique ID of the billing record
- *                           petId:
+ *                           patientId:
  *                             type: "string"
  *                             description: The ID of the pet associated with the billing
  *                           receptionistId:
@@ -168,7 +168,7 @@ const asyncHandler = (
  *                     totalCount: 2
  *                     tableData:
  *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         petId: "66b3279c39c21f7342c1520p"
+ *                         patientId: "66b3279c39c21f7342c1520p"
  *                         receptionistId: "66b3279c39c21f7342c178d"
  *                         doctorId: "66b3279c39c21f7342c19ab"
  *                         totalAmount: 5000.75
@@ -188,7 +188,7 @@ const asyncHandler = (
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
- *                         petId: "66b3279c39c21f7342c1520q"
+ *                         patientId: "66b3279c39c21f7342c1520q"
  *                         receptionistId: "66b3279c39c21f7342c178e"
  *                         doctorId: "66b3279c39c21f7342c19ac"
  *                         totalAmount: 3000.50
@@ -208,7 +208,8 @@ const asyncHandler = (
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post('/getAll',asyncHandler(authenticateAdmin), getAll);
+router.post('/getAll',//asyncHandler(authenticateAdmin),
+ getAll);
 
 
 /**
@@ -243,7 +244,7 @@ router.post('/getAll',asyncHandler(authenticateAdmin), getAll);
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   receptionistId: 1
  *                   doctorId: 1
  *                   totalAmount: 1
@@ -269,7 +270,7 @@ router.post('/getAll',asyncHandler(authenticateAdmin), getAll);
  *                     _id:
  *                       type: string
  *                       description: The unique ID of the billing record
- *                     petId:
+ *                     patientId:
  *                       type: string
  *                       description: The ID of the pet associated with the billing
  *                     receptionistId:
@@ -314,7 +315,7 @@ router.post('/getAll',asyncHandler(authenticateAdmin), getAll);
  *                   message: "Success"
  *                   data:
  *                     _id: "66b3279c39c21f7342c1520n"
- *                     petId: "66b3279c39c21f7342c1520q"
+ *                     patientId: "66b3279c39c21f7342c1520q"
  *                     receptionistId: "66b3279c39c21f7342c178e"
  *                     doctorId: "66b3279c39c21f7342c19ac"
  *                     totalAmount: 3000.00

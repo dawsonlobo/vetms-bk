@@ -9,6 +9,7 @@ import { swaggerUi, swaggerSpec } from "./swagger";
 import "./config/passport"; // Ensure passport is configured before routes
 import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
 import "./passport/passport"; // Ensure passport is configured before routes
+//import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
 import patients from './routes/v1/admin/patients'
 import users from './routes/v1/admin/users'
 import inventories from './routes/v1/admin/inventories'
@@ -19,7 +20,7 @@ import payments from './routes/v1/admin/payments'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
 import nurseAuth from "./routes/v1/nurse/auth"; 
- //import ngrok from "ngrok";//
+import ngrok from "ngrok";
 dotenv.config();
 
 const app = express();
@@ -66,4 +67,16 @@ app.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer:
 
 //add
 const port = config.PORT || 8000;
-app.listen(port, () => console.log(`🚀 Server running on http://localhost:${port}`));
+//app.listen(port, () => console.log(`🚀 Server running on http://localhost:${port}`));
+app.listen(port, async () => {
+  console.log(`Server is running on http://localhost:${port}`);
+  try {
+    const url = await ngrok.connect({
+      addr: port,
+      authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
+    });
+    console.log(`Ngrok tunnel available at: ${url}`);
+  } catch (error) {
+    console.error("Error starting ngrok:", error);
+  }
+});

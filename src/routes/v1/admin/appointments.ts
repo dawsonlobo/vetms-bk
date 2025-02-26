@@ -50,7 +50,7 @@ const router = Router();
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   doctorId: 1
  *                   date: 1
  *                   schedule: 1
@@ -121,7 +121,7 @@ const router = Router();
  *                           _id:
  *                             type: "string"
  *                             description: The unique ID of the appointment
- *                           petId:
+ *                           patientId:
  *                             type: "string"
  *                             description: The ID of the pet
  *                           doctorId:
@@ -153,14 +153,14 @@ const router = Router();
  *                     totalCount: 2
  *                     tableData:
  *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         petId: "66b3279c39c21f7342c12222"
+ *                         patientId: "66b3279c39c21f7342c12222"
  *                         doctorId: "66b3279c39c21f7342c13333"
  *                         date: "2025-02-01T08:00:00Z"
  *                         schedule: "SCHEDULED"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
- *                         petId: "66b3279c39c21f7342c14444"
+ *                         patientId: "66b3279c39c21f7342c14444"
  *                         doctorId: "66b3279c39c21f7342c15555"
  *                         date: "2025-02-02T10:30:00Z"
  *                         schedule: "COMPLETED"
@@ -204,7 +204,7 @@ router.post('/getAll',
  *               value:
  *                 project:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   doctorId: 1
  *                   date: 1
  *                   schedule: 1
@@ -229,7 +229,7 @@ router.post('/getAll',
  *                     _id:
  *                       type: string
  *                       description: The unique ID of the appointment
- *                     petId:
+ *                     patientId:
  *                       type: string
  *                       description: The ID of the pet associated with the appointment
  *                     doctorId:
@@ -259,7 +259,7 @@ router.post('/getAll',
  *                   message: "Success"
  *                   data:
  *                     _id: "66b3279c39c21f7342c1520a"
- *                     petId: "66b3279c39c21f7342c1520p"
+ *                     patientId: "66b3279c39c21f7342c1520p"
  *                     doctorId: "66b3279c39c21f7342c1520d"
  *                     date: "2025-02-19T10:00:00Z"
  *                     schedule: "SCHEDULED"
