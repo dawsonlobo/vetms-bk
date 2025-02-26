@@ -31,7 +31,7 @@ const app = express();
 app.use(express.json()); // Enable JSON parsing
 app.use(passport.initialize()); // Initialize Passport.js//
 
-// Connect to MongoDB
+// Connect to MongoDB using Mongoose
 mongoose
   .connect(config.MONGODB_URI)
   .then(async () => {
