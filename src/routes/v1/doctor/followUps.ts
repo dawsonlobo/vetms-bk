@@ -6,7 +6,7 @@ const router = Router();
 /**
  * @swagger
  *paths:
- *  /v1/doctor/followUps/create:
+ *  /v1/doctor/followUps/createupdate:
  *    post:
  *      summary: Create a new follow-up record
  *      tags: 
@@ -49,20 +49,21 @@ const router = Router();
  *                  format: date
  *                  description: Date of the follow-up visit
  *            examples:
- *              Example 1:
+ *              create example:
  *                summary: Example of a follow-up record
  *                value:
- *                  patientId: "67b6c39098c669e6c66adef8"
- *                  doctorId: "67bbfed74cea23da08bb62a6"
+ *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  doctorId: "67bc480859691058622faf3e"
  *                  diagnosis: "Skin infection due to allergy"
  *                  treatment: "Antibiotic injection and medicated shampoo"
  *                  prescription: "Amoxicillin 250mg, Antihistamines"
  *                  visitDate: "2024-02-10"
- *              Example 2:
+ *              update example:
  *                summary: Another example of a follow-up record
  *                value:
- *                  patientId: "6512c5f3e4b09a12d8f42b80"
- *                  doctorId: "6512c5f3e4b09a12d8f42b81"
+ *                  id: "67bdace8322f42e09ffb8a18"
+ *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  doctorId: "67bc480859691058622faf3e"
  *                  diagnosis: "Ear infection"
  *                  treatment: "Ear drops and pain relief medication"
  *                  prescription: "Otibiotic ointment, Ibuprofen"
@@ -89,7 +90,14 @@ const router = Router();
  *                    type: string
  *                    description: The toast message
  *              examples:
- *                example1:
+ *                create example:
+ *                  summary: Successful follow-up record creation response
+ *                  value:
+ *                    status: 201
+ *                    message: "Success"
+ *                    data: "Follow-up record created successfully"
+ *                    toastMessage: "Follow-up recorded successfully"
+ *                update example:
  *                  summary: Successful follow-up record creation response
  *                  value:
  *                    status: 201
@@ -100,7 +108,7 @@ const router = Router();
 
 
 
-router.post("/create",followUp.createFollowUp);
+router.post("/createupdate",followUp.createUpdateFollowUp);
 
 /**
  * @swagger

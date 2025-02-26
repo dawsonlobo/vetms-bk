@@ -9,57 +9,84 @@ import { ObjectId } from "mongodb";
 
 
 
+export async function createUpdateFollowUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+      const { _id, patientId, doctorId, diagnosis, treatment, prescription, visitDate, ...rest } = req.body;
+      
+      // Validate if doctor exists and has the correct role
+      const existingUser = await UserModel.findOne({ _id: new ObjectId(doctorId) });
 
-export async function createFollowUp(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-        const { patientId, doctorId, diagnosis, treatment, prescription, visitDate, } = req.body;
-            console.log(doctorId);
-            
-            const existingUser = await UserModel.findOne({_id: new ObjectId(doctorId)});
-            console.log(existingUser);
+      if (!existingUser) {
+          res.status(404).json({ message: "Doctor not found" });
+          return;
+      }
 
-        if (!existingUser) {
-            res.status(404).json({ message: "Doctor not found" });
-            return;
-        }
+      if (existingUser.role !== "DOCTOR") {
+          res.status(403).json({ message: "User is not authorized as a doctor" });
+          return;
+      }
 
-        if (existingUser.role !== "DOCTOR") {
-            res.status(403).json({ message: "User is not authorized as a doctor" });
-            return;
-        }
-        const existingPatient = await PatientModel.findOne({_id: new ObjectId(patientId)});;
+      // Validate if patient exists
+      const existingPatient = await PatientModel.findOne({ _id: new ObjectId(patientId) });
 
-        if (!existingPatient) {
-            res.status(404).json({ message: "Patient not found" });
-            return;
-        }
-        
-        const newFollowUp = new FollowUp({
-            patientId,
-            doctorId,
-            diagnosis,
-            treatment,
-            prescription,
-            visitDate
-        })
-        await newFollowUp.save();
+      if (!existingPatient) {
+          res.status(404).json({ message: "Patient not found" });
+          return;
+      }
 
-        res.status(200).json({
-            status: 200,
-            message: "Success",
-            data: newFollowUp, // Only includes fields from projection
+      if (_id) {
+          // Prepare update payload while ensuring `isDeleted` is never updated
+          const updateFields = { patientId, doctorId, diagnosis, treatment, prescription, visitDate, ...rest };
+          delete updateFields.isDeleted; // Explicitly remove `isDeleted`
+
+          // If ID is provided, update existing follow-up
+          const updatedFollowUp = await FollowUp.findByIdAndUpdate(_id, updateFields, { new: true });
+
+          if (!updatedFollowUp) {
+              res.status(404).json({ status: 404, message: "FollowUp record not found" });
+              return;
+          }
+
+          res.status(200).json({
+              status: 200,
+              message: "Success",
+              data: "Follow-up updated successfully",
+              toastMessage: "Follow-up updated successfully",
           });
 
+      } else {
+          // If no ID is provided, create a new follow-up record
+          const newFollowUp = new FollowUp({
+              patientId,
+              doctorId,
+              diagnosis,
+              treatment,
+              prescription,
+              visitDate
+          });
 
-    }  catch (error) {
-        console.error("Error fetching FollowUp record:", error);
-        res.status(500).json({
+          await newFollowUp.save();
+
+          res.status(201).json({
+              status: 201,
+              message: "Success",
+              data: "Follow-up created successfully",
+              toastMessage: "Follow-up created successfully",
+          });
+      }
+
+  } catch (error) {
+      console.error("Error in createUpdateFollowUp:", error);
+      res.status(500).json({
           status: 500,
           message: "Internal Server Error",
           error,
-        });
-    }
+      });
+  }
 }
+
+
+
 
 
 
