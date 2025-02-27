@@ -23,7 +23,7 @@ import doctors from './routes/v1/doctor/auth'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
 import nurseAuth from "./routes/v1/nurse/auth"; 
-import ngrok from "ngrok";
+//import ngrok from "ngrok";
 dotenv.config();
 
 const app = express();
@@ -39,7 +39,7 @@ mongoose
   })
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-app.use('/v1',adminAuth)
+  app.use('/v1',adminAuth)
   app.use('/v1',doctors)
   app.use('/v1/doctor/followups',doctorFollowUps)
   app.use('/v1/doctor/appointments',doctorappointments)
@@ -61,6 +61,8 @@ app.use('/v1',nurseAuth)
 //   next();
 // });
 
+
+
 app.use(
   "/v1/swagger/",
   swaggerUi.serve,
@@ -73,18 +75,18 @@ app.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer:
 
 // Use authentication routes// Ensure route prefix is added
 
-//add
+//addd
 const port = config.PORT || 8000;
 //app.listen(port, () => console.log(`🚀 Server running on http://localhost:${port}`));
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
-  try {
-    const url = await ngrok.connect({
-      addr: port,
-      authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
-    });
-    console.log(`Ngrok tunnel available at: ${url}`);
-  } catch (error) {
-    console.error("Error starting ngrok:", error);
-  }
+  // try {
+  //   const url = await ngrok.connect({
+  //     addr: port,
+  //     authtoken: `${process.env.NGROK_AUTH_TOKEN}`,
+  //   });
+  //   console.log(`Ngrok tunnel available at: ${url}`);
+  // } catch (error) {
+  //   console.error("Error starting ngrok:", error);
+  // }
 });
