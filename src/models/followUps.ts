@@ -45,10 +45,6 @@ import { Schema, model, Document } from "mongoose";
  *           format: date
  *           description: Date of the follow-up visit
  *           example: "2024-02-10"
- *         isDeleted:
- *           type: Boolean
- *           description: Flag indicating whether the follow-up record is deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

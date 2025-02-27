@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import UserModel from '../../../models/users'; // Adjust path as needed
 import bcrypt from 'bcryptjs';
-import mongoose, { SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { config } from '../../../config/config';
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from '../../../models/models';

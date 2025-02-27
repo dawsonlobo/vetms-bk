@@ -1,9 +1,13 @@
-import { Request, Response, NextFunction, Router } from "express";
-import { getAll, getOne, upsertBilling } from "../../../controllers/v1/admin/billings";
-import { authenticateAdmin } from "../../../middlewares/auth";
+import { Router } from "express";
+import {
+  getAll,
+  getOne,
+  upsertBilling,
+} from "../../../controllers/v1/admin/billings";
 import { exitPoint } from "../../../middlewares/exitpoint";
 import { entryPoint } from "../../../middlewares/entrypoint";
-
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
 const router = Router();
 
 /**
@@ -14,7 +18,7 @@ const router = Router();
  *       - admin/billings
  *     security:
  *       - adminBearerAuth: []
- *     summary: Upsert a billing record 
+ *     summary: Upsert a billing record
  *     requestBody:
  *       required: true
  *       content:
@@ -111,12 +115,14 @@ const router = Router();
  *                   type: "string"
  *                   example: "Billing updated successfully"
  */
-router.post('/upsert',
+router.post(
+  "/upsert",
   entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     upsertBilling,
-     exitPoint
-     );
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  upsertBilling,
+  exitPoint
+);
 
 /**
  * @swagger
@@ -126,7 +132,7 @@ router.post('/upsert',
  *       - admin/billings
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get all 
+ *     summary: Get all
  *     requestBody:
  *       required: true
  *       content:
@@ -318,14 +324,14 @@ router.post('/upsert',
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post('/getAll',
+router.post(
+  "/getAll",
   entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getAll,
-     exitPoint
-     );
-
-
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint
+);
 
 /**
  * @swagger
@@ -335,7 +341,7 @@ router.post('/getAll',
  *       - admin/billings
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get one 
+ *     summary: Get one
  *     parameters:
  *       - in: path
  *         name: id
@@ -450,10 +456,12 @@ router.post('/getAll',
  *                     createdAt: "2025-02-02T08:30:00Z"
  *                     updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post('/getOne/:id',
+router.post(
+  "/getOne/:id",
   entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     exitPoint
-     );
-     export default router;
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint
+);
+export default router;

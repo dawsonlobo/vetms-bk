@@ -27,10 +27,6 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           type: number
  *           description: Available quantity of the inventory item
  *           example: 20
- *         isDeleted:
- *           type: boolean
- *           description: Indicates if the inventory item is marked as deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

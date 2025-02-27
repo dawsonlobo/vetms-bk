@@ -1,16 +1,22 @@
-import { Router,Request,Response,NextFunction } from 'express';
-import {createInventory,updateInventory,deleteInventory,getAll,getOne} from '../../../controllers/v1/admin/inventories'
-import { authenticateAdmin } from '../../../middlewares/auth';
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-
+import { Router } from "express";
+import {
+  createInventory,
+  updateInventory,
+  deleteInventory,
+  getAll,
+  getOne,
+} from "../../../controllers/v1/admin/inventories";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
 const router = Router();
 
 /**
  * @swagger
  * /v1/admin/inventory/create:
  *   post:
- *     summary: Create a new inventory 
+ *     summary: Create a new inventory
  *     tags: [admin/inventory]
  *     security:
  *       - adminBearerAuth: []
@@ -86,17 +92,19 @@ const router = Router();
  *                   data: "Inventory item created successfully"
  *                   toastMessage: "Item successfully added to inventory"
  */
-router.post('/create',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }), 
-    createInventory, 
-    exitPoint
-    );
+router.post(
+  "/create",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  createInventory,
+  exitPoint
+);
 /**
  * @swagger
  * /v1/admin/inventory/update/{id}:
  *   put:
- *     summary: Update an existing inventory item 
+ *     summary: Update an existing inventory item
  *     tags: [admin/inventory]
  *     security:
  *       - adminBearerAuth: []
@@ -172,12 +180,14 @@ router.post('/create',
  *                   data: "Inventory item updated successfully"
  *                   toastMessage: "Item successfully updated"
  */
-router.put('/update/:id', 
-    entryPoint,
-    //passport.authenticate('bearer', { session: false }),
-     updateInventory, 
-     exitPoint
-    );
+router.put(
+  "/update/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  updateInventory,
+  exitPoint
+);
 
 /**
  * @swagger
@@ -239,12 +249,14 @@ router.put('/update/:id',
  *               message: "error"
  *               error: "Inventory item not found"
  */
-router.delete('/delete/:id',
-    entryPoint,
-    //passport.authenticate('bearer', { session: false }),
-    deleteInventory, 
-     exitPoint
-    );
+router.delete(
+  "/delete/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  deleteInventory,
+  exitPoint
+);
 /**
  * @swagger
  * /v1/admin/inventory/getAll:
@@ -301,7 +313,7 @@ router.delete('/delete/:id',
  *               summary: Filter Example
  *               value:
  *                 filter:
- *                   name: 
+ *                   name:
  *                     $regex: "Premium"
  *                     $options: "i"
  *             date:
@@ -405,12 +417,14 @@ router.delete('/delete/:id',
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',
-    entryPoint,
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    //exitPoint
-    );
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint
+);
 /**
  * @swagger
  * /v1/admin/inventory/getOne/{id}:
@@ -492,11 +506,13 @@ router.post('/getAll',
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     exitPoint
-     );
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint
+);
 
-     export default router;
+export default router;

@@ -119,7 +119,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     ];
 
     // Call aggregateData with the modified pipeline for a single record
-    const { totalCount, tableData } = await aggregateData(
+    const { tableData } = await aggregateData(
       AppointmentModel,
       {}, // No filter is needed for `getOne`, since we already match by ID
       projection,

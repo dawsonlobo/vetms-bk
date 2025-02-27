@@ -63,10 +63,6 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *                 type: number
  *                 description: Total amount for this item (Quantity * Price)
  *                 example: 500
- *         isDeleted:
- *           type: boolean
- *           description: Indicates if the billing record is marked as deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

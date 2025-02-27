@@ -1,9 +1,10 @@
-import { Router,Request,Response,NextFunction } from 'express';
-import { getAll, getOne } from '../../../controllers/v1/admin/payments';
-import { authenticateAdmin } from '../../../middlewares/auth';
-import { entryPoint } from '../../../middlewares/entrypoint';
-import { exitPoint } from '../../../middlewares/exitpoint';
-const router = Router()
+import { Router } from "express";
+import { getAll, getOne } from "../../../controllers/v1/admin/payments";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
+const router = Router();
 
 /**
  * @swagger
@@ -13,7 +14,7 @@ const router = Router()
  *       - admin/payments
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get all 
+ *     summary: Get all
  *     requestBody:
  *       required: true
  *       content:
@@ -162,12 +163,14 @@ const router = Router()
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',
-    entryPoint,
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    exitPoint
-    );
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint
+);
 /**
  * @swagger
  * /v1/admin/payments/getOne/{id}:
@@ -257,10 +260,12 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getOne/:id',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     exitPoint
-     );
- export default router;
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint
+);
+export default router;
