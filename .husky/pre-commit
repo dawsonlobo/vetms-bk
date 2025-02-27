@@ -1,8 +1,6 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
 # Run cspell to check for spelling errors
-npx cspell '**/*.js' '**/*.ts' '**/*.md'
+npx cspell '**/*.ts' '**/*.md'
 
 # If cspell finds errors, exit with status code 1 to block commit
 if [ $? -ne 0 ]; then

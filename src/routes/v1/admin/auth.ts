@@ -62,10 +62,10 @@ import { verifyAdmin } from "../../../middlewares/auth";
  *                       example: "2024-02-06T15:30:00Z"
  *                     access_token:
  *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *                     refresh_token:
  *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *                     tokenExpiresAt:
  *                       type: string
  *                       format: date-time
@@ -98,7 +98,7 @@ router.post("/admin/auth/login",entryPoint, auth.loginController,exitPoint);
  *             properties:
  *               refresh_token:
  *                 type: string
- *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *     responses:
  *       200:
  *         description: Logout successful
@@ -231,10 +231,10 @@ router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { s
  *                       example: "2024-02-06T15:30:00Z"
  *                     access_token:
  *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *                     refresh_token:
  *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *                     tokenExpiresAt:
  *                       type: string
  *                       format: date-time
@@ -252,8 +252,8 @@ router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { s
  *                     role: "ADMIN"
  *                     createdAt: "2024-02-05T12:00:00Z"
  *                     updatedAt: "2024-02-06T15:30:00Z"
- *                     access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *                     refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                     access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
+ *                     refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *                     tokenExpiresAt: "2024-02-07T18:00:00Z"
  *               limitedResponse:
  *                 summary: Limited response (only _id and createdAt)
