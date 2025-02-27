@@ -18,15 +18,14 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - petId
+ *               - patientId
  *               - doctorId
  *               - date
- *               - schedule
  *             properties:
  *               _id:
  *                 type: string
  *                 description: The unique ID of the appointment (for updates)
- *               petId:
+ *               patientId:
  *                 type: string
  *                 description: The ID of the pet for the appointment
  *               doctorId:
@@ -47,15 +46,14 @@ const router = Router();
  *             createAppointment:
  *               summary: Example request body for creating an appointment
  *               value:
- *                 petId: "66b3279c39c21f7342c100c4"
+ *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-01T10:00:00.000Z"
- *                 schedule: "SCHEDULED"
+ *                 date: "27-02-2025"
  *             updateAppointment:
  *               summary: Example request body for updating an appointment
  *               value:
  *                 _id: "66b3279c39c21f7342c100c6"
- *                 petId: "66b3279c39c21f7342c100c4"
+ *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
  *                 date: "2025-03-05T14:00:00.000Z"
  *                 schedule: "COMPLETED"
@@ -97,7 +95,6 @@ const router = Router();
  *                   toastMessage: "Appointment record updated successfully"
  */
 router.post('/create', createUpdate);
-
 
 /**
  * @swagger

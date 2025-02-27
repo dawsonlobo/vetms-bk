@@ -13,7 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts",
     "seed": "nodemon --watch \"src/seeds/**\" --ext \"ts\" --exec \"ts-node src/seeds/seed.ts\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "spellcheck": "cspell \"src/**/*.ts\" --no-progress"
   },
   "repository": {
     "type": "git",
