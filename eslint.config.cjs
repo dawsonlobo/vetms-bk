@@ -1,9 +1,10 @@
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsparser from "@typescript-eslint/parser";
+const tseslint = require("@typescript-eslint/eslint-plugin");
+const tsparser = require("@typescript-eslint/parser");
 
-export default [
+/** @type {import("eslint").Linter.FlatConfig[]} */
+module.exports = [
   {
-    ignores: ["node_modules/", "dist/", "public/swagger/web-components.min.js","lib"],
+    ignores: ["node_modules/", "dist/", "public/swagger/web-components.min.js", "lib"],
   },
   {
     languageOptions: {
