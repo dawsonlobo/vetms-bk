@@ -43,7 +43,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
-                data: "Failed to login",
+                data: "Invalid email or password",
                 toastMessage: "Invalid email or password",
             };
             next();
