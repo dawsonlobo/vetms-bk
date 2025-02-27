@@ -33,10 +33,6 @@
  *           enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
  *           description: Role of the user in the system
  *           example: "DOCTOR"
- *         isDeleted:
- *           type: boolean
- *           description: Flag indicating whether the user has been deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

@@ -1,5 +1,3 @@
-import { AppointmentModel } from "../models/appointments";
-
 export const CONSTANTS = {
     COLLECTIONS: {
       APPOINTMENTS_COLLECTION: "appointments",

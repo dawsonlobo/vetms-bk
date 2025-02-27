@@ -1,6 +1,5 @@
-import { Router,Request,Response,NextFunction } from 'express';
+import { Router } from 'express';
 import { getAll, getOne } from '../../../controllers/v1/admin/patients';
-import { authenticateAdmin } from '../../../middlewares/auth';
 import { entryPoint} from '../../../middlewares/entrypoint';
 import { exitPoint } from '../../../middlewares/exitpoint';
 

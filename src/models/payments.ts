@@ -38,10 +38,6 @@ import mongoose, { Document, Schema, Model } from "mongoose";
  *           type: string
  *           description: Unique reference number for the payment
  *           example: "TXN123456789"
- *         isDeleted:
- *           type: boolean
- *           description: Indicates if the payment record is marked as deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

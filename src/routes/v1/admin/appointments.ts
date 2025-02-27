@@ -1,4 +1,4 @@
-import { Router,Request,Response } from 'express';
+import { Router} from 'express';
 import {getAll,getOne} from '../../../controllers/v1/admin/appointments'
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';

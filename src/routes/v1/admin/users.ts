@@ -1,4 +1,4 @@
-import { Router,Request,Response,NextFunction } from 'express';
+import { Router } from 'express';
 import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
 import { authenticateAdmin } from '../../../middlewares/auth';
 import { exitPoint } from '../../../middlewares/exitpoint';

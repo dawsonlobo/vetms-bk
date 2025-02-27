@@ -72,10 +72,6 @@
  *             - AB
  *           description: Blood group of the pet
  *           example: "DEA 1.1+"
- *         isDeleted:
- *           type: boolean
- *           description: Flag to indicate soft deletion of the pet
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

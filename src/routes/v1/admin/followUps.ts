@@ -1,119 +1,10 @@
 import { Router,Request,Response, NextFunction } from 'express';
 import {getAll,getOne} from '../../../controllers/v1/admin/followUps'
-const router = Router();
 import { authenticateAdmin } from '../../../middlewares/auth';
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
 
-
-
-/**
- * @swagger
- * /v1/admin/followUps/getOne/{id}:
- *   post:
- *     summary: Get one follow-up 
- *     tags: [admin/followUps]
- *     security:
- *       - adminBearerAuth: []  # Requires a bearer token
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique identifier of the follow-up record to retrieve
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               project:
- *                 type: object
- *                 description: Fields to include or exclude in the response
- *           examples:
- *             projectionExample:
- *               summary: Example with projection
- *               value:
- *                 projection:
- *                   _id: 1
- *                   patientId: 1
- *                   diagnosis: 1
- *                   createdAt: 1
- *     responses:
- *       200:
- *         description: Get one follow-up record.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   format: int64
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       format: ObjectId
- *                       description: Unique ID of the follow-up record
- *                     patientId:
- *                       type: string
- *                       format: ObjectId
- *                       description: Unique ID of the pet associated with the follow-up
- *                     doctorId:
- *                       type: string
- *                       format: ObjectId
- *                       description: Unique ID of the doctor responsible for the follow-up
- *                     diagnosis:
- *                       type: string
- *                       description: Diagnosis of the pet's condition
- *                     treatment:
- *                       type: string
- *                       description: Treatment provided to the pet
- *                     prescription:
- *                       type: string
- *                       description: Prescribed medications for the pet
- *                     visitDate:
- *                       type: string
- *                       format: date
- *                       description: Date of the follow-up visit
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       description: Timestamp when the follow-up record was created
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       description: Timestamp when the follow-up record was last updated
- *             examples:
- *               get-one-followup:
- *                 summary: Successful response
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data:
- *                     _id: "6512c5f3e4b09a12d8f42b68"
- *                     patientId: "6512c5f3e4b09a12d8f42b69"
- *                     doctorId: "6512c5f3e4b09a12d8f42b70"
- *                     diagnosis: "Skin infection due to allergy"
- *                     treatment: "Antibiotic injection and medicated shampoo"
- *                     prescription: "Amoxicillin 250mg, Antihistamines"
- *                     visitDate: "2024-02-10"
- *                     createdAt: "2024-02-10T12:00:00Z"
- *                     updatedAt: "2024-02-11T15:30:00Z"
- */
-router.post('/getOne/:id',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     exitPoint
-     );
-
+const router = Router();
 
 /**
  * @swagger
@@ -289,5 +180,112 @@ router.post('/getAll',
     getAll,
     exitPoint
     );
+
+/**
+ * @swagger
+ * /v1/admin/followUps/getOne/{id}:
+ *   post:
+ *     summary: Get one follow-up 
+ *     tags: [admin/followUps]
+ *     security:
+ *       - adminBearerAuth: []  # Requires a bearer token
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the follow-up record to retrieve
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project:
+ *                 type: object
+ *                 description: Fields to include or exclude in the response
+ *           examples:
+ *             projectionExample:
+ *               summary: Example with projection
+ *               value:
+ *                 projection:
+ *                   _id: 1
+ *                   patientId: 1
+ *                   diagnosis: 1
+ *                   createdAt: 1
+ *     responses:
+ *       200:
+ *         description: Get one follow-up record.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       format: ObjectId
+ *                       description: Unique ID of the follow-up record
+ *                     patientId:
+ *                       type: string
+ *                       format: ObjectId
+ *                       description: Unique ID of the pet associated with the follow-up
+ *                     doctorId:
+ *                       type: string
+ *                       format: ObjectId
+ *                       description: Unique ID of the doctor responsible for the follow-up
+ *                     diagnosis:
+ *                       type: string
+ *                       description: Diagnosis of the pet's condition
+ *                     treatment:
+ *                       type: string
+ *                       description: Treatment provided to the pet
+ *                     prescription:
+ *                       type: string
+ *                       description: Prescribed medications for the pet
+ *                     visitDate:
+ *                       type: string
+ *                       format: date
+ *                       description: Date of the follow-up visit
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the follow-up record was created
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the follow-up record was last updated
+ *             examples:
+ *               get-one-followup:
+ *                 summary: Successful response
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data:
+ *                     _id: "6512c5f3e4b09a12d8f42b68"
+ *                     patientId: "6512c5f3e4b09a12d8f42b69"
+ *                     doctorId: "6512c5f3e4b09a12d8f42b70"
+ *                     diagnosis: "Skin infection due to allergy"
+ *                     treatment: "Antibiotic injection and medicated shampoo"
+ *                     prescription: "Amoxicillin 250mg, Antihistamines"
+ *                     visitDate: "2024-02-10"
+ *                     createdAt: "2024-02-10T12:00:00Z"
+ *                     updatedAt: "2024-02-11T15:30:00Z"
+ */
+router.post('/getOne/:id',
+    entryPoint,
+    // passport.authenticate('bearer', { session: false }),
+     getOne,
+     exitPoint
+     );
 
     export default router;

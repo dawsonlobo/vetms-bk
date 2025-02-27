@@ -53,11 +53,6 @@ import { CONSTANTS } from "../config/constant";
  *           type: string
  *           description: Additional comments or notes about the appointment
  *           example: "Patient requested a follow-up next week."
- *           default: ""
- *         isDeleted:
- *           type: boolean
- *           description: Indicates if the appointment record is marked as deleted
- *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time

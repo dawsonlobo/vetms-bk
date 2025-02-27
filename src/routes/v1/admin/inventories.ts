@@ -1,6 +1,5 @@
-import { Router,Request,Response,NextFunction } from 'express';
+import { Router} from 'express';
 import {createInventory,updateInventory,deleteInventory,getAll,getOne} from '../../../controllers/v1/admin/inventories'
-import { authenticateAdmin } from '../../../middlewares/auth';
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
 
