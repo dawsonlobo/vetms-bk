@@ -1,56 +1,58 @@
 import { Request, Response, NextFunction } from "express";
 import { PatientModel } from "../../../models/patients"; // Import the Patient model
-import mongoose, { SortOrder } from "mongoose";
+import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
+import { ErrorCodes } from "../../../models/models";
 
-export const createUpdate = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { _id, ...patientData } = req.body;
-  
-      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
-        res.status(400).json({
-          status: 400,
-          message: "Invalid Patient ID",
-          toastMessage: "Invalid Patient ID provided",
-        });
-        return;
+export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id, ...patientData } = req.body;
+
+    let result;
+    if (id) {
+      // Update existing patient record
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1003],
+          toastMessage: "Invalid ID",
+        };
+        return next();
       }
-  
-      let isUpdate = Boolean(_id);
-      let patient;
-  
-      if (isUpdate) {
-        patient = await PatientModel.findByIdAndUpdate(_id, patientData, { new: true }).exec();
-      } else {
-        patient = await new PatientModel(patientData).save();
+
+      result = await PatientModel.findByIdAndUpdate(id, patientData, { new: true, runValidators: true });
+
+      if (!result) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1004],
+          toastMessage: "Record not found or deleted",
+        };
+        return next();
       }
-  
-      if (!patient) {
-        res.status(404).json({
-          status: 404,
-          message: "Patient not found",
-          toastMessage: "Patient record not found",
-        });
-        return;
-      }
-  
-      res.status(200).json({
-        status: 200,
-        message: "Success",
-        data: isUpdate ? "Patient record updated successfully" : "Patient added successfully",
-        toastMessage: isUpdate ? "Patient record updated successfully" : "Patient added successfully",
-      });
-  
-    } catch (error) {
-      console.error("Error in createUpdate:", error);
-      res.status(500).json({
-        status: 500,
-        message: "Internal Server Error",
-        toastMessage: "Something went wrong. Please try again.",
-      });
+    } else {
+      // Create new patient record
+      result = await PatientModel.create(patientData);
     }
-  };
-  
+
+    req.apiStatus = {
+      isSuccess: true,
+      message: id ? "Patient updated successfully" : "Patient created successfully",
+      data: result,
+    };
+    next();
+  } catch (error) {
+    console.error("Error in createUpdate:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+  }
+};
+
+
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const {
@@ -75,23 +77,22 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate
     );
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-    });
+    };
+    next(); // Pass control to the next middleware
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
-      message: "Internal Server Error",
-      error,
-    });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next(); // Pass control to the error-handling middleware
   }
 };
-// Adjust path as needed
-
-// Ensure this path matches your project structure
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -99,22 +100,38 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     const { projection } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-       res.status(400).json({ status: 400, message: "Invalid ID" });
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1003],
+        toastMessage: "Invalid ID",
+      };
+      return next();
     }
 
     const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
 
     if (!result.tableData.length) {
-      res.status(404).json({ status: 404, message: "Record not found or deleted" });
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1004],
+        toastMessage: "Record not found or deleted",
+      };
+      return next();
     }
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: result.tableData[0], // Access the first element of tableData
-    });
+    };
+    next();
   } catch (error) {
     console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error: error });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
   }
 };
