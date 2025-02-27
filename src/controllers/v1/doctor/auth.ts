@@ -15,6 +15,7 @@ const { JWT_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 // Login Controller
 export async function loginController(req: Request, res: Response, next: NextFunction): Promise<void> {
+
     passport.authenticate(
         "local",
         { session: false },
@@ -37,7 +38,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
                     data: "Only doctors are allowed to log in",
                     toastMessage: "You are not authorized to log in.",
                 });
-                // next();
+                next();
                 return;
             }
 
@@ -84,7 +85,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
                 });
             }
         }
-    )(req, res, next);
+    );
 }
 
 

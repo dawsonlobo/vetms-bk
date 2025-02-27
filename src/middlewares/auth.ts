@@ -198,3 +198,64 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         });
     }
 };
+
+
+
+export async function authenticateDoctor (req: Request, res: Response, next: NextFunction):Promise<void> {
+    try {
+        // Extract the token from headers
+        const accessToken = req.headers.authorization?.split(" ")[1];
+
+        if (!accessToken) {
+            res.status(401).json({
+                status: 401,
+                message: "Unauthorized",
+                data: "Unauthorized",
+                toastMessage: "Please log in again.",
+            });
+            return 
+        }
+
+        // Check if the token exists in the database (ensures accessToken is valid)
+        const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+        if (!storedAccessToken) {
+            res.status(403).json({
+                status: 403,
+                message: "Invalid or expired access token",
+                data: "Invalid or expired access token",
+                toastMessage: "Please log in again.",
+            });
+            return
+        }
+
+        // Decode and verify the JWT token
+        let decoded: any;
+        try {
+            decoded = jwt.verify(accessToken, config.JWT_SECRET);
+            console.log(decoded);
+            
+        } catch (error) {
+            res.status(403).json({
+                status: 403,
+                message: "Invalid token",
+                data: "Invalid token",
+                toastMessage: "Session expired. Please log in again.",
+            });
+            return 
+        }
+
+        // Attach the decoded user ID to the request for further use
+        req.user = { id: decoded.id };
+
+        next(); // Proceed to the next middleware or controller
+    } catch (error) {
+        console.error("Error in authentication middleware:", error);
+        res.status(500).json({
+            status: 500,
+            message: "Internal server error",
+            data: "Internal server error",
+            toastMessage: "An error occurred while verifying authentication.",
+        });
+        return;
+    }
+};

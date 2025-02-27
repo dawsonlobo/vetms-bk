@@ -1,6 +1,9 @@
 import { Router,Request,Response, NextFunction } from 'express';
 import * as appointment from '../../../controllers/v1/doctor/appointments'
 const router = Router();
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor} from '../../../middlewares/auth'
 
 
 
@@ -87,7 +90,7 @@ const router = Router();
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",appointment.Update);
+router.post("/update/:_id",entryPoint,authenticateDoctor,appointment.Update,exitPoint);
 
 
 
@@ -186,7 +189,7 @@ router.post("/update/:_id",appointment.Update);
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
 
-router.post("/getone/:id",appointment.getOne);
+router.post("/getone/:id",entryPoint,appointment.getOne,exitPoint);
 
 
 
@@ -353,7 +356,7 @@ router.post("/getone/:id",appointment.getOne);
  *                         updatedAt: "2024-02-11T15:30:00Z" 
  */
 
-router.post("/getall",appointment.getAll);
+router.post("/getall",entryPoint,appointment.getAll,exitPoint);
 
 
 
