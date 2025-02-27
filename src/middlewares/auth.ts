@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { config } from "../config/config"; // Correct import for config
-import UserModel, { UserRole } from "../models/users";
+import UserModel from "../models/users";
+import {CONSTANTS} from '../config/constant'
 import { AccessToken } from "../models/accessTokens"; // Import UserRole if it's an enum or type
+import { ErrorCodes } from "../models/models";
 
 
 // Middleware to verify Admin user
@@ -21,7 +23,7 @@ export async function verifyAdmin(req: Request, res: Response, next: NextFunctio
     }
 
     
-    if (user.role !== UserRole.ADMIN) {
+    if (user.role !== CONSTANTS.USER_ROLE.ADMIN) {
         res.status(403).json({
             status: 403,
             message: "Forbidden",
@@ -66,8 +68,10 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
         } catch (error) {
+            console.error("Authentication error:", error);
             res.status(403).json({
                 status: 403,
+                error:ErrorCodes[1002],
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
@@ -112,7 +116,7 @@ export const verifyNurse = async (req: Request, res: Response, next: NextFunctio
         const decoded: any = jwt.verify(token, config.JWT_SECRET);
         const user = await UserModel.findById(decoded.id);
 
-        if (!user || user.role !== UserRole.NURSE) {
+        if (!user || user.role !== CONSTANTS.USER_ROLE.NURSE) {
              res.status(403).json({
                 status: 403,
                 message: "Forbidden",
@@ -184,8 +188,10 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
         } catch (error) {
+            console.error("Authentication error:", error);
              res.status(403).json({
                 status: 403,
+                error:ErrorCodes[1002],
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
@@ -201,6 +207,7 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         console.error("Error in authentication middleware:", error);
          res.status(500).json({
             status: 500,
+            error:ErrorCodes[1002],
             message: "Internal server error",
             data: "Internal server error",
             toastMessage: "An error occurred while verifying authentication.",
@@ -224,7 +231,7 @@ export async function verifyReceptionist(req: Request, res: Response, next: Next
 
     const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
     
-    if (user.role !== UserRole.RECEPTIONIST) {
+    if (user.role !== CONSTANTS.USER_ROLE.RECEPTIONIST) {
         res.status(403).json({
             status: 403,
             message: "Forbidden",

@@ -1,4 +1,4 @@
-import { Router,Request,Response } from 'express';
+import { Router} from 'express';
 import { createUpdate, getAll, getOne } from '../../../controllers/v1/receptionist/patients';
 const router = Router()
 /**

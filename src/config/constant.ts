@@ -10,5 +10,11 @@ export const CONSTANTS = {
       COMPLETED: "completed",
       NOTATTENDED:"not attended"
       
+    },
+    USER_ROLE: {
+      ADMIN : "ADMIN",
+      DOCTOR : "DOCTOR",
+      RECEPTIONIST : "RECEPTIONIST",
+      NURSE :"NURSE",
     }
 }

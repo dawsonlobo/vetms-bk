@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, Router } from "express";
+import { Router } from "express";
 import passport from "../../../passport/passport";
 import * as auth from "../../../controllers/v1/nurse/auth"
 import { entryPoint } from "../../../middlewares/entrypoint";

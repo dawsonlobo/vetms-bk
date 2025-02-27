@@ -9,7 +9,7 @@ import { AccessToken } from "../../../models/accessTokens";
 import {ErrorCodes} from "../../../models/models"
 
 
-const { JWT_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
+const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 const logger: winston.Logger = winston.createLogger({
     level: "error",
@@ -172,7 +172,7 @@ export async function refreshTokenController(req: Request, res: Response, next: 
 }
 
 // Logout Controller
-const ACCESS_SECRET = config.JWT_SECRET || "default_access_secret";
+//const ACCESS_SECRET = config.JWT_SECRET || "default_access_secret";
 
 export const logoutController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

@@ -1,22 +1,73 @@
 import { Request, Response, NextFunction } from "express";
-import { PatientModel } from "../../../models/patients";
+import { PatientModel } from "../../../models/patients"; // Import the Nurse model
 import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
+import { ErrorCodes } from "../../../models/models";
 
-export const getAllForNurse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const user = req.user as { _id?: string };
-    if (!user?._id) {
-      res.status(401).json({ status: 401, message: "Unauthorized" });
-      return;
+    const { id, ...nurseData } = req.body;
+
+    let result;
+    if (id) {
+      // Update existing nurse record
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1003],
+          toastMessage: "Invalid ID",
+        };
+        return next();
+      }
+
+      result = await PatientModel.findByIdAndUpdate(id, nurseData, { new: true, runValidators: true });
+
+      if (!result) {
+        req.apiStatus = {
+          isSuccess: false,
+          error: ErrorCodes[1004],
+          toastMessage: "Record not found or deleted",
+        };
+        return next();
+      }
+    } else {
+      // Create new nurse record
+      result = await PatientModel.create(nurseData);
     }
 
-    const { projection = {}, filter = {}, options = {}, search = [], date, fromDate, toDate } = req.body;
-    const nurseFilter = { ...filter, assignedNurseId: user._id }; // Ensure nurse sees only assigned patients
+    req.apiStatus = {
+      isSuccess: true,
+      message: id ? "Nurse updated successfully" : "Nurse created successfully",
+      data: result,
+    };
+    next();
+  } catch (error) {
+    console.error("Error in createUpdate:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+  }
+};
 
+export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const {
+      projection = {},
+      filter = {},
+      options = {},
+      search = [],
+      date,
+      fromDate,
+      toDate,
+    } = req.body;
+
+    // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
       PatientModel,
-      nurseFilter,
+      filter,
       projection,
       options,
       search,
@@ -25,55 +76,61 @@ export const getAllForNurse = async (req: Request, res: Response, next: NextFunc
       toDate
     );
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-    });
+    };
+    next(); // Pass control to the next middleware
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
-      message: "Internal Server Error",
-      error,
-    });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next(); // Pass control to the error-handling middleware
   }
 };
 
-export const getOneForNurse = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const user = req.user as { _id?: string };
-    if (!user?._id) {
-      res.status(401).json({ status: 401, message: "Unauthorized" });
-      return;
-    }
-
     const { id } = req.params;
     const { projection } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ status: 400, message: "Invalid ID" });
-      return;
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1003],
+        toastMessage: "Invalid ID",
+      };
+      return next();
     }
 
-    const result = await aggregateData(
-      PatientModel,
-      { _id: new mongoose.Types.ObjectId(id), assignedNurseId: user._id },
-      projection
-    );
+    const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
 
     if (!result.tableData.length) {
-      res.status(404).json({ status: 404, message: "Record not found or unauthorized" });
-      return;
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1004],
+        toastMessage: "Record not found or deleted",
+      };
+      return next();
     }
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
-      data: result.tableData[0],
-    });
+      data: result.tableData[0], // Access the first element of tableData
+    };
+    next();
   } catch (error) {
     console.error("Error fetching record:", error);
-    res.status(500).json({ status: 500, message: "Internal Server Error", error });
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
   }
 };

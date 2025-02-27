@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import {PatientModel} from "../../../models/patients"
-import { ObjectId } from "mongodb";
 import { aggregateData } from "../../../utils/aggregation";
 
 

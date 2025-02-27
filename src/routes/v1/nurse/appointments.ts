@@ -1,7 +1,6 @@
 import express from "express";
-import { Router,Request,Response } from 'express';
 import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/nurse/appointments';
-import { authenticateNurse, verifyNurse } from '../../../middlewares/auth';
+import {  verifyNurse } from '../../../middlewares/auth';
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 
