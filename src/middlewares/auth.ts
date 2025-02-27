@@ -277,6 +277,8 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
             
         } catch (error) {
+            console.log("the errors in verify errors are",error);
+
             res.status(403).json({
                 status: 403,
                 message: "Invalid token",
