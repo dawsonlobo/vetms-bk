@@ -1,5 +1,5 @@
 import { Router,Request,Response,NextFunction } from 'express';
-import { getAllForNurse, getOneForNurse  } from '../../../controllers/v1/nurse/patients';
+import { getAll, getOne  } from '../../../controllers/v1/nurse/patients';
 import { authenticateNurse } from '../../../middlewares/auth';
 
 const asyncHandler = (
@@ -201,9 +201,9 @@ const router = Router()
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAllForNurse',asyncHandler(authenticateNurse),
+router.post('/getAll',asyncHandler(authenticateNurse),
     // passport.authenticate('bearer', { session: false }),
-     getAllForNurse,
+     getAll,
      //exitPoint
      );
  /**
@@ -321,9 +321,9 @@ router.post('/getAllForNurse',asyncHandler(authenticateNurse),
   */
  
  
- router.post('/getOneForNurse/:id',asyncHandler(authenticateNurse),
+ router.post('/getOne/:id',asyncHandler(authenticateNurse),
      // passport.authenticate('bearer', { session: false }),
-      getOneForNurse,
+      getOne,
       //exitPoint
       );
   export default router;
