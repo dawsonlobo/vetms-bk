@@ -7,7 +7,8 @@ import { AccessToken } from "../models/accessTokens"; // Import UserRole if it's
 
 // Middleware to verify Admin user
 export async function verifyAdmin(req: Request, res: Response, next: NextFunction) {
-    console.log("Req User in verifyAdmin:", req.user); // Debugging
+    
+    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
 
     if (!req.user) {
         res.status(401).json({
@@ -19,8 +20,7 @@ export async function verifyAdmin(req: Request, res: Response, next: NextFunctio
         return;
     }
 
-    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
-
+    
     if (user.role !== UserRole.ADMIN) {
         res.status(403).json({
             status: 403,
@@ -30,9 +30,7 @@ export async function verifyAdmin(req: Request, res: Response, next: NextFunctio
         });
         return;
     }
-
     next();
-
 }
 
 //Specifically ensures that the token exists in the database and is valid for an admin user
@@ -198,3 +196,30 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         });
     }
 };
+
+export async function verifyReceptionist(req: Request, res: Response, next: NextFunction) {
+    
+    
+    if (!req.user) {
+        res.status(401).json({
+            status: 401,
+            message: "Unauthorized",
+            data: "User authentication failed.",
+            toastMessage: "Please log in to continue.",
+        });
+        return;
+    }
+
+    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
+    
+    if (user.role !== UserRole.RECEPTIONIST) {
+        res.status(403).json({
+            status: 403,
+            message: "Forbidden",
+            data: "Admin access required.",
+            toastMessage: "You do not have permission to access this resource.",
+        });
+        return;
+    }
+    next();
+}

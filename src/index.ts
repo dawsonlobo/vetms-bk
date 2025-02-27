@@ -20,9 +20,12 @@ import doctorFollowUps from './routes/v1/doctor/followUps'
 import billings from './routes/v1/admin/billings'
 import payments from './routes/v1/admin/payments'
 import doctors from './routes/v1/doctor/auth'
-import rPatients from './routes/v1/receptionist/rPatients'
-import rAppointments from './routes/v1/receptionist/rAppointments'
 import nurseAuth from "./routes/v1/nurse/auth"; 
+
+import receptionistAuth from './routes/v1/receptionist/auth'
+import receptionistPatients from './routes/v1/receptionist/patients'
+import receptionistAppointments from './routes/v1/receptionist/appointments'
+
 //import ngrok from "ngrok";
 dotenv.config();
 
@@ -52,8 +55,11 @@ app.use('/v1/admin/appointments',appointments)
 app.use('/v1/admin/followUps',followUps)
 app.use('/v1/admin/billings',billings)
 app.use('/v1/admin/payments',payments)
-app.use('/v1/receptionist/patients',rPatients);
-app.use('/v1/receptionist/appointments',rAppointments);
+
+app.use('/v1',receptionistAuth)
+app.use('/v1/receptionist/patients',receptionistPatients);
+app.use('/v1/receptionist/appointments',receptionistAppointments);
+
 app.use(express.urlencoded({ extended: true }));
 app.use('/v1',nurseAuth)
 // app.use((req, res, next) => {

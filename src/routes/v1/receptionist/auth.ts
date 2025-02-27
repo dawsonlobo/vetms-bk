@@ -1,17 +1,17 @@
 import { Router } from "express";
 import passport from "../../../passport/passport";
-import * as auth from "../../../controllers/v1/admin/auth"
+import * as auth from "../../../controllers/v1/receptionist/auth"
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
-import { verifyAdmin } from "../../../middlewares/auth";
+import { verifyReceptionist } from "../../../middlewares/auth";
 
 /**
  * @swagger
- * /v1/admin/auth/login:
+ * /v1/receptionist/auth/login:
  *   post:
  *     summary: login
- *     tags: [admin/auth]
+ *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
  *     requestBody:
@@ -76,17 +76,17 @@ import { verifyAdmin } from "../../../middlewares/auth";
  */
 
 
-router.post("/admin/auth/login",entryPoint,auth.loginController,exitPoint);
+router.post("/receptionist/auth/login",entryPoint, auth.loginController,exitPoint);
 
 
 
 
 /**
  * @swagger
- * /v1/admin/auth/logout:
+ * /v1/receptionist/auth/logout:
  *   post:
  *     summary: logout
- *     tags: [admin/auth]
+ *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
  *     requestBody:
@@ -122,13 +122,13 @@ router.post("/admin/auth/login",entryPoint,auth.loginController,exitPoint);
  */
 
 
-router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin,auth.logoutController,exitPoint);
+router.post("/receptionist/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,auth.logoutController,exitPoint);
 /**
  * @swagger
- * /v1/admin/auth/profile:
+ * /v1/receptionist/auth/profile:
  *   post:
  *     summary: Get user profile 
- *     tags: [admin/auth]
+ *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
  *     requestBody:
@@ -266,14 +266,14 @@ router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { s
  */
 
 
-router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.getAdminProfile,exitPoint);
+router.post("/receptionist/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.getAdminProfile,exitPoint);
 
 /**
  * @swagger
- * /v1/admin/auth/update:
+ * /v1/receptionist/auth/update:
  *   put:
  *     summary: Update user profile 
- *     tags: [admin/auth]
+ *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
  *     requestBody:
@@ -333,14 +333,14 @@ router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.updateAdminProfile,exitPoint);
+router.put("/receptionist/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.updateAdminProfile,exitPoint);
 
 /**
  * @swagger
- * /v1/admin/auth/refresh:
+ * /v1/receptionist/auth/refresh:
  *   post:
  *     summary: Refresh user token 
- *     tags: [admin/auth]
+ *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
  *     requestBody:
@@ -404,6 +404,6 @@ router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { ses
 
 
 
-router.post("/admin/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.refreshTokenController,exitPoint);
+router.post("/receptionist/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.refreshTokenController,exitPoint);
 
 export default router;
