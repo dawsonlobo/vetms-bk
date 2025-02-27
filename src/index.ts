@@ -23,6 +23,7 @@ import doctors from './routes/v1/doctor/auth'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
 import nurseAuth from "./routes/v1/nurse/auth"; 
+import nurseAppointments from "./routes/v1/nurse/appointments"; 
 //import ngrok from "ngrok";
 dotenv.config();
 

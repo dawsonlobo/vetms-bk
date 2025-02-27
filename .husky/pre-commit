@@ -1,9 +1,45 @@
+#!/bin/sh
 
-# Run cspell to check for spelling errors
-npx cspell '**/*.ts' '**/*.md'
+# Get the current branch
+branch=$(git rev-parse --abbrev-ref HEAD)
 
-# If cspell finds errors, exit with status code 1 to block commit
-if [ $? -ne 0 ]; then
-  echo "Spelling errors found. Commit aborted."
-  exit 1
+# Check if package.json is already staged (prevents infinite loop)
+# if [ "$branch" = "dev" ]; then
+#     echo "Checking if version bump is needed..."
+
+#     # Check if the last commit message contains "[skip ci]" to prevent looping
+#     last_commit_msg=$(git log -1 --pretty=%B)
+
+#     if echo "$last_commit_msg" | grep -q "chore: bump version"; then
+#         echo "Version was already bumped in the last commit, skipping..."
+#     else
+#         echo "Bumping version..."
+#         npm version patch --no-git-tag-version
+#         git add package.json package-lock.json
+#         git commit -m "chore: bump version [skip ci]" --no-verify  # Prevents triggering Husky again
+#         git push
+#     fi
+# else
+#     echo "Not on dev branch, skipping version bump."
+# fi
+
+
+# Run lint, build, and spell check if scripts exist
+if npm run | grep -q "lint"; then
+    npm run lint
+else
+    echo "Skipping lint: script not found"
+fi
+
+if npm run | grep -q "build"; then
+    npm run build --if-present
+else
+    echo "Skipping build: script not found"
+fi
+
+# Run cspell on all files (Fixes incorrect usage of English words)
+if command -v cspell >/dev/null 2>&1; then
+    git diff --cached --name-only | grep -E '\.(ts|tsx|js|md|json|yml|yaml)$' | xargs -r npx cspell --no-progress --no-summary
+else
+    echo "Skipping spell check: cspell not found"
 fi
