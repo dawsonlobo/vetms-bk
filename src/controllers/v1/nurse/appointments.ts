@@ -9,16 +9,17 @@ import { aggregateData } from "../../../utils/aggregation";
 
 export const createUpdate = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = req.user as { _id?: string }; // Ensure user type
-        if (!user?._id) {
+        const user = req.user as { _id?: string }; 
+        const nurseId = user?._id; // Extract nurse ID from user
+        
+        if (!nurseId) {
             res.status(401).json({ status: 401, message: "Unauthorized" });
             return;
         }
 
-        const { _id, ...appointmentData } = req.body;
+        const { _id, doctorId, date, status } = req.body;
 
-        // Prevent sending restricted fields
-       // If updating, prevent modifying restricted fields
+        // Prevent modification of restricted fields during an update
         if (_id && (req.body.patientId || req.body.nurseId)) {
             req.apiStatus = {
                 isSuccess: false,
@@ -27,7 +28,6 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
             };
             return;
         }
-
 
         // Validate `_id` if updating
         if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
@@ -45,7 +45,7 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
                 { 
                     ...(doctorId && { doctorId }),
                     ...(date && { date }),
-                    ...(status && { status }) // Update status only if provided
+                    ...(status && { status }) 
                 }, 
                 { new: true }
             ).exec();
@@ -55,19 +55,21 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
                 doctorId,
                 date,
                 nurseId,
-                status: "PENDING", // Ensure new appointments always start as "PENDING"
+                status: "PENDING", 
                 createdAt: new Date(),
                 updatedAt: new Date(),
             }).save();
         }
 
         req.apiStatus = {
-            isSuccess: true,
-            message: isUpdate ? "Appointment updated successfully" : "Appointment added successfully",
-            data: appointment,
+            isSuccess: !!appointment,
+            message: appointment
+                ? (isUpdate ? "Appointment updated successfully" : "Appointment added successfully")
+                : "Failed to create/update appointment",
+            data: appointment || undefined,
         };
     } catch (error) {
-        logger.error("Error in createUpdate:", error);
+        console.error("Error in createUpdate:", error);
         req.apiStatus = {
             isSuccess: false,
             message: "Internal Server Error",
@@ -75,6 +77,7 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
         };
     }
 };
+
 /**
  * Get all appointments for the logged-in nurse
  */
