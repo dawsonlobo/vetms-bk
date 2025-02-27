@@ -1,6 +1,9 @@
 import { Router,Request,Response, NextFunction } from 'express';
 import * as appointment from '../../../controllers/v1/doctor/appointments'
 const router = Router();
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
 
 
 
@@ -34,28 +37,14 @@ const router = Router();
  *               - date
  *               - status
  *             properties:
- *               _id:
+ *               remarks:
  *                 type: string
- *                 description: The ID of the pet for the appointment
- *               doctorId:
- *                 type: string
- *                 description: The ID of the doctor assigned to the appointment
- *               date:
- *                 type: string
- *                 format: date-time
- *                 description: The scheduled date and time of the appointment
- *               status:
- *                 type: string
- *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
- *                 description: Status of the appointment
+ *                 description: remarks related to the appointment
  *           examples:
  *             updateAppointment:
  *               summary: Example request body for updating an appointment
  *               value:
- *                 patientId: "66b3279c39c21f7342c100c4"
- *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-05T14:00:00.000Z"
- *                 status: "COMPLETED"
+ *                 remarks: "the patient needs an surgery"
  *     responses:
  *       200:
  *         description: Appointment record created/updated successfully
@@ -87,7 +76,9 @@ const router = Router();
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",appointment.Update);
+router.post("/update/:_id",entryPoint,
+    authenticateDoctor,verifyDoctor,
+    appointment.Update,exitPoint);
 
 
 
@@ -186,7 +177,7 @@ router.post("/update/:_id",appointment.Update);
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
 
-router.post("/getone/:id",appointment.getOne);
+router.post("/getone/:id",entryPoint, authenticateDoctor,verifyDoctor,appointment.getOne,exitPoint);
 
 
 
@@ -353,7 +344,9 @@ router.post("/getone/:id",appointment.getOne);
  *                         updatedAt: "2024-02-11T15:30:00Z" 
  */
 
-router.post("/getall",appointment.getAll);
+router.post("/getall",entryPoint,
+    authenticateDoctor,verifyDoctor,
+    appointment.getAll,exitPoint);
 
 
 

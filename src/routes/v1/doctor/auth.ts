@@ -1,16 +1,13 @@
 import { Request, Response, NextFunction, Router } from "express";
-// import { loginController, refreshTokenController, logoutController, getDoctorProfile, updateDoctorProfile } from "../../../controllers/v1/doctor/auth";
+import { loginController, refreshTokenController, logoutController, getDoctorProfile, updateDoctorProfile } from "../../../controllers/v1/doctor/auth";
 import * as doctor from "../../../controllers/v1/doctor/auth";
-// import { authenticateDoctor } from "../../../middlewares/auth";
-//import { entryPoint } from "../../../middlewares/entrypoint";
-//import { exitPoint } from "../../../middlewares/exitpoint";
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
+
 
 const router = Router();
-// const asyncHandler = (
-//     fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-// ) => (req: Request, res: Response, next: NextFunction) => {
-//     Promise.resolve(fn(req, res, next)).catch(next);
-// };
+
 
 /**
  * @swagger
@@ -86,9 +83,9 @@ const router = Router();
 
 
 router.post("/doctor/auth/login",
-    //entryPoint, 
+    entryPoint,
     doctor.loginController
-    //,exitPoint
+    ,exitPoint
     );
 
 
@@ -135,7 +132,8 @@ router.post("/doctor/auth/login",
  */
 
 
-// router.post("/doctor/auth/logout", authenticateDoctor, doctor.logoutController);
+router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, doctor.logoutController,exitPoint);
+
 /**
  * @swagger
  * /v1/doctor/auth/profile:
@@ -279,12 +277,12 @@ router.post("/doctor/auth/login",
  */
 
 
-// router.post("/doctor/auth/profile",authenticateDoctor , doctor.getDoctorProfile);
+router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
 
 /**
  * @swagger
- * /v1/doctor/auth/update:
- *   put:
+ * /v1/doctor/auth/update/:
+ *   post:
  *     summary: Update user profile 
  *     tags: [doctor/auth]
  *     security:
@@ -346,7 +344,7 @@ router.post("/doctor/auth/login",
  *                   type: string
  *                   example: "Updated successfully"
  */
-// router.put("/doctor/auth/update",authenticateDoctor, doctor.updateDoctorProfile);
+router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
 
 /**
  * @swagger
@@ -417,6 +415,6 @@ router.post("/doctor/auth/login",
 
 
 
-// router.post("/doctor/auth/refresh",authenticateDoctor, doctor.refreshTokenController);
+router.post("/doctor/auth/refresh",entryPoint,authenticateDoctor,verifyDoctor,doctor.refreshTokenController,exitPoint);
 
 export default router;

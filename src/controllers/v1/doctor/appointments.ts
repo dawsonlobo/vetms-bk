@@ -3,76 +3,95 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
 import { PatientModel } from "../../../models/patients";
 import { aggregateData } from "../../../utils/aggregation";
-import UserModel from "../../../models/users"
 import { ObjectId } from "mongodb";
+import { CONSTANTS } from "../../../config/constant";
+import { ErrorCodes } from "../../../models/models";
 
 
 
 
 
-export const Update = async (req: Request, res: Response): Promise<void> => {
+
+export const Update = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
     try {
-      
-        const{_id}=req.params;
-        const { patientId, doctorId, date, status } = req.body;
+        const { _id } = req.params;
+        const { remarks } = req.body;
 
+        // Find the existing appointment
+        const existingAppointment = await AppointmentModel.findOne({ _id: new ObjectId(_id) });
 
-        const existingUser = await UserModel.findOne({ _id: new ObjectId(doctorId) });
+        if (!existingAppointment) {
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "Internal Server Error",
+            toastMessage: "Something went wrong. Please try again.",
+          };
+          next();
+          return;
+        } 
+              
+            
+            // "Appointment record not found matching the appointment id" });
+            
+        // Extract current status
+        const { status } = existingAppointment;
 
-        if (!existingUser) {
-            res.status(404).json({ message: "Doctor not found" });
-            return;
-        }
-  
-        if (existingUser.role !== "DOCTOR") {
-            res.status(403).json({ message: "doctorId is not authorized as a doctor" });
-            return;
-        }
+        // Prepare update fields
+        const updateFields: Record<string, any> = { remarks };
 
-
-              const existingPatient = await PatientModel.findOne({ _id: new ObjectId(patientId) });
+        // Only update status if it's "pending", do nothing if it's "cancelled"
+        if (status === CONSTANTS.APPOINTMENT_STATUS.PENDING) {
+            updateFields.status = CONSTANTS.APPOINTMENT_STATUS.COMPLETED;
+        } else if (status === CONSTANTS.APPOINTMENT_STATUS.CANCELLED) {
+          console.error("Error fetching data:");
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "Cannot update cancelled or not attended status.",
+            toastMessage: "Cannot update cancelled or not attended status.",
+          };
+          next();
+          return;
+        } 
         
-              if (!existingPatient) {
-                  res.status(404).json({ message: "Patient not found" });
-                  return;
-              }
 
+      
+        // Update appointment
+        const updatedAppointment = await AppointmentModel.findByIdAndUpdate(_id, updateFields, { new: true });
 
-              const existingApointment=await AppointmentModel.findOne({_id:new ObjectId(_id)});
-              if(existingApointment){
-
-              const updateFields = { patientId, doctorId, date, status };
-              
-            //   if (updateFields.isDeleted) {
-            //     delete updateFields.isDeleted;
-            // }
-
-            const updatedAppointments = await AppointmentModel.findByIdAndUpdate(_id, updateFields, { new: true });
-
-
-            if (!updatedAppointments) {
-                res.status(404).json({ status: 404, message: "FollowUp record not found" });
-                return;
-            }
-  
-            res.status(200).json({
-                status: 200,
-                message: "Success",
-                data: "Appointment updated successfully",
-                toastMessage: "Appointment updated successfully",
-            });
-              
-              }else{
-                res.status(404).json({ status: 404, message: "Appointment record not found matching the appointment id" });
-              return;
-              }
-    
+        if (!updatedAppointment) {
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "Follow-up record not found.",
+            toastMessage: "Follow-up record not found.",
+          };
+          next();
+             return;
+        }
+        
+  req.apiStatus = {
+  isSuccess: true,
+  message: "Success",
+  data: "Appointment updated successfully",
+  toastMessage: "Appointment updated successfully",
+};
+next();
+return;
 
     } catch (error) {
-        console.error("Error in createUpdate:", error);
-        res.status(500).json({ status: 500, message: "Internal Server Error" });
-    }
-};
+      console.error("Error fetching data:", error);
+      req.apiStatus = {
+        isSuccess: false,
+        error:ErrorCodes[1002],
+        message: "Something went wrong. Please try again.",
+        toastMessage: "Something went wrong. Please try again.",
+      } 
+      next(); 
+      return;   
+      };
+    };
 
 
 
@@ -82,13 +101,18 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     const { projection = {} } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ status: 400, message: "Invalid Appointment ID" });
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1002],
+        toastMessage: "Invalid Appointment ID",
+      };
+      next();
       return;
     }
-
     const objectId = new mongoose.Types.ObjectId(id); // Convert string to ObjectId
 
     // Remove isDeleted from projection to ensure it's never included
+
     const sanitizedProjection = { ...projection };
     delete sanitizedProjection.isDeleted;
 
@@ -96,26 +120,36 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     const { tableData } = await aggregateData(AppointmentModel, { _id: objectId, isDeleted: false }, sanitizedProjection);
 
     if (!tableData || tableData.length === 0) {
-      res.status(404).json({ status: 404, message: "FollowUp record not found or deleted" });
-      return;
+      req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1010],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
     }
 
     const followUpObj = tableData[0];
-
-    res.status(200).json({
-      status: 200,
+    
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
-      data: followUpObj, // Only includes fields from sanitizedProjection
-    });
+      data: followUpObj,
+    };
+    next();
+    return;
   } catch (error) {
-    console.error("Error fetching FollowUp record:", error);
-    res.status(500).json({
-      status: 500,
-      message: "Internal Server Error",
-      error,
-    });
+    console.error("Error in upsertBilling:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1010],
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+  return;
   }
-};
+  
+  };
 
 
 
@@ -155,12 +189,17 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
       message: "Success",
       data: { totalCount, tableData },
     });
+    next();
+    return;
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
       message: "Internal Server Error",
-      error,
-    });
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
   }
 };
