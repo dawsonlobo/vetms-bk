@@ -37,7 +37,7 @@ const options: swaggerJSDoc.Options = {
           bearerFormat: "JWT",
           description: "Specify the nurse token",
         },
-      },
+      
       doctorBearerAuth: {
         type: "http",
         scheme: "bearer",
@@ -50,7 +50,7 @@ const options: swaggerJSDoc.Options = {
         bearerFormat: "JWT",
         description: "Enter any role's token",
       },
-    },
+    },}
   },
   security: [
     {

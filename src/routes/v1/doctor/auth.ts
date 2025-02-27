@@ -4,6 +4,8 @@ import * as doctor from "../../../controllers/v1/doctor/auth";
 // import { authenticateDoctor } from "../../../middlewares/auth";
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
+
 
 const router = Router();
 
@@ -82,7 +84,7 @@ const router = Router();
 
 
 router.post("/doctor/auth/login",
-    entryPoint, 
+    entryPoint, authenticateDoctor,verifyDoctor,
     doctor.loginController
     ,exitPoint
     );
@@ -131,7 +133,7 @@ router.post("/doctor/auth/login",
  */
 
 
-router.post("/doctor/auth/logout",entryPoint, doctor.logoutController,exitPoint);
+router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, doctor.logoutController,exitPoint);
 
 /**
  * @swagger
@@ -276,7 +278,7 @@ router.post("/doctor/auth/logout",entryPoint, doctor.logoutController,exitPoint)
  */
 
 
-router.post("/doctor/auth/profile",entryPoint , doctor.getDoctorProfile,exitPoint);
+router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
 
 /**
  * @swagger
@@ -343,7 +345,7 @@ router.post("/doctor/auth/profile",entryPoint , doctor.getDoctorProfile,exitPoin
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/doctor/auth/update",entryPoint, doctor.updateDoctorProfile,exitPoint);
+router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
 
 /**
  * @swagger
@@ -414,6 +416,6 @@ router.put("/doctor/auth/update",entryPoint, doctor.updateDoctorProfile,exitPoin
 
 
 
-router.post("/doctor/auth/refresh",entryPoint, doctor.refreshTokenController,exitPoint);
+router.post("/doctor/auth/refresh",entryPoint,authenticateDoctor,verifyDoctor,doctor.refreshTokenController,exitPoint);
 
 export default router;

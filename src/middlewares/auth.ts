@@ -33,7 +33,7 @@ export async function verifyAdmin(req: Request, res: Response, next: NextFunctio
 
     next();
 
-}
+};
 
 //Specifically ensures that the token exists in the database and is valid for an admin user
 export const authenticateAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -259,3 +259,37 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
         return;
     }
 };
+
+
+
+export async function verifyDoctor(req: Request, res: Response, next: NextFunction):Promise<void> {
+    console.log("Req User in verifyAdmin:", req.user); // Debugging
+
+    if (!req.user) {
+        res.status(401).json({
+            status: 401,
+            message: "Unauthorized",
+            data: "User authentication failed.",
+            toastMessage: "Please log in to continue.",
+        });
+        return;
+    }
+
+    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
+
+    if (user.role !== UserRole.DOCTOR) {
+        res.status(403).json({
+            status: 403,
+            message: "Forbidden",
+            data: "DOCTOR access required.",
+            toastMessage: "You do not have permission to access this resource.",
+        });
+        return;
+    }
+
+    next();
+
+}
+
+
+

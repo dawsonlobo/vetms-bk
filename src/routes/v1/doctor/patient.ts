@@ -3,6 +3,7 @@ import * as patients from '../../../controllers/v1/doctor/patient'
 const router = Router();
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
 
 
 
@@ -151,7 +152,7 @@ import { entryPoint } from '../../../middlewares/entrypoint';
  *                     updatedAt: "2024-02-20T15:45:30Z"
  */
 
-router.post("/getone/:id",entryPoint,patients.getOne,exitPoint);
+router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.getOne,exitPoint);
 
 
 
@@ -363,7 +364,7 @@ router.post("/getone/:id",entryPoint,patients.getOne,exitPoint);
  *                         createdAt: "2024-02-19T12:34:56Z"
  *                         updatedAt: "2024-02-20T15:45:30Z"
  */
-router.post("/getall",entryPoint,patients.getAll,exitPoint);
+router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll,exitPoint);
 
 
 
@@ -443,7 +444,7 @@ router.post("/getall",entryPoint,patients.getAll,exitPoint);
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",entryPoint,patients.Update,exitPoint);
+router.post("/update/:_id",entryPoint,authenticateDoctor,verifyDoctor,patients.Update,exitPoint);
 
 
 export default router;

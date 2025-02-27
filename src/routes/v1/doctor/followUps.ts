@@ -2,6 +2,7 @@ import { Router,Request,Response, NextFunction } from 'express';
 import * as followUp from '../../../controllers/v1/doctor/followUps'
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
+import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
 
 const router = Router();
 
@@ -111,7 +112,7 @@ const router = Router();
 
 
 
-router.post("/createupdate",entryPoint,followUp.createUpdateFollowUp,exitPoint);
+router.post("/createupdate",entryPoint,authenticateDoctor,verifyDoctor,followUp.createUpdateFollowUp,exitPoint);
 
 /**
  * @swagger
@@ -218,7 +219,7 @@ router.post("/createupdate",entryPoint,followUp.createUpdateFollowUp,exitPoint);
 
 
 
-router.post("/getone/:id",entryPoint,followUp.getOne,exitPoint);
+router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.getOne,exitPoint);
 
 
 
@@ -284,7 +285,7 @@ router.post("/getone/:id",entryPoint,followUp.getOne,exitPoint);
  *               error: "Follow-up record not found or already deleted"
  */
 
-router.post("/delete/:id",entryPoint,followUp.deleteFollowUp,exitPoint);
+router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.deleteFollowUp,exitPoint);
 
 
 /**
@@ -456,6 +457,6 @@ router.post("/delete/:id",entryPoint,followUp.deleteFollowUp,exitPoint);
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
 
-router.post("/getall",entryPoint,followUp.getAll,exitPoint);
+router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,followUp.getAll,exitPoint);
 
 export default router;
