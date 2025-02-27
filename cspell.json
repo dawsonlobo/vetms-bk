@@ -1,0 +1,31 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "words": [
+      "authtoken",
+      "exitpoint",
+      "doctorappointments",
+      "appoitments",
+      "doctorpatients",
+      "NOTATTENDED",
+      "Vetms",
+      "Veterinary",
+      "Apointment",
+      "XVCJ",
+      "IOTP",
+      "discrption",
+      "Deworming",
+      "rammy",
+      "securepassword",
+      "getone",
+      "createupdate",
+      "Otibiotic",
+      "uniqid",
+      "Veternary"
+    ],
+    "ignorePaths": [
+      "**/node_modules/**",
+      "**/dist/**"
+    ]
+  }
+  

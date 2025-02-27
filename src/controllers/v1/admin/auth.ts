@@ -144,12 +144,12 @@ export async function refreshTokenController(req: Request, res: Response, next: 
 
         // Generate new tokens
         const { accessToken, accessExpiresAt } = generateAccessToken(String(user._id));
-        const { refreshToken: newRefreshToken, refreshExpiresAt } = generateRefreshToken(String(user._id));
+        //const { refreshToken: newRefreshToken, refreshExpiresAt } = generateRefreshToken(String(user._id));
 
         // Update refresh token in DB
         await RefreshToken.findOneAndUpdate(
             { userId: user._id },
-            { token: newRefreshToken, refreshExpiresAt: refreshExpiresAt },
+            //{ token: newRefreshToken, refreshExpiresAt: refreshExpiresAt },
             { upsert: true }
         );
 
@@ -164,7 +164,7 @@ export async function refreshTokenController(req: Request, res: Response, next: 
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
                 access_token: accessToken,
-                refresh_token: newRefreshToken,
+                //refresh_token: newRefreshToken,
                 tokenExpiresAt: accessExpiresAt, // You can change this if you want refresh expiry here
             }
         };

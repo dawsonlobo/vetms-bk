@@ -24,7 +24,7 @@ import { Schema, model, Document } from "mongoose";
  *         token:
  *           type: string
  *           description: JWT or session token for authentication
- *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC9..."
  *         createdAt:
  *           type: string
  *           format: date-time
