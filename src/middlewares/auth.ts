@@ -332,7 +332,7 @@ export async function verifyDoctor(req: Request, res: Response, next: NextFuncti
     
 
     // Check if the user's role is DOCTOR
-    if (existingUser.role !== UserRole.DOCTOR) {
+    if (existingUser.role !== CONSTANTS.USER_ROLE.DOCTOR) {
         res.status(403).json({
             status: 403,
             message: "Forbidden",
