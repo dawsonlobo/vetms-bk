@@ -1,4 +1,4 @@
-import { Router,Request,Response, NextFunction } from 'express';
+import { Router } from 'express';
 import * as followUp from '../../../controllers/v1/doctor/followUps'
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';

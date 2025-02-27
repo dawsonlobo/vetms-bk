@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
 import {PatientModel} from "../../../models/patients"
 import { aggregateData } from "../../../utils/aggregation";
@@ -6,7 +6,7 @@ import { aggregateData } from "../../../utils/aggregation";
 
 
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -49,7 +49,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
 
 
 
-export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getAll(req: Request, res: Response): Promise<void> {
   try {
     const {
       projection = {},
@@ -125,6 +125,7 @@ export const Update = async (req: Request, res: Response): Promise<void> => {
                 data: "Appointment updated successfully",
                 toastMessage: "Appointment updated successfully",
             });
+
               
               
     

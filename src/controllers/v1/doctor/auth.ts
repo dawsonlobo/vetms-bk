@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { config } from "../../../config/config";
-import UserModel, { IUserDocument } from "../../../models/users";
+import UserModel from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
 import bcrypt from "bcryptjs";
@@ -8,7 +8,7 @@ import winston from "winston";
 import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import {ErrorCodes} from "../../../models/models"
 
-const { JWT_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
+const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 const logger: winston.Logger = winston.createLogger({
     level: "error",
@@ -181,7 +181,6 @@ export async function refreshTokenController  (req: Request, res: Response, next
 }
 
 // Logout Controller
-const ACCESS_SECRET = config.JWT_SECRET || "default_access_secret";
 
 
 
@@ -310,7 +309,8 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
             toastMessage: "Admin profile fetched successfully",
         };
 
-        return next();
+        next();
+        return
     } catch (error) {
         console.error(`Error fetching admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
@@ -379,6 +379,7 @@ export async function updateDoctorProfile  (req: Request, res: Response, next: N
 
         req.apiStatus = {
             isSuccess: true,
+            message:"Success",
             data: "Updated successfully",
             toastMessage: "Updated successfully",
         };
