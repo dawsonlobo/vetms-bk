@@ -1,9 +1,9 @@
-import { Router,Request,Response, NextFunction } from 'express';
-import {getAll,getOne} from '../../../controllers/v1/admin/followUps'
-import { authenticateAdmin } from '../../../middlewares/auth';
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-
+import { Router } from "express";
+import { getAll, getOne } from "../../../controllers/v1/admin/followUps";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
 const router = Router();
 
 /**
@@ -174,18 +174,20 @@ const router = Router();
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post('/getAll',
-    entryPoint,
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    exitPoint
-    );
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint
+);
 
 /**
  * @swagger
  * /v1/admin/followUps/getOne/{id}:
  *   post:
- *     summary: Get one follow-up 
+ *     summary: Get one follow-up
  *     tags: [admin/followUps]
  *     security:
  *       - adminBearerAuth: []  # Requires a bearer token
@@ -281,11 +283,13 @@ router.post('/getAll',
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post('/getOne/:id',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     exitPoint
-     );
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint
+);
 
-    export default router;
+export default router;

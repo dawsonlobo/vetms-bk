@@ -3,7 +3,7 @@ import tsparser from "@typescript-eslint/parser";
 
 export default [
   {
-    ignores: ["node_modules/", "dist/", "public/swagger/web-components.min.js"],
+    ignores: ["node_modules/", "dist/", "public/swagger/web-components.min.js","lib"],
   },
   {
     languageOptions: {

@@ -1,11 +1,25 @@
 import { Request, Response, RequestHandler } from "express";
 import { ResponseObj } from "../models/models";
-import { IUser, IUserDocument } from "../models/users";
+import { IUser } from "../models/users";
 import { ObjectId } from "bson";
 import logger from "../logger/v1/logger";
 type bodyType = string | object | object[];
 //import { User } from "../model/user"; // Adjust import as per your project structure
 
+const removeIsDeleted = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(removeIsDeleted);
+  } else if (typeof data === "object" && data !== null) {
+    const newData: any = {};
+    for (const key in data) {
+      if (key !== "isDeleted") {
+        newData[key] = removeIsDeleted(data[key]);
+      }
+    }
+    return newData;
+  }
+  return data;
+};
 
 
 declare global {
@@ -94,7 +108,7 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
       const responseObj = new ResponseObj(
         200,
         "Success",
-        req.apiStatus.data ?? "",
+        removeIsDeleted(req.apiStatus.data)?? "",
         req.apiStatus.toastMessage ?? ""
       );
       res.status(responseObj.status).json(responseObj);
@@ -102,7 +116,7 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
       const responseObj = new ResponseObj(
         req.apiStatus?.error?.statusCode ?? 500,
         req.apiStatus?.error?.message ?? "Unknown error",
-        req.apiStatus?.data ?? "",
+        removeIsDeleted(req.apiStatus?.data) ?? "",
         req.apiStatus?.toastMessage ?? ""
       );
       res.status(responseObj.status).json(responseObj);

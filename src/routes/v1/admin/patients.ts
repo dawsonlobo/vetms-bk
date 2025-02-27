@@ -1,8 +1,9 @@
-import { Router } from 'express';
-import { getAll, getOne } from '../../../controllers/v1/admin/patients';
-import { entryPoint} from '../../../middlewares/entrypoint';
-import { exitPoint } from '../../../middlewares/exitpoint';
-
+import { Router } from "express";
+import { getAll, getOne } from "../../../controllers/v1/admin/patients";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
 const router = Router();
 /**
  * @swagger
@@ -12,7 +13,7 @@ const router = Router();
  *       - admin/patients
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get all 
+ *     summary: Get all
  *     requestBody:
  *       required: true
  *       content:
@@ -65,7 +66,7 @@ const router = Router();
  *                summary: filter example
  *                value:
  *                  filter:
- *                    name: "rammy" 
+ *                    name: "rammy"
  *             singleDateExample:
  *               summary: Multi-date Example
  *               value:
@@ -197,131 +198,134 @@ const router = Router();
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',
-    entryPoint,
-    // passport.authenticate('bearer', { session: false }),
-     getAll,
-     exitPoint
-     );
- /**
-  * @swagger
-  * /v1/admin/patients/getOne/{id}:
-  *   post:
-  *     tags:
-  *       - admin/patients
-  *     security:
-  *       - adminBearerAuth: []
-  *     summary: Get one 
-  *     parameters:
-  *       - in: path
-  *         name: id
-  *         required: true
-  *         schema:
-  *           type: string
-  *         description: The unique identifier of the patient to retrieve
-  *     requestBody:
-  *       required: true
-  *       content:
-  *         application/json:
-  *           schema:
-  *             type: object
-  *             properties:
-  *               project:
-  *                 type: object
-  *                 description: Fields to include or exclude in the response
-  *           examples:
-  *             projectionExample:
-  *               summary: Example with projection
-  *               value:
-  *                 projection:
-  *                   _id: 1
-  *                   name: 1
-  *     responses:
-  *       200:
-  *         description: Get one patient.
-  *         content:
-  *           application/json:
-  *             schema:
-  *               type: object
-  *               properties:
-  *                 status:
-  *                   type: integer
-  *                   format: int64
-  *                 message:
-  *                   type: string
-  *                 data:
-  *                   type: object
-  *                   properties:
-  *                          _id:
-  *                            type: string
-  *                            description: The unique ID of the patient
-  *                          name:
-  *                            type: string
-  *                            description: The name of the patient
-  *                          species:
-  *                            type: string
-  *                            description: The species of the patient
-  *                          breed:
-  *                            type: string
-  *                            description: The breed of the patient
-  *                          age:
-  *                            type: integer
-  *                            description: The age of the patient
-  *                          weight:
-  *                            type: number
-  *                            format: float
-  *                            description: The weight of the patient
-  *                          gender:
-  *                            type: string
-  *                            enum: ["MALE", "FEMALE"]
-  *                            description: The gender of the patient
-  *                          medicalHistory:
-  *                            type: array
-  *                            items:
-  *                              type: string
-  *                            description: The medical history of the patient
-  *                          BMI:
-  *                            type: number
-  *                            format: float
-  *                            description: The BMI of the patient
-  *                          bloodGroup:
-  *                            type: string
-  *                            enum: ["DEA 1.1+", "DEA 1.1-", "DEA 1.2+", "DEA 1.2-", "DEA 3", "DEA 4", "DEA 5", "DEA 7", "A", "B", "AB"]
-  *                            description: The blood group of the patient
-  *                          createdAt:
-  *                            type: string
-  *                            format: date-time
-  *                            description: Timestamp when the patient record was created
-  *                          updatedAt:
-  *                            type: string
-  *                            format: date-time
-  *                            description: Timestamp when the patient record was last updated
-  *             examples:
-  *               get-one-patient:
-  *                 summary: Successful response
-  *                 value:
-  *                   status: 200
-  *                   message: "Success"
-  *                   data:
-  *                     _id: "66b3279c39c21f7342c1520p"
-  *                     name: "Buddy"
-  *                     species: "Dog"
-  *                     breed: "Labrador Retriever"
-  *                     age: 5
-  *                     weight: 30.5
-  *                     gender: "MALE"
-  *                     medicalHistory: "Vaccinated, No known allergies"
-  *                     BMI: 23.4
-  *                     bloodGroup: "DEA 1.1+"
-  *                     createdAt: "2025-02-01T08:00:00Z"
-  *                     updatedAt: "2025-02-01T08:00:00Z"
-  */
- 
- 
- router.post('/getOne/:id',
-    entryPoint,
-     // passport.authenticate('bearer', { session: false }),
-      getOne,
-      exitPoint
-      );
-  export default router;
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint
+);
+/**
+ * @swagger
+ * /v1/admin/patients/getOne/{id}:
+ *   post:
+ *     tags:
+ *       - admin/patients
+ *     security:
+ *       - adminBearerAuth: []
+ *     summary: Get one
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the patient to retrieve
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project:
+ *                 type: object
+ *                 description: Fields to include or exclude in the response
+ *           examples:
+ *             projectionExample:
+ *               summary: Example with projection
+ *               value:
+ *                 projection:
+ *                   _id: 1
+ *                   name: 1
+ *     responses:
+ *       200:
+ *         description: Get one patient.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   format: int64
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                          _id:
+ *                            type: string
+ *                            description: The unique ID of the patient
+ *                          name:
+ *                            type: string
+ *                            description: The name of the patient
+ *                          species:
+ *                            type: string
+ *                            description: The species of the patient
+ *                          breed:
+ *                            type: string
+ *                            description: The breed of the patient
+ *                          age:
+ *                            type: integer
+ *                            description: The age of the patient
+ *                          weight:
+ *                            type: number
+ *                            format: float
+ *                            description: The weight of the patient
+ *                          gender:
+ *                            type: string
+ *                            enum: ["MALE", "FEMALE"]
+ *                            description: The gender of the patient
+ *                          medicalHistory:
+ *                            type: array
+ *                            items:
+ *                              type: string
+ *                            description: The medical history of the patient
+ *                          BMI:
+ *                            type: number
+ *                            format: float
+ *                            description: The BMI of the patient
+ *                          bloodGroup:
+ *                            type: string
+ *                            enum: ["DEA 1.1+", "DEA 1.1-", "DEA 1.2+", "DEA 1.2-", "DEA 3", "DEA 4", "DEA 5", "DEA 7", "A", "B", "AB"]
+ *                            description: The blood group of the patient
+ *                          createdAt:
+ *                            type: string
+ *                            format: date-time
+ *                            description: Timestamp when the patient record was created
+ *                          updatedAt:
+ *                            type: string
+ *                            format: date-time
+ *                            description: Timestamp when the patient record was last updated
+ *             examples:
+ *               get-one-patient:
+ *                 summary: Successful response
+ *                 value:
+ *                   status: 200
+ *                   message: "Success"
+ *                   data:
+ *                     _id: "66b3279c39c21f7342c1520p"
+ *                     name: "Buddy"
+ *                     species: "Dog"
+ *                     breed: "Labrador Retriever"
+ *                     age: 5
+ *                     weight: 30.5
+ *                     gender: "MALE"
+ *                     medicalHistory: "Vaccinated, No known allergies"
+ *                     BMI: 23.4
+ *                     bloodGroup: "DEA 1.1+"
+ *                     createdAt: "2025-02-01T08:00:00Z"
+ *                     updatedAt: "2025-02-01T08:00:00Z"
+ */
+
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint
+);
+export default router;

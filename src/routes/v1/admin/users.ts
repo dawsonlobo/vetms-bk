@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
-import { authenticateAdmin } from '../../../middlewares/auth';
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
+import { verifyAdmin } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
 const router = Router()
 /**
 /**
@@ -89,7 +90,8 @@ const router = Router()
  */
 router.post('/create',
     entryPoint,
-    // passport.authenticate('bearer', { session: false }), 
+    passport.authenticate('bearer', { session: false }), 
+    verifyAdmin,
     createUser, 
     exitPoint
     );
@@ -176,7 +178,8 @@ router.post('/create',
  */
 router.put('/update/:id',
      entryPoint,
-    //passport.authenticate('bearer', { session: false }),
+    passport.authenticate('bearer', { session: false }),
+    verifyAdmin,
      updateUser,
     exitPoint
     );
@@ -233,7 +236,8 @@ router.put('/update/:id',
 */
 router.delete('/delete/:id',
     entryPoint,
-    //passport.authenticate('bearer', { session: false }),
+    passport.authenticate('bearer', { session: false }),
+    verifyAdmin,
     deleteUser, 
      exitPoint
     );
@@ -393,7 +397,8 @@ router.delete('/delete/:id',
 
 router.post('/getAll',
     entryPoint,
-   // passport.authenticate('bearer', { session: false }),
+    passport.authenticate('bearer', { session: false }),
+    verifyAdmin,
     getAll,
     exitPoint
     );
@@ -484,7 +489,8 @@ router.post('/getAll',
 
 router.post('/getOne/:id',
     entryPoint,
-    // passport.authenticate('bearer', { session: false }),
+     passport.authenticate('bearer', { session: false }),
+     verifyAdmin,
      getOne,
      exitPoint
      );
