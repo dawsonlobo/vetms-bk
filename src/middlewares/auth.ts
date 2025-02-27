@@ -294,3 +294,46 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
         return;
     }
 };
+
+export async function verifyDoctor(req: Request, res: Response, next: NextFunction): Promise<void> {
+    console.log("Req User in verifyAdmin:", req.user); // Debugging
+
+    if (!req.user) {
+        res.status(401).json({
+            status: 401,
+            message: "Unauthorized",
+            data: "User authentication failed.",
+            toastMessage: "Please log in to continue.",
+        });
+        return;
+    }
+
+    const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
+
+    // Find the existing user by their ID (using req.user.id)
+    const existingUser = await UserModel.findById(user.id);
+
+    if (!existingUser) {
+        res.status(404).json({
+            status: 404,
+            message: "User not found",
+            data: "The user does not exist in the database.",
+            toastMessage: "User not found in the system.",
+        });
+        return;
+    }
+    
+
+    // Check if the user's role is DOCTOR
+    if (existingUser.role !== UserRole.DOCTOR) {
+        res.status(403).json({
+            status: 403,
+            message: "Forbidden",
+            data: "DOCTOR access required.",
+            toastMessage: "You do not have permission to access this resource.",
+        });
+        return;
+    }
+
+    next(); // Proceed to the next middleware or route handler
+}
