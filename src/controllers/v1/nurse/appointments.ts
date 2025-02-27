@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
 import { aggregateData } from "../../../utils/aggregation";
 
+/**
+ * Create or update an appointment (Nurse only)
+ */
+
 export const createUpdate = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = req.user as { _id?: string }; // Ensure user type
@@ -13,6 +17,19 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
 
         const { _id, ...appointmentData } = req.body;
 
+        // Prevent sending restricted fields
+       // If updating, prevent modifying restricted fields
+        if (_id && (req.body.patientId || req.body.nurseId)) {
+            req.apiStatus = {
+                isSuccess: false,
+                message: "Invalid fields in request",
+                error: { statusCode: 400, message: "You cannot modify patientId or nurseId during an update" },
+            };
+            return;
+        }
+
+
+        // Validate `_id` if updating
         if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
             res.status(400).json({ status: 400, message: "Invalid Appointment ID" });
             return;
@@ -22,35 +39,54 @@ export const createUpdate = async (req: Request, res: Response): Promise<void> =
         let appointment;
 
         if (isUpdate) {
+            // Update appointment (Only update provided fields)
             appointment = await AppointmentModel.findOneAndUpdate(
-                { _id, nurseId: user._id }, // Ensure the nurse is assigned
-                appointmentData,
+                { _id, nurseId }, // Ensure only assigned nurse can update
+                { 
+                    ...(doctorId && { doctorId }),
+                    ...(date && { date }),
+                    ...(status && { status }) // Update status only if provided
+                }, 
                 { new: true }
             ).exec();
         } else {
-            appointment = await new AppointmentModel({ ...appointmentData, nurseId: user._id }).save();
+            // Create new appointment with status "PENDING"
+            appointment = await new AppointmentModel({
+                doctorId,
+                date,
+                nurseId,
+                status: "PENDING", // Ensure new appointments always start as "PENDING"
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }).save();
         }
 
-        if (!appointment) {
-            res.status(404).json({ status: 404, message: "Appointment not found or unauthorized" });
-            return;
-        }
-
-        res.status(200).json({
-            status: 200,
+        req.apiStatus = {
+            isSuccess: true,
             message: isUpdate ? "Appointment updated successfully" : "Appointment added successfully",
-        });
+            data: appointment,
+        };
     } catch (error) {
-        console.error("Error in createUpdate:", error);
-        res.status(500).json({ status: 500, message: "Internal Server Error" });
+        logger.error("Error in createUpdate:", error);
+        req.apiStatus = {
+            isSuccess: false,
+            message: "Internal Server Error",
+            error: { statusCode: 500, message: "Something went wrong while processing the appointment" },
+        };
     }
 };
-
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+/**
+ * Get all appointments for the logged-in nurse
+ */
+export const getAll = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = req.user as { _id?: string };
         if (!user?._id) {
-            res.status(401).json({ status: 401, message: "Unauthorized" });
+            req.apiStatus = {
+                isSuccess: false,
+                message: "Unauthorized access",
+                error: { statusCode: 401, message: "User not authenticated" },
+            };
             return;
         }
 

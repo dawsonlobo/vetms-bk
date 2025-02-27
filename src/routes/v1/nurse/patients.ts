@@ -1,4 +1,3 @@
-
 import { Router,Request,Response,NextFunction } from 'express';
 import { getAllForNurse, getOneForNurse  } from '../../../controllers/v1/nurse/patients';
 import { authenticateNurse } from '../../../middlewares/auth';

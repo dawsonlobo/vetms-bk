@@ -12,9 +12,9 @@ import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
 import patients from './routes/v1/admin/patients'
 import users from './routes/v1/admin/users'
 import inventories from './routes/v1/admin/inventories'
-import appointments from './routes/v1/admin/appointments'
 import doctorappointments from './routes/v1/doctor/appoitments'
 import doctorpatients from './routes/v1/doctor/patient'
+import adminAppointments from './routes/v1/admin/appointments'
 import followUps from './routes/v1/admin/followUps'
 import doctorFollowUps from './routes/v1/doctor/followUps'
 import billings from './routes/v1/admin/billings'
@@ -23,6 +23,7 @@ import doctors from './routes/v1/doctor/auth'
 import rPatients from './routes/v1/receptionist/rPatients'
 import rAppointments from './routes/v1/receptionist/rAppointments'
 import nurseAuth from "./routes/v1/nurse/auth"; 
+import nurseAppointments from "./routes/v1/nurse/appointments";
 import ngrok from "ngrok";
 dotenv.config();
 
@@ -48,7 +49,7 @@ app.use('/v1',adminAuth)
 app.use('/v1/admin/patients',patients)
 app.use('/v1/admin/users',users)
 app.use('/v1/admin/inventory',inventories)
-app.use('/v1/admin/appointments',appointments)
+app.use('/v1/admin/appointments',adminAppointments)
 app.use('/v1/admin/followUps',followUps)
 app.use('/v1/admin/billings',billings)
 app.use('/v1/admin/payments',payments)
@@ -56,6 +57,7 @@ app.use('/v1/receptionist/patients',rPatients);
 app.use('/v1/receptionist/appointments',rAppointments);
 app.use(express.urlencoded({ extended: true }));
 app.use('/v1',nurseAuth)
+app.use('/v1/nurse/appointments',nurseAppointments)
 // app.use((req, res, next) => {
 //   res.setHeader("ngrok-skip-browser-warning", "true");
 //   next();
