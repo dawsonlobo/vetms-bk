@@ -37,28 +37,14 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *               - date
  *               - status
  *             properties:
- *               _id:
+ *               remarks:
  *                 type: string
- *                 description: The ID of the pet for the appointment
- *               doctorId:
- *                 type: string
- *                 description: The ID of the doctor assigned to the appointment
- *               date:
- *                 type: string
- *                 format: date-time
- *                 description: The scheduled date and time of the appointment
- *               status:
- *                 type: string
- *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
- *                 description: Status of the appointment
+ *                 description: remarks related to the appointment
  *           examples:
  *             updateAppointment:
  *               summary: Example request body for updating an appointment
  *               value:
- *                 patientId: "66b3279c39c21f7342c100c4"
- *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-05T14:00:00.000Z"
- *                 status: "COMPLETED"
+ *                 remarks: "the patient needs an surgery"
  *     responses:
  *       200:
  *         description: Appointment record created/updated successfully

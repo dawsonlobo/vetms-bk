@@ -1,7 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import passport from "passport";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import { config } from "../../../config/config";
 import UserModel, { IUserDocument } from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";

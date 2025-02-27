@@ -215,9 +215,10 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
             });
             return 
         }
-
+            
         // Check if the token exists in the database (ensures accessToken is valid)
         const storedAccessToken = await AccessToken.findOne({ token: accessToken });
+
         if (!storedAccessToken) {
             res.status(403).json({
                 status: 403,
@@ -232,7 +233,6 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
         let decoded: any;
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
-            console.log(decoded);
             
         } catch (error) {
             res.status(403).json({
@@ -262,7 +262,8 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
 
 
 
-export async function verifyDoctor(req: Request, res: Response, next: NextFunction):Promise<void> {
+
+export async function verifyDoctor(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log("Req User in verifyAdmin:", req.user); // Debugging
 
     if (!req.user) {
@@ -277,7 +278,22 @@ export async function verifyDoctor(req: Request, res: Response, next: NextFuncti
 
     const user = req.user as { id: string; role: string; email: string }; // Explicitly defining expected properties
 
-    if (user.role !== UserRole.DOCTOR) {
+    // Find the existing user by their ID (using req.user.id)
+    const existingUser = await UserModel.findById(user.id);
+
+    if (!existingUser) {
+        res.status(404).json({
+            status: 404,
+            message: "User not found",
+            data: "The user does not exist in the database.",
+            toastMessage: "User not found in the system.",
+        });
+        return;
+    }
+    
+
+    // Check if the user's role is DOCTOR
+    if (existingUser.role !== UserRole.DOCTOR) {
         res.status(403).json({
             status: 403,
             message: "Forbidden",
@@ -287,9 +303,5 @@ export async function verifyDoctor(req: Request, res: Response, next: NextFuncti
         return;
     }
 
-    next();
-
+    next(); // Proceed to the next middleware or route handler
 }
-
-
-

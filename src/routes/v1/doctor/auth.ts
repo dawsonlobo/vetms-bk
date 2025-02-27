@@ -84,7 +84,7 @@ const router = Router();
 
 
 router.post("/doctor/auth/login",
-    entryPoint, authenticateDoctor,verifyDoctor,
+    entryPoint,
     doctor.loginController
     ,exitPoint
     );
