@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
 import { PatientModel } from "../../../models/patients";
 import { aggregateData } from "../../../utils/aggregation";
-import UserModel from "../../../models/users"
 import { ObjectId } from "mongodb";
 import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
@@ -124,13 +123,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       req.apiStatus = {
       isSuccess: false,
       error: ErrorCodes[1010],
-      toastMessage: 
+      toastMessage: "Something went wrong. Please try again.",
     };
     next();
     return;
     }
-
-    // "Something went wrong. Please try again."
 
     const followUpObj = tableData[0];
     
