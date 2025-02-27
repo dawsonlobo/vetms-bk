@@ -46,20 +46,16 @@
  */
 
 import mongoose, { Schema, Document } from "mongoose";
+import { CONSTANTS } from "../config/constant";
 
-export enum UserRole {
-    ADMIN = "ADMIN",
-    DOCTOR = "DOCTOR",
-    RECEPTIONIST = "RECEPTIONIST",
-    NURSE = "NURSE",
-  }
+
   
   export interface IUser {
     _id?: mongoose.Types.ObjectId;
     name: string;
     email: string;
     password: string;
-    role: UserRole;  // Uses the Enum
+    role: keyof typeof CONSTANTS.USER_ROLE;
     createdAt?: Date;
     updatedAt?: Date;
     isDeleted: boolean
@@ -75,7 +71,7 @@ export enum UserRole {
       name: { type: String, required: true },
       email: { type: String, required: true, unique: true },
       password: { type: String, required: true },
-      role: { type: String, enum: Object.values(UserRole), required: true },
+      role: { type: String, enum: Object.values(CONSTANTS.USER_ROLE), required: true },
       isDeleted: { type: Boolean, default: false }
     },
     {     timestamps: true,

@@ -1,4 +1,4 @@
-import { Router,Request,Response } from 'express';
+import { Router} from 'express';
 import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/receptionist/appointments'
 const router = Router();
 

@@ -1,4 +1,4 @@
-import { Router,Request,Response, NextFunction } from 'express';
+import { Router } from 'express';
 import * as patients from '../../../controllers/v1/doctor/patient'
 const router = Router();
 import { exitPoint } from '../../../middlewares/exitpoint';

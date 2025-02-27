@@ -120,16 +120,14 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     try {
         const user = req.user as { _id?: string };
         if (!user?._id) {
-            res.status(401).json({ status: 401, message: "Unauthorized" });
-            return;
+            return next({ status: 401, message: "Unauthorized" });
         }
 
         const { id } = req.params;
         const { projection } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            res.status(400).json({ status: 400, message: "Invalid appointment ID" });
-            return;
+            return next({ status: 400, message: "Invalid appointment ID" });
         }
 
         const result = await aggregateData(
@@ -139,14 +137,13 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
         );
 
         if (!result.tableData.length) {
-            res.status(404).json({ status: 404, message: "Appointment not found or unauthorized" });
-            return;
+            return next({ status: 404, message: "Appointment not found or unauthorized" });
         }
 
         res.status(200).json({ status: 200, message: "Success", data: result.tableData[0] });
     } catch (error) {
         console.error("Error fetching appointment:", error);
-        res.status(500).json({ status: 500, message: "Internal Server Error" });
+        return next(error); // Pass the error to Express error handling middleware
     }
 };
 

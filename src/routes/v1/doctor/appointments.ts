@@ -1,4 +1,4 @@
-import { Router,Request,Response, NextFunction } from 'express';
+import { Router } from 'express';
 import * as appointment from '../../../controllers/v1/doctor/appointments'
 const router = Router();
 import { exitPoint } from '../../../middlewares/exitpoint';

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction, Router } from "express";
-import { loginController, refreshTokenController, logoutController, getDoctorProfile, updateDoctorProfile } from "../../../controllers/v1/doctor/auth";
+import {  Router } from "express";
+// import { loginController, refreshTokenController, logoutController, getDoctorProfile, updateDoctorProfile } from "../../../controllers/v1/doctor/auth";
 import * as doctor from "../../../controllers/v1/doctor/auth";
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';

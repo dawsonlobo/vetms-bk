@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { config } from "../../../config/config";
-import UserModel, { IUserDocument } from "../../../models/users";
+import UserModel from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
 import bcrypt from "bcryptjs";
@@ -8,14 +8,7 @@ import winston from "winston";
 import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import {ErrorCodes} from "../../../models/models"
 
-const { JWT_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
-
-const logger: winston.Logger = winston.createLogger({
-    level: "error",
-    format: winston.format.json(),
-    transports: [new winston.transports.Console()],
-  });
- export default logger; 
+const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 
 // Login Controller
@@ -43,7 +36,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
-                data: "Invalid email or password",
+                data: "Failed to login",
                 toastMessage: "Invalid email or password",
             };
             next();
@@ -77,7 +70,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
         next();
         return;
     } catch (error) {
-        logger.error("Login error:", error);
+        console.error("Login error:", error);
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
@@ -169,7 +162,7 @@ export async function refreshTokenController  (req: Request, res: Response, next
         };
         next();
     } catch (error) {
-        logger.error("Refresh token error:", error);
+        console.error("Refresh token error:", error);
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
@@ -181,7 +174,6 @@ export async function refreshTokenController  (req: Request, res: Response, next
 }
 
 // Logout Controller
-const ACCESS_SECRET = config.JWT_SECRET || "default_access_secret";
 
 
 
@@ -239,7 +231,7 @@ export async function logoutController (req: Request, res: Response, next: NextF
 
         return next();
     } catch (error: unknown) {
-        logger.error(`Logout error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        console.error(`Logout error: ${error instanceof Error ? error.message : "Unknown error"}`);
 
         req.apiStatus = {
             isSuccess: false,
@@ -310,7 +302,8 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
             toastMessage: "Admin profile fetched successfully",
         };
 
-        return next();
+        next();
+        return
     } catch (error) {
         console.error(`Error fetching admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
@@ -379,6 +372,7 @@ export async function updateDoctorProfile  (req: Request, res: Response, next: N
 
         req.apiStatus = {
             isSuccess: true,
+            message:"Success",
             data: "Updated successfully",
             toastMessage: "Updated successfully",
         };

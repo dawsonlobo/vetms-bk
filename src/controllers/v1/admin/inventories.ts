@@ -27,8 +27,11 @@ export const createInventory = async (req: Request, res: Response, next: NextFun
         });
 
         const savedItem = await newInventoryItem.save();
-        const { isDeleted, ...responseData } = savedItem.toObject();
-
+        // const { isDeleted, ...responseData } = savedItem.toObject();
+        const savedItemObject = savedItem.toObject();
+        delete savedItemObject.isDeleted;
+        const responseData = savedItemObject;
+        
         req.apiStatus = {
             isSuccess: true,
             message: "Success",
@@ -82,7 +85,9 @@ export const updateInventory = async (req: Request, res: Response, next: NextFun
             return next();
         }
 
-        const { isDeleted: _, ...responseData } = updatedItem.toObject();
+        const responseData = updatedItem.toObject();
+        delete responseData.isDeleted;
+        
 
         req.apiStatus = {
             isSuccess: true,

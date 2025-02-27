@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
-import { PatientModel } from "../../../models/patients";
 import { aggregateData } from "../../../utils/aggregation";
 import { ObjectId } from "mongodb";
 import { CONSTANTS } from "../../../config/constant";
