@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { FollowUp} from "../../../models/followUps"; // Import Appointment model
 import { aggregateData } from "../../../utils/aggregation";
@@ -9,7 +9,7 @@ import { ObjectId } from "mongodb";
 
 
 
-export async function createUpdateFollowUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function createUpdateFollowUp(req: Request, res: Response): Promise<void> {
   try {
       const { _id, patientId, doctorId, diagnosis, treatment, prescription, visitDate, ...rest } = req.body;
       
@@ -90,7 +90,7 @@ export async function createUpdateFollowUp(req: Request, res: Response, next: Ne
 
 
 
-export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getAll(req: Request, res: Response): Promise<void> {
   try {
     const {
       projection = {},
@@ -138,7 +138,7 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
 
 
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -183,7 +183,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
 
 
 
-export async function deleteFollowUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function deleteFollowUp(req: Request, res: Response): Promise<void> {
     try {
         const { id } = req.params;
 
