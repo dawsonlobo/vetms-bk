@@ -42,23 +42,25 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
         const accessToken = req.headers.authorization?.split(" ")[1];
 
         if (!accessToken) {
-            return res.status(401).json({
+             res.status(401).json({
                 status: 401,
                 message: "Unauthorized",
                 data: "Unauthorized",
                 toastMessage: "Please log in again.",
             });
+            return;
         }
 
         // Check if the token exists in the database (ensures accessToken is valid)
         const storedAccessToken = await AccessToken.findOne({ token: accessToken });
         if (!storedAccessToken) {
-            return res.status(403).json({
+             res.status(403).json({
                 status: 403,
                 message: "Invalid or expired access token",
                 data: "Invalid or expired access token",
                 toastMessage: "Please log in again.",
             });
+            return;
         }
 
         // Decode and verify the JWT token
@@ -66,12 +68,13 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
         } catch (error) {
-            return res.status(403).json({
+            res.status(403).json({
                 status: 403,
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return;
         }
 
         // Attach the decoded user ID to the request for further use
@@ -80,12 +83,13 @@ export const authenticateAdmin = async (req: Request, res: Response, next: NextF
         next(); // Proceed to the next middleware or controller
     } catch (error) {
         console.error("Error in authentication middleware:", error);
-        return res.status(500).json({
+         res.status(500).json({
             status: 500,
             message: "Internal server error",
             data: "Internal server error",
             toastMessage: "An error occurred while verifying authentication.",
         });
+        return;
     }
 };
 
@@ -95,12 +99,13 @@ export const verifyNurse = async (req: Request, res: Response, next: NextFunctio
     const authHeader: string | undefined = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-        return res.status(401).json({
+          res.status(401).json({
             status: 401,
             message: "Unauthorized",
             data: "Unauthorized",
             toastMessage: "Authentication required.",
         });
+        return;
     }
 
     const token = authHeader.split(" ")[1];
@@ -110,38 +115,41 @@ export const verifyNurse = async (req: Request, res: Response, next: NextFunctio
         const user = await UserModel.findById(decoded.id);
 
         if (!user || user.role !== UserRole.NURSE) {
-            return res.status(403).json({
+             res.status(403).json({
                 status: 403,
                 message: "Forbidden",
                 data: "Forbidden",
                 toastMessage: "Nurse access required.",
             });
+            return;
         }
-
         req.user = user;
         next();
     } catch (error) {
         if (error instanceof TokenExpiredError) {
-            return res.status(401).json({
+             res.status(401).json({
                 status: 401,
                 message: "Token expired",
                 data: "Token expired",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return;
         }
         if (error instanceof JsonWebTokenError) {
-            return res.status(403).json({
+             res.status(403).json({
                 status: 403,
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return;
         }
-        return res.status(500).json({
+         res.status(500).json({
             status: 500,
             message: "Internal server error",
             data: "Internal server error",
         });
+        return;
     }
 };
 
@@ -152,23 +160,25 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         const accessToken = req.headers.authorization?.split(" ")[1];
 
         if (!accessToken) {
-            return res.status(401).json({
+             res.status(401).json({
                 status: 401,
                 message: "Unauthorized",
                 data: "Unauthorized",
                 toastMessage: "Please log in again.",
             });
+            return;
         }
 
         // Check if the token exists in the database (ensures accessToken is valid)
         const storedAccessToken = await AccessToken.findOne({ token: accessToken });
         if (!storedAccessToken) {
-            return res.status(403).json({
+             res.status(403).json({
                 status: 403,
                 message: "Invalid or expired access token",
                 data: "Invalid or expired access token",
                 toastMessage: "Please log in again.",
             });
+            return;
         }
 
         // Decode and verify the JWT token
@@ -176,12 +186,13 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         try {
             decoded = jwt.verify(accessToken, config.JWT_SECRET);
         } catch (error) {
-            return res.status(403).json({
+             res.status(403).json({
                 status: 403,
                 message: "Invalid token",
                 data: "Invalid token",
                 toastMessage: "Session expired. Please log in again.",
             });
+            return;
         }
 
         // Attach the decoded user ID to the request for further use
@@ -190,11 +201,12 @@ export const authenticateNurse = async (req: Request, res: Response, next: NextF
         next(); // Proceed to the next middleware or controller
     } catch (error) {
         console.error("Error in authentication middleware:", error);
-        return res.status(500).json({
+         res.status(500).json({
             status: 500,
             message: "Internal server error",
             data: "Internal server error",
             toastMessage: "An error occurred while verifying authentication.",
         });
+        return;
     }
 };

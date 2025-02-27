@@ -1,16 +1,10 @@
 import { Request, Response, NextFunction, Router } from "express";
-import { loginController, refreshTokenController, logoutController, getNurseProfile, updateNurseProfile } from "../../../controllers/v1/nurse/auth";
-import { verifyNurse } from "../../../middlewares/auth";
-//import { entryPoint } from "../../../middlewares/entrypoint";
-//import { exitPoint } from "../../../middlewares/exitpoint";
-
+import passport from "../../../passport/passport";
+import * as auth from "../../../controllers/v1/nurse/auth"
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
-
-const asyncHandler = (
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-};
+import { verifyNurse } from "../../../middlewares/auth";
 
 /**
  * @swagger
@@ -19,7 +13,7 @@ const asyncHandler = (
  *     summary: login
  *     tags: [nurse/auth]
  *     security:
- *        - nurseBearerAuth: []
+ *       - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -52,10 +46,10 @@ const asyncHandler = (
  *                   properties:
  *                     _id:
  *                       type: string
- *                       example: "6512c5f3e4b09a12d8f42b68"
+ *                       example: "67bbfed74cea23da08bb62a9"
  *                     name:
  *                       type: string
- *                       example: "Nurse Jane"
+ *                       example: "Jane"
  *                     email:
  *                       type: string
  *                       example: "nurse@example.com"
@@ -82,13 +76,7 @@ const asyncHandler = (
  */
 
 
-router.post("/nurse/auth/login",
-    //entryPoint, 
-    loginController
-    //,exitPoint
-    );
-
-
+router.post("/nurse/auth/login",entryPoint, auth.loginController,exitPoint);
 
 
 /**
@@ -98,7 +86,7 @@ router.post("/nurse/auth/login",
  *     summary: logout
  *     tags: [nurse/auth]
  *     security:
- *        - nurseBearerAuth: []
+ *       - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -132,15 +120,15 @@ router.post("/nurse/auth/login",
  */
 
 
-router.post("/nurse/auth/logout", asyncHandler(verifyNurse), asyncHandler(logoutController));
+router.post("/nurse/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse,auth.logoutController,exitPoint);
 /**
  * @swagger
  * /v1/nurse/auth/profile:
  *   post:
- *     summary: Get nurse profile 
+ *     summary: Get user profile 
  *     tags: [nurse/auth]
  *     security:
- *        - nurseBearerAuth: []
+ *       - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -221,7 +209,7 @@ router.post("/nurse/auth/logout", asyncHandler(verifyNurse), asyncHandler(logout
  *                   properties:
  *                     _id:
  *                       type: string
- *                       example: "6512c5f3e4b09a12d8f42b68"
+ *                       example: "67bbfed74cea23da08bb62a9"
  *                     name:
  *                       type: string
  *                       example: "Nurse User"
@@ -256,7 +244,7 @@ router.post("/nurse/auth/logout", asyncHandler(verifyNurse), asyncHandler(logout
  *                   status: 200
  *                   message: "Success"
  *                   data:
- *                     _id: "6512c5f3e4b09a12d8f42b68"
+ *                     _id: "67bbfed74cea23da08bb62a9"
  *                     name: "Nurse User"
  *                     email: "nurse@example.com"
  *                     role: "NURSE"
@@ -276,7 +264,7 @@ router.post("/nurse/auth/logout", asyncHandler(verifyNurse), asyncHandler(logout
  */
 
 
-router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNurseProfile));
+router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.getNurseProfile,exitPoint);
 
 /**
  * @swagger
@@ -285,7 +273,7 @@ router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNu
  *     summary: Update user profile 
  *     tags: [nurse/auth]
  *     security:
- *        - nurseBearerAuth: []
+ *       - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -295,7 +283,7 @@ router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNu
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Nurse Jane"
+ *                 example: "Jane"
  *               email:
  *                 type: string
  *                 example: "nurse@example.com"
@@ -314,7 +302,7 @@ router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNu
  *             fullUpdate:
  *               summary: Full profile update
  *               value:
- *                 name: "Nurse Jane"
+ *                 name: "Jane"
  *                 email: "nurse@example.com"
  *                 role: "NURSE"
  *                 isDeleted: false
@@ -343,77 +331,77 @@ router.post("/nurse/auth/profile", asyncHandler(verifyNurse), asyncHandler(getNu
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/nurse/auth/update",asyncHandler(verifyNurse), asyncHandler(updateNurseProfile));
+router.put("/nurse/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.updateNurseProfile,exitPoint);
 
-/**
- * @swagger
- * /v1/nurse/auth/refresh:
- *   post:
- *     summary: Refresh user token 
- *     tags: [nurse/auth]
- *     security:
- *        - nurseBearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               refresh_token:
- *                 type: string
- *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9.eyJpYXQiOjE3MTg0NTYyMzEsImV4cCI6MjAzMzgxNjIzMX0.Po_Xc3McuJt4GhKWpd1B5cUcHsdZWq_4ElO138VmsU"
- *     responses:
- *       200:
- *         description: Token refreshed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: "Success"
- *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "6512c5f3e4b09a12d8f42b68"
- *                     name:
- *                       type: string
- *                       example: "nurse User"
- *                     email:
- *                       type: string
- *                       example: "nurse@example.com"
- *                     role:
- *                       type: string
- *                       example: "NURSE"
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-02-05T12:00:00Z"
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-02-06T15:30:00Z"
- *                     access_token:
- *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9..."
- *                     refresh_token:
- *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9..."
- *                     tokenExpiresAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-07-15T12:57:10.956Z"
- */
+// /**
+//  * @swagger
+//  * /v1/nurse/auth/refresh:
+//  *   post:
+//  *     summary: Refresh user token 
+//  *     tags: [nurse/auth]
+//  *     security:
+//  *       - nurseBearerAuth: []
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             type: object
+//  *             properties:
+//  *               refresh_token:
+//  *                 type: string
+//  *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9.eyJpYXQiOjE3MTg0NTYyMzEsImV4cCI6MjAzMzgxNjIzMX0.Po_Xc3McuJt4GhKWpd1B5cUcHsdZWq_4ElO138VmsU"
+//  *     responses:
+//  *       200:
+//  *         description: Token refreshed successfully
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 status:
+//  *                   type: integer
+//  *                   example: 200
+//  *                 message:
+//  *                   type: string
+//  *                   example: "Success"
+//  *                 data:
+//  *                   type: object
+//  *                   properties:
+//  *                     _id:
+//  *                       type: string
+//  *                       example: "67bbfed74cea23da08bb62a9"
+//  *                     name:
+//  *                       type: string
+//  *                       example: "Nurse User"
+//  *                     email:
+//  *                       type: string
+//  *                       example: "nurse@example.com"
+//  *                     role:
+//  *                       type: string
+//  *                       example: "NURSE"
+//  *                     createdAt:
+//  *                       type: string
+//  *                       format: date-time
+//  *                       example: "2024-02-05T12:00:00Z"
+//  *                     updatedAt:
+//  *                       type: string
+//  *                       format: date-time
+//  *                       example: "2024-02-06T15:30:00Z"
+//  *                     access_token:
+//  *                       type: string
+//  *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9..."
+//  *                     refresh_token:
+//  *                       type: string
+//  *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV2CJ9..."
+//  *                     tokenExpiresAt:
+//  *                       type: string
+//  *                       format: date-time
+//  *                       example: "2024-07-15T12:57:10.956Z"
+//  */
 
 
 
-router.post("/nurse/auth/refresh",asyncHandler(verifyNurse), asyncHandler(refreshTokenController));
+router.post("/nurse/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.refreshTokenController,exitPoint);
 
 export default router;

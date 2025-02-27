@@ -1,68 +1,61 @@
+import express from "express";
 import { Router,Request,Response } from 'express';
 import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/nurse/appointments';
+import { authenticateNurse, verifyNurse } from '../../../middlewares/auth';
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { exitPoint } from "../../../middlewares/exitpoint";
 
-const router = Router();
 
+const router = express.Router();
 /**
  * @swagger
  * /v1/nurse/appointments/create:
  *   post:
  *     tags:
  *       - nurse/appointments
- *     summary: Create/Update an appointment record
+ *     summary: Create or update an appointment
  *     security:
- *       - nurseBearerAuth: []  # Requires a bearer token for this route
+ *       - nurseBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - petId
- *               - doctorId
- *               - date
- *               - schedule
  *             properties:
- *               _id:
+ *               nurseId:
  *                 type: string
- *                 description: The unique ID of the appointment (for updates)
- *               petId:
+ *                 description: The ID of the nurse creating the appointment (required for create)
+ *               patientId:
  *                 type: string
- *                 description: The ID of the pet for the appointment
+ *                 description: The ID of the patient for the appointment (required for create)
  *               doctorId:
  *                 type: string
  *                 description: The ID of the doctor assigned to the appointment
  *               date:
  *                 type: string
- *                 format: date-time
- *                 description: The scheduled date and time of the appointment
- *               schedule:
+ *                 description: The scheduled date of the appointment in DD-MM-YYYY format
+ *               status:
  *                 type: string
- *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
- *                 description: Status of the appointment
- *               isDeleted:
- *                 type: boolean
- *                 description: Whether the appointment record is deleted
+ *                 enum: [PENDING, CONFIRMED, COMPLETED]
+ *                 description: Status of the appointment (required for update, not needed in creation)
  *           examples:
- *             createAppointment:
- *               summary: Example request body for creating an appointment
+ *             ExampleCreate:
+ *               summary: Create an appointment
  *               value:
- *                 petId: "66b3279c39c21f7342c100c4"
- *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-01T10:00:00.000Z"
- *                 schedule: "SCHEDULED"
- *             updateAppointment:
- *               summary: Example request body for updating an appointment
+ *                 nurseId: "67bbfed74cea23da08bb62a9"
+ *                 patientId: "67b6c3b098c669e6c66adef9"
+ *                 doctorId: "67bc28582dc692c7133ad092"
+ *                 date: "27-01-2025"
+ *             ExampleUpdate:
+ *               summary: Update an appointment
  *               value:
- *                 _id: "66b3279c39c21f7342c100c6"
- *                 petId: "66b3279c39c21f7342c100c4"
- *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-05T14:00:00.000Z"
- *                 schedule: "COMPLETED"
+ *                 doctorId: "67bc28582dc692c7133ad092"
+ *                 date: "28-02-2025"
+ *                 status: "CONFIRMED"
  *     responses:
- *       200:
- *         description: Appointment record created/updated successfully
+ *       201:
+ *         description: Appointment created or updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -70,41 +63,32 @@ const router = Router();
  *               properties:
  *                 status:
  *                   type: integer
- *                   format: int64
  *                   description: Status code
  *                 message:
  *                   type: string
- *                   description: Message describing the result of the operation
+ *                   description: Success message
  *                 data:
  *                   type: object
- *                   description: The created or updated appointment record
- *                 toastMessage:
- *                   type: string
- *                   description: The message that is sent
- *             examples:
- *               createExample:
- *                 summary: Successful response for creating an appointment
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data: "Appointment added successfully"
- *                   toastMessage: "Appointment added successfully"
- *               updateExample:
- *                 summary: Successful response for updating an appointment
- *                 value:
- *                   status: 200
- *                   message: "Success"
- *                   data: "Appointment record updated successfully"
- *                   toastMessage: "Appointment record updated successfully"
+ *                   properties:
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the item was created
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the item was last updated
  */
-router.post('/create', createUpdate);
+
+router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
+
 
 
 /**
  * @swagger
  * /v1/nurse/appointments/getAll:
  *   post:
- *     tags:
+ *     tags: 
  *       - nurse/appointments
  *     security:
  *       - nurseBearerAuth: []  # Requires a bearer token
@@ -264,11 +248,7 @@ router.post('/create', createUpdate);
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-router.post('/getAll',
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    //exitPoint
-    );
+router.post("/getAll", entryPoint, verifyNurse, getAll, exitPoint);
 /**
  * @swagger
  * /v1/nurse/appointments/getOne/{id}:
@@ -363,11 +343,7 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getOne/:id',
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     //exitPoint
-     );
+router.get("/getOne/:id", entryPoint,verifyNurse, getOne, exitPoint);
 /**
  * @swagger
  * /v1/nurse/appointments/delete/{id}:
@@ -414,6 +390,7 @@ router.post('/getOne/:id',
  *                   data: "Appointment deleted successfully"
  *                   toastMessage: "Appointment deleted successfully"
  */
-router.delete('/delete/:id', deleteAppointment);
+router.delete("/delete/:id", entryPoint,verifyNurse,deleteAppointment, exitPoint);
+
 
      export default router;
