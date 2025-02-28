@@ -363,12 +363,17 @@ router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.de
  *                     - "visitDate"
  *                   sortDesc:
  *                     - true
+ *             filterExample:
+ *                summary: filter example
+ *                value:
+ *                  filter:
+ *                    name: "rammy" 
  *             searchExample:
  *               summary: Search Example
  *               value:
  *                 search:
- *                   - term: "diagnosis"
- *                     fields: ["diagnosis", "treatment"]
+ *                   - term: "Obesity"
+ *                     fields: ["diagnosis"]
  *                     startsWith: true
  *     responses:
  *       200:
