@@ -162,7 +162,7 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *   post:
  *     tags: 
  *       - doctor/patients
- *     summary: Get all appointments
+ *     summary: Get all patients
  *     security:
  *       - doctorBearerAuth: []  # Requires authentication
  *     requestBody:

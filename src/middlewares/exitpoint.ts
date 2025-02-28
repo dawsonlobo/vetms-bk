@@ -6,7 +6,6 @@ import logger from "../logger/v1/logger";
 type bodyType = string | object | object[];
 //import { User } from "../model/user"; // Adjust import as per your project structure
 
-
 interface IData {
   body?: bodyType;
   query?: bodyType;
@@ -46,11 +45,11 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
     const user: IUser = req.user as IUser;
     reqData.userId = String(user._id);
   }
-    
+
   // Token
   const authorizationHeader = req.headers.authorization ?? "";
   const parts = authorizationHeader.split(" ");
-    
+
   let token: string;
   if (parts.length === 2 && parts[0].toLowerCase() === "bearer") {
     token = parts[1];
@@ -59,27 +58,28 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
     logger?.info("Authorization header is not in the expected format");
   }
 
-   
-    reqData.response = req?.apiStatus?.data;
-  
+  reqData.response = req?.apiStatus?.data;
 
   JSON.stringify(reqData);
 
-  if (req?.apiStatus?.isSuccess) {
-    const responseObj = new ResponseObj(
-      200,
-      "Success",
-      req.apiStatus.data ?? "",
-      req.apiStatus.toastMessage ?? ""
-    );
-    res.status(responseObj.status).json(responseObj);
-  } else {
-    const responseObj = new ResponseObj(
-      req.apiStatus?.error?.statusCode ?? 500,
-      req.apiStatus?.error?.message ?? "Unknown error",
-      req.apiStatus?.data ?? "",
-      req.apiStatus?.toastMessage ?? ""
-    );
-    res.status(responseObj.status).json(responseObj);
+  if (req.apiStatus?.data) 
+    {
+    if (req?.apiStatus?.isSuccess) {
+      const responseObj = new ResponseObj(
+        200,
+        "Success",
+        req.apiStatus.data,
+        req.apiStatus.toastMessage
+      );
+      res.status(responseObj.status).json(responseObj);
+    } else {
+      const responseObj = new ResponseObj(
+        req.apiStatus?.error?.statusCode ?? 500,
+        req.apiStatus?.error?.message ?? "Unknown error",
+        req.apiStatus?.data,
+        req.apiStatus?.toastMessage
+      );
+      res.status(responseObj.status).json(responseObj);
+    }
   }
 };
