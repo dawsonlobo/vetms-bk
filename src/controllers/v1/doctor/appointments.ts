@@ -23,7 +23,7 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
           req.apiStatus = {
             isSuccess: false,
             error:ErrorCodes[1002],
-            message: "Internal Server Error",
+            data: "Internal Server Error",
             toastMessage: "Something went wrong. Please try again.",
           };
           next();
@@ -47,7 +47,7 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
           req.apiStatus = {
             isSuccess: false,
             error:ErrorCodes[1002],
-            message: "Cannot update cancelled or not attended status.",
+            data: "Cannot update cancelled or not attended status.",
             toastMessage: "Cannot update cancelled or not attended status.",
           };
           next();
@@ -183,13 +183,15 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
       toDate
     );
 
-    res.status(200).json({
-      status: 200,
+    
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-    });
+    };
     next();
     return;
+
   } catch (error) {
     console.error("Error fetching data:", error);
     req.apiStatus = {

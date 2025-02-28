@@ -281,7 +281,7 @@ router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,do
 /**
  * @swagger
  * /v1/doctor/auth/update/:
- *   post:
+ *   put:
  *     summary: Update user profile 
  *     tags: [doctor/auth]
  *     security:

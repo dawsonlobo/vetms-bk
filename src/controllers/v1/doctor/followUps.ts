@@ -1,37 +1,60 @@
-import { Request, Response } from "express";
+import { Request, Response,NextFunction } from "express";
 import mongoose from "mongoose";
 import { FollowUp} from "../../../models/followUps"; // Import Appointment model
 import { aggregateData } from "../../../utils/aggregation";
 import UserModel from "../../../models/users"
 import {PatientModel} from "../../../models/patients"
 import { ObjectId } from "mongodb";
+import { ErrorCodes } from "../../../models/models";
 
 
 
 
-export async function createUpdateFollowUp(req: Request, res: Response): Promise<void> {
+
+export async function createUpdateFollowUp(req: Request, res: Response,next:NextFunction): Promise<void> {
   try {
       const { _id, patientId, doctorId, diagnosis, treatment, prescription, visitDate, ...rest } = req.body;
       
       // Validate if doctor exists and has the correct role
       const existingUser = await UserModel.findOne({ _id: new ObjectId(doctorId) });
 
+      
       if (!existingUser) {
-          res.status(404).json({ message: "Doctor not found" });
-          return;
+        req.apiStatus = {
+          isSuccess: false,
+          error:ErrorCodes[1002],
+          message:"Doctor not found",
+          toastMessage: "Doctor not found",
+        };
+        next();
+           return;
       }
 
+      
       if (existingUser.role !== "DOCTOR") {
-          res.status(403).json({ message: "User is not authorized as a doctor" });
-          return;
+        req.apiStatus = {
+          isSuccess: false,
+          error:ErrorCodes[1002],
+          message:"User is not authorized as a doctor" ,
+          toastMessage: "User is not authorized as a doctor" ,
+        };
+        next();
+           return;
       }
 
       // Validate if patient exists
       const existingPatient = await PatientModel.findOne({ _id: new ObjectId(patientId) });
 
+      
       if (!existingPatient) {
-          res.status(404).json({ message: "Patient not found" });
-          return;
+        req.apiStatus = {
+          isSuccess: false,
+          error:ErrorCodes[1002],
+          message: "Patient not found",
+          toastMessage: "Patient not found",
+        };
+        next();
+           return;
       }
 
       if (_id) {
@@ -42,17 +65,27 @@ export async function createUpdateFollowUp(req: Request, res: Response): Promise
           // If ID is provided, update existing follow-up
           const updatedFollowUp = await FollowUp.findByIdAndUpdate(_id, updateFields, { new: true });
 
+          
           if (!updatedFollowUp) {
-              res.status(404).json({ status: 404, message: "FollowUp record not found" });
-              return;
+            req.apiStatus = {
+              isSuccess: false,
+              error:ErrorCodes[1002],
+              message: "FollowUp record not found",
+              toastMessage: "FollowUp record not found",
+            };
+            next();
+               return;
           }
 
-          res.status(200).json({
-              status: 200,
-              message: "Success",
-              data: "Follow-up updated successfully",
-              toastMessage: "Follow-up updated successfully",
-          });
+          
+          req.apiStatus = {
+            isSuccess: true,
+            message: "Success",
+            data: "Follow-up updated successfully",
+            toastMessage: "Follow-up updated successfully",
+          };
+          next();
+          return;
 
       } else {
           // If no ID is provided, create a new follow-up record
@@ -66,22 +99,29 @@ export async function createUpdateFollowUp(req: Request, res: Response): Promise
           });
 
           await newFollowUp.save();
-
-          res.status(201).json({
-              status: 201,
-              message: "Success",
-              data: "Follow-up created successfully",
-              toastMessage: "Follow-up created successfully",
-          });
+          
+          
+          // "Follow-up created successfully",
+          req.apiStatus = {
+            isSuccess: true,
+            message: "Success",
+            data: "Follow-up created successfully",
+            toastMessage: "Follow-up created successfully",
+          };
+          next();
+          return;
       }
 
   } catch (error) {
-      console.error("Error in createUpdateFollowUp:", error);
-      res.status(500).json({
-          status: 500,
-          message: "Internal Server Error",
-          error,
-      });
+    console.error("Error fetching data:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
+      message: "Internal Server Error",
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
   }
 }
 
@@ -90,7 +130,7 @@ export async function createUpdateFollowUp(req: Request, res: Response): Promise
 
 
 
-export async function getAll(req: Request, res: Response): Promise<void> {
+export async function getAll(req: Request, res: Response,next:NextFunction): Promise<void> {
   try {
     const {
       projection = {},
@@ -121,31 +161,43 @@ export async function getAll(req: Request, res: Response): Promise<void> {
       toDate
     );
 
-    res.status(200).json({
-      status: 200,
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-    });
+      };
+    next();
+    return;
   } catch (error) {
     console.error("Error fetching data:", error);
-    res.status(500).json({
-      status: 500,
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
       message: "Internal Server Error",
-      error,
-    });
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
   }
 };
 
 
 
-export const getOne = async (req: Request, res: Response): Promise<void> => {
+export const getOne = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
 
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ status: 400, message: "Invalid FollowUp ID" });
-      return;
+      req.apiStatus = {
+        isSuccess: false,
+        error:ErrorCodes[1002],
+        message: "Invalid FollowUp ID",
+        toastMessage: "Invalid FollowUp ID",
+      };
+      next();
+         return;
     }
 
     const objectId = new mongoose.Types.ObjectId(id); // Convert string to ObjectId
@@ -157,25 +209,38 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
     // Fetch follow-up data using aggregation
     const { tableData } = await aggregateData(FollowUp, { _id: objectId, isDeleted: false }, sanitizedProjection);
 
+    
     if (!tableData || tableData.length === 0) {
-      res.status(404).json({ status: 404, message: "FollowUp record not found or deleted" });
-      return;
+      req.apiStatus = {
+        isSuccess: false,
+        error:ErrorCodes[1002],
+        message: "FollowUp record not found or deleted",
+        toastMessage: "FollowUp record not found or deleted",
+      };
+      next();
+         return;
     }
 
     const followUpObj = tableData[0];
-
-    res.status(200).json({
-      status: 200,
+    // Only includes fields from sanitizedProjection
+    
+    req.apiStatus = {
+      isSuccess: true,
       message: "Success",
-      data: followUpObj, // Only includes fields from sanitizedProjection
-    });
+      data: followUpObj, 
+      };
+    next();
+    return;
   } catch (error) {
-    console.error("Error fetching FollowUp record:", error);
-    res.status(500).json({
-      status: 500,
+    console.error("Error fetching data:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error:ErrorCodes[1002],
       message: "Internal Server Error",
-      error,
-    });
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
   }
 };
 
@@ -183,47 +248,74 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
 
 
 
-export async function deleteFollowUp(req: Request, res: Response): Promise<void> {
+export async function deleteFollowUp(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
         const { id } = req.params;
 
         // Validate ObjectId
+        // "Invalid FollowUp ID"
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            res.status(400).json({ status: 400, message: "Invalid FollowUp ID" });
-            return;
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "Enter a valid id",
+            toastMessage: "Enter a valid id",
+          };
+          next();
+             return;
         }
 
         // Check if FollowUp record exists
         const followup = await FollowUp.findById(id);
 
+        
         if (!followup) {  // Fixed: Properly handle the null case
-            res.status(404).json({ status: 404, message: "FollowUp record not found or deleted" });
-            return;
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "FollowUp record not found or deleted",
+            toastMessage: "FollowUp record not found or deleted",
+          };
+          next();
+             return;
         }
 
+        
         if (followup.isDeleted) {
-            res.status(404).json({ status: 404, message: "FollowUp record already deleted" });
-            return;
+          req.apiStatus = {
+            isSuccess: false,
+            error:ErrorCodes[1002],
+            message: "FollowUp record already deleted",
+            toastMessage: "FollowUp record already deleted",
+          };
+          next();
+             return;
         }
 
         // Perform soft delete
         followup.isDeleted = true;
         await followup.save();
 
-        res.status(200).json({
-            status: 200,
-            message: "Success",
-            data: "Follow-up deleted successfully",
-            toastMessage: "Follow-up deleted successfully",
-        });
+        
+        req.apiStatus = {
+          isSuccess: true,
+          message: "Success",
+          data: "Follow-up deleted successfully",
+          toastMessage: "Follow-up deleted successfully",
+        };
+        next();
+        return;
 
     } catch (error) {
-        console.error("Error deleting FollowUp record:", error);
-        res.status(500).json({
-            status: 500,
-            message: "Internal Server Error",
-            error: error instanceof Error ? error.message : error,
-        });
+      console.error("Error fetching data:", error);
+      req.apiStatus = {
+        isSuccess: false,
+        error:ErrorCodes[1002],
+        message: "Internal Server Error",
+        toastMessage: "Something went wrong. Please try again.",
+      };
+      next();
+      return;
     }
 }
 

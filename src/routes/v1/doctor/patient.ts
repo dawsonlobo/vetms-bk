@@ -396,7 +396,7 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
  *                 type: number
  *                 description: Weight of the pet in kilograms
  *                 example: 25.5
- *               BMI:
+ *               bmi:
  *                 type: number
  *                 description: Body Mass Index of the pet
  *                 example: 18.2
@@ -411,7 +411,7 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
  *               summary: Example request body for updating an appointment
  *               value:
  *                 weight: 25.5
- *                 BMI: 18.2
+ *                 bmi: 18.2
  *                 medicalHistory: ["Vaccinated", "No major illnesses"]
  *     responses:
  *       200:
