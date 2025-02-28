@@ -56,7 +56,7 @@ const router = Router();
  *              create example:
  *                summary: Example of a follow-up record
  *                value:
- *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  patientId: "67c1408cb2c2f6be65087847"
  *                  doctorId: "67bc480859691058622faf3e"
  *                  diagnosis: "Skin infection due to allergy"
  *                  treatment: "Antibiotic injection and medicated shampoo"
@@ -66,7 +66,7 @@ const router = Router();
  *                summary: Another example of a follow-up record
  *                value:
  *                  id: "67bdace8322f42e09ffb8a18"
- *                  patientId: "67b6c3b098c669e6c66adef9"
+ *                  patientId: "67c1408cb2c2f6be65087847"
  *                  doctorId: "67bc480859691058622faf3e"
  *                  diagnosis: "Ear infection"
  *                  treatment: "Ear drops and pain relief medication"
@@ -290,7 +290,7 @@ router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.de
 
 /**
  * @swagger
- * /v1/admin/followUps/getall:
+ * /v1/doctor/followups/getall:
  *   post:
  *     tags: 
  *       - doctor/followups

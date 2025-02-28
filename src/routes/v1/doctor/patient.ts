@@ -370,7 +370,7 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
 
 /**
  * @swagger
- * /v1/doctor/patients/update/{_id}:
+ * /v1/doctor/patients/update/{id}:
  *   post:
  *     tags:
  *       - doctor/patients
@@ -444,7 +444,7 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",entryPoint,authenticateDoctor,verifyDoctor,patients.Update,exitPoint);
+router.post("/update/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.Update,exitPoint);
 
 
 export default router;

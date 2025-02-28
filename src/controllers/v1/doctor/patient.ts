@@ -129,9 +129,11 @@ export async function getAll(req: Request, res: Response,next:NextFunction): Pro
 export const Update = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
     try {
       
-        const{_id}=req.params;
+        const{id}=req.params;
         const { weight, bmi, medicalHistory } = req.body;
         
+
+        console.log(id);
 
               const updateFields = { weight, bmi, medicalHistory };
               
@@ -139,7 +141,10 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
             //     delete updateFields.isDeleted;
             // }
 
-            const updatedPatients = await PatientModel.findByIdAndUpdate(_id, updateFields, { new: true });
+            const updatedPatients = await PatientModel.findById(new mongoose.Types.ObjectId(id), updateFields, { new: true });
+
+            console.log(updatedPatients);
+            
 
 
             
@@ -147,7 +152,7 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
               req.apiStatus = {
                 isSuccess: false,
                 error:ErrorCodes[1002],
-                message: "Patients record not found." ,
+                data: "Patients record not found." ,
                 toastMessage: "Patients record not found." ,
               };
               next();
@@ -175,3 +180,6 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
       return;
     }
 };
+
+
+

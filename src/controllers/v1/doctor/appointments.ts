@@ -18,7 +18,8 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
 
         // Find the existing appointment
         const existingAppointment = await AppointmentModel.findOne({ _id: new ObjectId(_id) });
-
+        console.log(existingAppointment);
+        
         if (!existingAppointment) {
           req.apiStatus = {
             isSuccess: false,

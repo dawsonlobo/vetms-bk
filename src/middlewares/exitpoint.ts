@@ -7,33 +7,6 @@ type bodyType = string | object | object[];
 //import { User } from "../model/user"; // Adjust import as per your project structure
 
 
-
-
-declare global {
-  namespace Express {
-    export interface Request {
-      apiStatus?: {
-        isSuccess?: boolean;
-        message?: string;
-        data?: object | object[] | string;
-        error?: {
-          statusCode: number;
-          message: string;
-          toastMessage?: string;
-        };
-        log?: string | object | unknown;
-        count?: number;
-        toastMessage?: string;
-      };
-      startTime?: number;
-      user?: User;
-      txId?: string;
-      path?: string;
-      baseUrl?: string;
-    }
-  }
-}
-
 interface IData {
   body?: bodyType;
   query?: bodyType;
@@ -44,6 +17,7 @@ interface IData {
   token?: string;
   userId?: string | ObjectId;
 }
+
 /**
  *
  * @param req
@@ -85,38 +59,9 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
     logger?.info("Authorization header is not in the expected format");
   }
 
-  // Process response data to convert MongoDB buffer objects to string IDs
-  if (req.apiStatus?.data) {
-    const normalizeData = (data: any): any => {
-      if (Array.isArray(data)) {
-        return data.map(item => normalizeData(item));
-      } else if (data && typeof data === 'object') {
-        const normalizedObj: any = {};
-        
-        for (const key in data) {
-          // Skip isDeleted field
-          if (key === "isDeleted") continue;
-          
-          const value = data[key];
-          
-          // Convert MongoDB buffer object IDs to string
-          if (value && typeof value === 'object' && value.buffer) {
-            // For MongoDB ObjectId-like objects with buffer property
-            normalizedObj[key] = new ObjectId(value.buffer).toString();
-          } else if (value && typeof value === 'object') {
-            normalizedObj[key] = normalizeData(value);
-          } else {
-            normalizedObj[key] = value;
-          }
-        }
-        return normalizedObj;
-      }
-      return data;
-    };
-
-    req.apiStatus.data = normalizeData(req.apiStatus.data);
-    reqData.response = req.apiStatus.data;
-  }
+   
+    reqData.response = req?.apiStatus?.data;
+  
 
   JSON.stringify(reqData);
 

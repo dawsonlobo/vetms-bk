@@ -6,6 +6,7 @@ import { AccessToken } from "../../../models/accessTokens";
 import bcrypt from "bcryptjs";
 import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import {ErrorCodes} from "../../../models/models"
+import { log } from "console";
 
 const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
@@ -398,71 +399,97 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
 
 
 export async function updateDoctorProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        try {
-            const user = req.user as { id: string };
-            if (!user || !user.id) {
-                req.apiStatus = {
-                    isSuccess: false,
-                    error: ErrorCodes[1012],
-                    data: "Unauthorized",
-                    toastMessage: "Session expired. Please log in again.",
-                };
-                return next();
-            }
-    
-            // Define allowed fields to update
-            const allowedFields = ["name", "email", "role", "isDeleted"];
-            const updateData: Partial<Record<string, any>> = {};
-    
-            Object.keys(req.body).forEach((key) => {
-                if (allowedFields.includes(key)) {
-                    updateData[key] = req.body[key];
-                }
-            });
-    
-            if (Object.keys(updateData).length === 0) {
-                req.apiStatus = {
-                    isSuccess: false,
-                    error: ErrorCodes[1003],
-                    data: "No valid fields to update",
-                    toastMessage: "Please provide valid fields to update.",
-                };
-                return next();
-            }
-    
-            // Update admin profile
-            const updatedAdmin = await UserModel.findByIdAndUpdate(user.id, updateData, {
-                new: true,
-                select: "-password",
-            });
-    
-            if (!updatedAdmin) {
-                req.apiStatus = {
-                    isSuccess: false,
-                    error: ErrorCodes[1003],
-                    data: "Admin profile not updated",
-                    toastMessage: "Update failed",
-                };
-                return next();
-            }
-    
-            req.apiStatus = {
-                isSuccess: true,
-                data: "Updated successfully",
-                toastMessage: "Updated successfully",
-            };
-    
-            return next();
-        } catch (error) {
-            console.error(`Error updating admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
-    
+    try {
+        // Get user ID from request
+        const user = req.user as { id: string };
+        console.log("first log",user);
+        console.log("second log",user.id);
+        
+        if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
-                error: ErrorCodes[1010],
-                data: "Internal server error",
-                toastMessage: "An error occurred while updating the profile.",
+                error: ErrorCodes[1012],
+                data: "Unauthorized",
+                toastMessage: "Unauthorized",
             };
-            return next();
+            next();
+            return;
         }
+
+        // Extract allowed fields from request body
+        const { name, email, role, isDeleted } = req.body;
+        const updateFields: Partial<Record<string, any>> = { name, email, role, isDeleted };
+
+        // Remove undefined fields to avoid unnecessary updates
+        Object.keys(updateFields).forEach((key) => {
+            if (updateFields[key] === undefined) {
+                delete updateFields[key];
+            }
+        });
+
+        if (Object.keys(updateFields).length === 0) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Please provide valid fields to update",
+                toastMessage: "Please provide valid fields to update",
+            };
+            next();
+            return;
+        }
+
+        // Update doctor profile
+        const updatedDoctor = await UserModel.findByIdAndUpdate(
+            user.id, 
+            updateFields, 
+            { new: true, select: "-password" } // Return updated document without password
+        );
+
+        if (!updatedDoctor) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Doctor profile not updated",
+                toastMessage: "Update failed",
+            };
+            next();
+            return;
+        }
+
+        // Success response
+        req.apiStatus = {
+            isSuccess: true,
+            message: "Success",
+            data: updatedDoctor,
+            toastMessage: "Profile updated successfully",
+        };
+        next();
+        return;
+
+    } catch (error: any) {
+        console.error(`Error updating doctor profile: ${error.message}`);
+
+        // Handle duplicate key (email already exists) error
+        if (error.code === 11000 && error.keyPattern?.email) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[11000],
+                data: "Email already exists",
+                toastMessage: "This email is already in use",
+            };
+            next();
+            return;
+        }
+
+        // Generic error handling
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1010],
+            data: "An error occurred while updating the profile",
+            toastMessage: "An error occurred while updating the profile",
+        };
+        next();
+        return;
     }
+}
+
