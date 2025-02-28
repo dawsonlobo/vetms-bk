@@ -3,12 +3,6 @@ import mongoose from "mongoose";
 import {PatientModel} from "../../../models/patients"
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
-import { ObjectId } from "mongodb";
-
-
-
-
-
 
 export const getOne = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
   try {
