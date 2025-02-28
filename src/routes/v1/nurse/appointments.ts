@@ -3,6 +3,7 @@ import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controller
 import {  verifyNurse } from '../../../middlewares/auth';
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
+import passport from "passport";
 
 
 const router = express.Router();
@@ -22,9 +23,9 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               nurseId:
+ *               _id:
  *                 type: string
- *                 description: The ID of the nurse creating the appointment (required for create)
+ *                 description: The ID of the appointment (required for update)
  *               patientId:
  *                 type: string
  *                 description: The ID of the patient for the appointment (required for create)
@@ -33,28 +34,29 @@ const router = express.Router();
  *                 description: The ID of the doctor assigned to the appointment
  *               date:
  *                 type: string
- *                 description: The scheduled date of the appointment in DD-MM-YYYY format
+ *                 format: date
+ *                 description: The scheduled date of the appointment in YYYY-MM-DD format
  *               status:
  *                 type: string
- *                 enum: [PENDING, CONFIRMED, COMPLETED]
+ *                 enum: [PENDING,COMPLETED,NOT-ATTENDED,CANCELLED]
  *                 description: Status of the appointment (required for update, not needed in creation)
  *           examples:
  *             ExampleCreate:
  *               summary: Create an appointment
  *               value:
- *                 nurseId: "67bbfed74cea23da08bb62a9"
  *                 patientId: "67b6c3b098c669e6c66adef9"
  *                 doctorId: "67bc28582dc692c7133ad092"
- *                 date: "27-01-2025"
+ *                 date: "2025-02-28"
  *             ExampleUpdate:
  *               summary: Update an appointment
  *               value:
+ *                 _id: "67c1234a5bc678d9e0123456"
  *                 doctorId: "67bc28582dc692c7133ad092"
- *                 date: "28-02-2025"
+ *                 date: "2025-02-28"
  *                 status: "CONFIRMED"
  *     responses:
  *       201:
- *         description: Appointment created or updated successfully
+ *         description: Appointment created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -66,6 +68,36 @@ const router = express.Router();
  *                 message:
  *                   type: string
  *                   description: Success message
+ *                 appointmentId:
+ *                   type: string
+ *                   description: The ID of the newly created appointment
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the item was created
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the item was last updated
+ *       200:
+ *         description: Appointment updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: Status code
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *                 appointmentId:
+ *                   type: string
+ *                   description: The ID of the updated appointment
  *                 data:
  *                   type: object
  *                   properties:
@@ -79,7 +111,7 @@ const router = express.Router();
  *                       description: Timestamp when the item was last updated
  */
 
-router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
+router.post("/create", entryPoint,passport.authenticate("bearer", { session: false }), verifyNurse, createUpdate, exitPoint);
 
 
 
@@ -91,7 +123,7 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *       - nurse/appointments
  *     security:
  *       - nurseBearerAuth: []  # Requires a bearer token
- *     summary: Get all 
+ *     summary: Get all appointments
  *     requestBody:
  *       required: true
  *       content:
@@ -117,24 +149,27 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *                 items:
  *                   type: object
  *               date:
- *                 type: integer
- *                 description: The specific date in Unix timestamp format
+ *                 type: string
+ *                 format: date
+ *                 description: The specific date in YYYY-MM-DD format
  *               fromDate:
- *                 type: integer
- *                 description: The starting date in Unix timestamp format
+ *                 type: string
+ *                 format: date
+ *                 description: The starting date in YYYY-MM-DD format
  *               toDate:
- *                 type: integer
- *                 description: The ending date in Unix timestamp format
+ *                 type: string
+ *                 format: date
+ *                 description: The ending date in YYYY-MM-DD format
  *           examples:
  *             projectionExample:
  *               summary: Projection Example
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   doctorId: 1
  *                   date: 1
- *                   schedule: 1
+ *                   status: 1
  *                   createdAt: 1
  *                   updatedAt: 1
  *             filterExample:
@@ -142,18 +177,18 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *               value:
  *                 filter:
  *                   doctorId: "66b3279c39c21f7342c13333"
- *                   schedule: "SCHEDULED"
- *                   petId: { "$in": ["66b3279c39c21f7342c12222", "66b3279c39c21f7342c14444"] }
+ *                   status: "PENDING"
+ *                   patientId: { "$in": ["66b3279c39c21f7342c12222", "66b3279c39c21f7342c14444"] }
  *             singleDateExample:
- *               summary: Multi-date Example
- *               value:
- *                 date: 1738658701
- *             multiDateExample:
  *               summary: Single-date Example
  *               value:
- *                 fromDate: 1707036301
- *                 toDate: 1738658701
- *             pagination:
+ *                 date: "2025-02-28"
+ *             multiDateExample:
+ *               summary: Multi-date Example
+ *               value:
+ *                 fromDate: "2025-02-01"
+ *                 toDate: "2025-02-28"
+ *             paginationExample:
  *               summary: Pagination Example
  *               value:
  *                 options:
@@ -171,8 +206,8 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *               summary: Search Example
  *               value:
  *                 search:
- *                   - term: "SCHEDULED"
- *                     fields: ["schedule"]
+ *                   - term: "PENDING"
+ *                     fields: ["status"]
  *                     startsWith: true
  *     responses:
  *       200:
@@ -201,19 +236,19 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *                           _id:
  *                             type: "string"
  *                             description: The unique ID of the appointment
- *                           petId:
+ *                           patientId:
  *                             type: "string"
- *                             description: The ID of the pet
+ *                             description: The ID of the patient
  *                           doctorId:
  *                             type: "string"
  *                             description: The ID of the doctor
  *                           date:
  *                             type: "string"
  *                             format: "date-time"
- *                             description: The date and time of the appointment
- *                           schedule:
+ *                             description: The date and time of the appointment in ISO 8601 format
+ *                           status:
  *                             type: "string"
- *                             enum: ["SCHEDULED", "COMPLETED", "CANCELLED"]
+ *                             enum: ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "NOTATTENDED"] 
  *                             description: The current status of the appointment
  *                           createdAt:
  *                             type: "string"
@@ -233,21 +268,21 @@ router.post("/create", entryPoint, verifyNurse, createUpdate, exitPoint);
  *                     totalCount: 2
  *                     tableData:
  *                     -   _id: "66b3279c39c21f7342c125b4"
- *                         petId: "66b3279c39c21f7342c12222"
+ *                         patientId: "66b3279c39c21f7342c12222"
  *                         doctorId: "66b3279c39c21f7342c13333"
  *                         date: "2025-02-01T08:00:00Z"
- *                         schedule: "SCHEDULED"
+ *                         status: "PENDING"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  *                     -   _id: "66b3279c39c21f7342c1520n"
- *                         petId: "66b3279c39c21f7342c14444"
+ *                         patientId: "66b3279c39c21f7342c14444"
  *                         doctorId: "66b3279c39c21f7342c15555"
  *                         date: "2025-02-02T10:30:00Z"
- *                         schedule: "COMPLETED"
+ *                         status: "COMPLETED"
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-router.post("/getAll", entryPoint, verifyNurse, getAll, exitPoint);
+router.post("/getAll", entryPoint, passport.authenticate("bearer", { session: false }),verifyNurse, getAll, exitPoint);
 /**
  * @swagger
  * /v1/nurse/appointments/getOne/{id}:
@@ -342,7 +377,7 @@ router.post("/getAll", entryPoint, verifyNurse, getAll, exitPoint);
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.get("/getOne/:id", entryPoint,verifyNurse, getOne, exitPoint);
+router.get("/getOne/:id", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, getOne, exitPoint);
 /**
  * @swagger
  * /v1/nurse/appointments/delete/{id}:
@@ -389,7 +424,7 @@ router.get("/getOne/:id", entryPoint,verifyNurse, getOne, exitPoint);
  *                   data: "Appointment deleted successfully"
  *                   toastMessage: "Appointment deleted successfully"
  */
-router.delete("/delete/:id", entryPoint,verifyNurse,deleteAppointment, exitPoint);
+router.delete("/delete/:id", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse,deleteAppointment, exitPoint);
 
 
      export default router;

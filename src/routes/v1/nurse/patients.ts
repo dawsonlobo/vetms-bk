@@ -10,7 +10,7 @@ import passport from "../../../passport/passport";
 const router = Router();
 /**
  * @swagger
- * /v1/nurse/patients/getAllForNurse:
+ * /v1/nurse/patients/getAll:
  *   post:
  *     tags:
  *       - nurse/patients
@@ -202,7 +202,7 @@ const router = Router();
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
 router.post(
-  "/getAllForNurse",
+  "/getAll",
   entryPoint,
   passport.authenticate("bearer", { session: false }),
   verifyNurse,
@@ -211,7 +211,7 @@ router.post(
 );
 /**
  * @swagger
- * /v1/nurse/patients/getOneForNurse/{id}:
+ * /v1/nurse/patients/getOne/{id}:
  *   post:
  *     tags:
  *       - nurse/patients
@@ -324,7 +324,7 @@ router.post(
  */
 
 router.post(
-  "/getOneForNurse/:id",
+  "/getOne/:id",
   entryPoint,
   passport.authenticate("bearer", { session: false }),
   getOne,

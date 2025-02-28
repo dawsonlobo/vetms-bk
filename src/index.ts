@@ -25,6 +25,7 @@ import nurseAppointments from "./routes/v1/nurse/appointments";
 import receptionistAuth from './routes/v1/receptionist/auth'
 import receptionistPatients from './routes/v1/receptionist/patients'
 import receptionistAppointments from './routes/v1/receptionist/appointments'
+import nursePatients from './routes/v1/nurse/patients';
 
 //import ngrok from "ngrok";
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/v1/receptionist/appointments',receptionistAppointments);
 app.use(express.urlencoded({ extended: true }));
 app.use('/v1',nurseAuth)
 app.use('/v1/nurse/appointments',nurseAppointments)
+app.use('/v1/nurse/patients',nursePatients)
 // app.use((req, res, next) => {
 //   res.setHeader("ngrok-skip-browser-warning", "true");
 //   next();
