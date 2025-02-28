@@ -12,7 +12,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
 /**
  * @swagger
  * /v1/doctor/appointments/update/{_id}:
- *   post:
+ *   put:
  *     tags:
  *       - doctor/appointments
  *     summary: Update an appointment record
@@ -73,7 +73,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",entryPoint,
+router.put("/update/:_id",entryPoint,
     authenticateDoctor,verifyDoctor,
     appointment.Update,exitPoint);
 

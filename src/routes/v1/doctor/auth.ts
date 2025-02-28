@@ -281,7 +281,7 @@ router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,do
 /**
  * @swagger
  * /v1/doctor/auth/update/:
- *   post:
+ *   put:
  *     summary: Update user profile 
  *     tags: [doctor/auth]
  *     security:
@@ -343,7 +343,7 @@ router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,do
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.post("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
+router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
 
 /**
  * @swagger
