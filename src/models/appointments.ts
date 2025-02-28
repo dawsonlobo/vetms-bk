@@ -35,6 +35,12 @@ import { CONSTANTS } from "../config/constant";
  *           nullable: true
  *           description: Unique identifier of the assigned nurse (if applicable)
  *           example: "60d5ec49f72b4c0015d3b789"
+ *         receptionistId:
+ *           type: string
+ *           format: objectId
+ *           nullable: true
+ *           description: Unique identifier of the receptionist who scheduled the appointment
+ *           example: "60d5ec49f72b4c0015d3b999"
  *         date:
  *           type: string
  *           format: date
@@ -69,9 +75,10 @@ import { CONSTANTS } from "../config/constant";
 export interface IAppointment {
   patientId: mongoose.Types.ObjectId;
   doctorId: mongoose.Types.ObjectId;
-  nurseId?: mongoose.Types.ObjectId; // Added nurseId (optional)
+  nurseId?: mongoose.Types.ObjectId;
+  receptionistId?: mongoose.Types.ObjectId; // Newly added field
   date: Date;
-  status: keyof typeof CONSTANTS.APPOINTMENT_STATUS; // Updated to use constants dynamically
+  status: keyof typeof CONSTANTS.APPOINTMENT_STATUS;
   remarks?: string;
   isDeleted?: boolean;
   createdAt?: Date;
@@ -87,9 +94,10 @@ const AppointmentSchema: Schema = new Schema(
     patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
     doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     nurseId: { type: Schema.Types.ObjectId, ref: "users" }, // Optional field
+    receptionistId: { type: Schema.Types.ObjectId, ref: "users" }, // Newly added optional field
     date: { type: Date, required: true },
     status: { type: String, enum: Object.values(CONSTANTS.APPOINTMENT_STATUS), required: true },
-    remarks: { type: String, default: "" }, // Default value set to an empty string
+    remarks: { type: String }, // Default value set to an empty string
     isDeleted: { type: Boolean, default: false }, 
   },
   {     
@@ -105,4 +113,3 @@ export const AppointmentModel: Model<IAppointmentModel> = mongoose.model<IAppoin
   "appointments",
   AppointmentSchema
 );
-  

@@ -57,7 +57,7 @@ app.use('/v1/admin/billings',billings)
 app.use('/v1/admin/payments',payments)
 
 app.use('/v1',receptionistAuth)
-app.use('/v1/receptionist/patients',receptionistPatients);
+app.use('/v1/receptionist/patients', receptionistPatients);
 app.use('/v1/receptionist/appointments',receptionistAppointments);
 
 app.use(express.urlencoded({ extended: true }));

@@ -7,6 +7,7 @@ import UserModel from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
 import {ErrorCodes} from "../../../models/models"
+import { log } from "console";
 
 
 const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
@@ -245,6 +246,8 @@ export async function getAdminProfile(req: Request, res: Response, next: NextFun
         console.log(req.user);
         
         const user = req.user as { id: string }; 
+        console.log(user);
+        
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
@@ -316,6 +319,8 @@ export async function updateAdminProfile(
 ): Promise<void> {
     try {
         const user = req.user as { id: string };
+        console.log(user);
+        
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,

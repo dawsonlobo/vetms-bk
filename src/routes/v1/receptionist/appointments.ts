@@ -1,5 +1,9 @@
 import { Router} from 'express';
 import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/receptionist/appointments'
+import { entryPoint } from '../../../middlewares/entrypoint';
+import passport from 'passport';
+import { verifyReceptionist } from '../../../middlewares/auth';
+import { exitPoint } from '../../../middlewares/exitpoint';
 const router = Router();
 
 /**
@@ -94,7 +98,7 @@ const router = Router();
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.post('/create', createUpdate);
+router.post('/create', entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, createUpdate, exitPoint);
 
 /**
  * @swagger

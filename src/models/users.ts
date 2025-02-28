@@ -74,7 +74,7 @@ import { CONSTANTS } from "../config/constant";
       role: { type: String, enum: Object.values(CONSTANTS.USER_ROLE), required: true },
       isDeleted: { type: Boolean, default: false }
     },
-    {     timestamps: true,
+    { timestamps: true,
       usePushEach: true,
       bufferCommands: true,
       versionKey: false,
