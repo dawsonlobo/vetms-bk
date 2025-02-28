@@ -1,15 +1,21 @@
-import { Router} from 'express';
+import { Router } from 'express';
 import { createUpdate, getAll, getOne } from '../../../controllers/v1/receptionist/patients';
-const router = Router()
+import { exitPoint } from '../../../middlewares/exitpoint';
+import { entryPoint } from '../../../middlewares/entrypoint';
+import { verifyReceptionist } from "../../../middlewares/auth";
+import passport from "../../../passport/passport";
+const router = Router();
+
 /**
  * @swagger
- * /v1/receptionist/patients/create:
+ * /v1/receptionist/patients/createupdate:
  *   post:
  *     tags:
  *       - receptionist/patients
- *     summary: Create/Update a patient record
+ *     summary: Create or update a patient record
+ *     description: This endpoint allows the receptionist to create a new patient record or update an existing one based on the provided `_id`.
  *     security:
- *       - adminBearerAuth: []  # This requires a bearer token for this route
+ *       - adminBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,7 +26,7 @@ const router = Router()
  *               - name
  *               - species
  *               - breed
- *               - age
+ *               - dob
  *               - weight
  *               - gender
  *               - medicalHistory
@@ -29,7 +35,7 @@ const router = Router()
  *             properties:
  *                _id:
  *                  type: string
- *                  description: The unique ID of the patient (for updates)
+ *                  description: The unique ID of the patient (only required for updates)
  *                name:
  *                  type: string
  *                  description: Name of the patient
@@ -39,9 +45,10 @@ const router = Router()
  *                breed:
  *                  type: string
  *                  description: Breed of the patient
- *                age:
- *                  type: integer
- *                  description: Age of the patient in years
+ *                dob:
+ *                  type: string
+ *                  format: date
+ *                  description: Date of birth of the patient (YYYY-MM-DD)
  *                weight:
  *                  type: number
  *                  description: Weight of the patient in kg
@@ -82,7 +89,7 @@ const router = Router()
  *                 name: "Buddy"
  *                 species: "Dog"
  *                 breed: "Golden Retriever"
- *                 age: 5
+ *                 dob: "2019-06-15"
  *                 weight: 30
  *                 gender: "MALE"
  *                 medicalHistory:
@@ -97,7 +104,7 @@ const router = Router()
  *                 name: "Buddy"
  *                 species: "Dog"
  *                 breed: "Golden Retriever"
- *                 age: 6
+ *                 dob: "2018-04-20"
  *                 weight: 32
  *                 gender: "MALE"
  *                 medicalHistory:
@@ -143,8 +150,8 @@ const router = Router()
  *                   data: "Patient record updated successfully"
  *                   toastMessage: "Patient record updated successfully"
  */
-router.post('/create',createUpdate);
 
+router.post('/createupdate', entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, createUpdate, exitPoint);
 /**
  * @swagger
  * /v1/receptionist/patients/getAll:
@@ -196,7 +203,7 @@ router.post('/create',createUpdate);
  *                   name: 1
  *                   species: 1
  *                   breed: 1
- *                   age: 1
+ *                   dob: 1
  *                   weight: 1
  *                   gender: 1
  *                   medicalHistory: 1
@@ -273,9 +280,10 @@ router.post('/create',createUpdate);
  *                           breed:
  *                             type: "string"
  *                             description: The breed of the patient
- *                           age:
- *                             type: "integer"
- *                             description: The age of the patient
+ *                           dob:
+ *                             type: "string"
+ *                             format: "date"
+ *                             description: The date of the patient
  *                           weight:
  *                             type: "number"
  *                             format: "float"
@@ -287,7 +295,7 @@ router.post('/create',createUpdate);
  *                           medicalHistory:
  *                             type: "string"
  *                             description: The medical history of the patient
- *                           BMI:
+ *                           bmi:
  *                             type: "number"
  *                             format: "float"
  *                             description: The BMI of the patient
@@ -316,7 +324,7 @@ router.post('/create',createUpdate);
  *                         name: "Buddy"
  *                         species: "Dog"
  *                         breed: "Golden Retriever"
- *                         age: 5
+ *                         dob: "2020-05-15"
  *                         weight: 30.5
  *                         gender: "MALE"
  *                         medicalHistory: "No known issues"
@@ -328,7 +336,7 @@ router.post('/create',createUpdate);
  *                         name: "Mittens"
  *                         species: "Cat"
  *                         breed: "Persian"
- *                         age: 3
+ *                         dob: "2022-09-10"
  *                         weight: 4.8
  *                         gender: "FEMALE"
  *                         medicalHistory: "Allergic to certain foods"
@@ -338,10 +346,11 @@ router.post('/create',createUpdate);
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
 router.post('/getAll',
-   // passport.authenticate('bearer', { session: false }),
+    entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,
     getAll,
-    //exitPoint
+    exitPoint
     );
+
 /**
  * @swagger
  * /v1/receptionist/patients/getOne/{id}:
@@ -403,9 +412,10 @@ router.post('/getAll',
  *                          breed:
  *                            type: string
  *                            description: The breed of the patient
- *                          age:
- *                            type: integer
- *                            description: The age of the patient
+ *                          dob:
+ *                            type: string
+ *                            format: date
+ *                            description: The date of the patient
  *                          weight:
  *                            type: number
  *                            format: float
@@ -419,7 +429,7 @@ router.post('/getAll',
  *                            items:
  *                              type: string
  *                            description: The medical history of the patient
- *                          BMI:
+ *                          bmi:
  *                            type: number
  *                            format: float
  *                            description: The BMI of the patient
@@ -446,7 +456,7 @@ router.post('/getAll',
  *                     name: "Buddy"
  *                     species: "Dog"
  *                     breed: "Labrador Retriever"
- *                     age: 5
+ *                     dob: 5
  *                     weight: 30.5
  *                     gender: "MALE"
  *                     medicalHistory: "Vaccinated, No known allergies"
@@ -458,9 +468,9 @@ router.post('/getAll',
 
 
 router.post('/getOne/:id',
-    // passport.authenticate('bearer', { session: false }),
+    entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,
      getOne,
-     //exitPoint
+     exitPoint
      );
  export default router;
 

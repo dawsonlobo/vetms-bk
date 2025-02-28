@@ -3,53 +3,137 @@ import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
-
+import { CONSTANTS } from "../../../config/constant";
+import moment from "moment";
+import { AccessToken } from "../../../models/accessTokens";
 export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-      const { _id, ...appointmentData } = req.body;
-
-      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
+      // Extract access token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
           req.apiStatus = {
               isSuccess: false,
-              error: ErrorCodes[1003],
-              toastMessage: "Invalid Appointment ID provided",
+              error: ErrorCodes[1001],
+              toastMessage: "Unauthorized: Access token is missing",
+          };
+          return next();
+      }
+      
+      const token = authHeader.split(" ")[1];
+
+      // Find receptionist ID from AccessToken model
+      const accessTokenRecord = await AccessToken.findOne({ token }).exec();
+      if (!accessTokenRecord) {
+          req.apiStatus = {
+              isSuccess: false,
+              error: ErrorCodes[1001],
+              toastMessage: "Unauthorized: Invalid access token",
           };
           return next();
       }
 
-      let isUpdate = Boolean(_id);
+      const receptionistId = accessTokenRecord.userId;
+      console.log("Authenticated receptionist ID:", receptionistId);
+
+      const { _id, doctorId, patientId, date, status } = req.body;
+      console.log("Received request data:", req.body);
+
+      // Prevent unauthorized modification of patientId or doctorId during an update
+      if (_id && (req.body.patientId || req.body.doctorId)) {
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1002],
+            toastMessage: "You cannot modify patientId or doctorId during an update",
+        };
+        return next();
+    }
+    
+
+      // Validate `_id`
+      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1003],
+            toastMessage: "Invalid Appointment ID",
+        };
+        return next();
+    }
+    
+
+      // Validate Date
+      let parsedDate: Date | null = null;
+      if (date) {
+          const formattedDate = moment(date, "DD-MM-YYYY", true);
+          if (!formattedDate.isValid()) {
+              req.apiStatus = {
+                  isSuccess: false,
+                  error: ErrorCodes[1004],
+                  toastMessage: "Invalid date format. Use 'DD-MM-YYYY'.",
+              };
+              return next();
+          }
+          parsedDate = formattedDate.toDate();
+      }
+
+      const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
+
       let appointment;
+      const isUpdate = Boolean(_id);
 
       if (isUpdate) {
-          appointment = await AppointmentModel.findByIdAndUpdate(_id, appointmentData, { new: true }).exec();
+          // Update appointment only if it belongs to the logged-in receptionist
+          appointment = await AppointmentModel.findOneAndUpdate(
+            { _id, receptionistId },  // Ensure the appointment belongs to the receptionist
+            { 
+                ...(doctorId && { doctorId }),
+                ...(parsedDate && { date: parsedDate }),
+                status: validatedStatus
+            }, 
+            { new: true }
+        ).exec();
+        
+
+          if (!appointment) {
+              req.apiStatus = {
+                  isSuccess: false,
+                  error: ErrorCodes[1004],
+                  toastMessage: "Appointment record not found",
+              };
+              return next();
+          }
       } else {
-          appointment = await new AppointmentModel(appointmentData).save();
+          // Create a new appointment, automatically setting receptionistId
+          appointment = await new AppointmentModel({
+              doctorId,
+              patientId,
+              date: parsedDate,
+              receptionistId, // Taken from AccessToken model
+              status: CONSTANTS.APPOINTMENT_STATUS.PENDING
+          }).save();
       }
 
-      if (!appointment) {
-          req.apiStatus = {
-              isSuccess: false,
-              error: ErrorCodes[1004],
-              toastMessage: "Appointment record not found",
-          };
-          return next();
-      }
-
+      console.log("Created/Updated appointment:", appointment);
+      
       req.apiStatus = {
           isSuccess: true,
           message: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
-          data: appointment,
+          data: isUpdate 
+              ? { ...appointment.toObject() }  // Return all updated fields
+              : { _id: appointment._id, createdAt: appointment.createdAt, updatedAt: appointment.updatedAt }, // Only selected fields for creation
           toastMessage: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
       };
+      
       next();
+      return;
   } catch (error) {
       console.error("Error in createUpdate:", error);
       req.apiStatus = {
           isSuccess: false,
-          error: ErrorCodes[1002],
-          toastMessage: "Something went wrong. Please try again.",
+          error: ErrorCodes[1006],
+          toastMessage: "Internal Server Error",
       };
       next();
+      return;
   }
 };
 

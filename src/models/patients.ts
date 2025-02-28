@@ -118,7 +118,7 @@ const PatientSchema: Schema = new Schema(
     name: { type: String, required: true },
     species: { type: String, required: true },
     breed: { type: String, required: true },
-    DOB: { type: Date, required: true },
+    dob: { type: Date, required: true },
     weight: { type: Number, required: true },
     gender: { type: String, enum: ["MALE", "FEMALE"], required: true },
     medicalHistory: { type: [String], required: true },

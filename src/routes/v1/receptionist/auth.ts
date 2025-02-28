@@ -23,10 +23,10 @@ import { verifyReceptionist } from "../../../middlewares/auth";
  *             properties:
  *               email:
  *                 type: string
- *                 example: "alex@example.com"
+ *                 example: "receptionist@example.com"
  *               password:
  *                 type: string
- *                 example: "admin123"
+ *                 example: "Reception@123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -49,13 +49,13 @@ import { verifyReceptionist } from "../../../middlewares/auth";
  *                       example: "6512c5f3e4b09a12d8f42b68"
  *                     name:
  *                       type: string
- *                       example: "Alex"
+ *                       example: "Receptionist Mike"
  *                     email:
  *                       type: string
- *                       example: "alex@example.com"
+ *                       example: "receptionist@example.com"
  *                     role:
  *                       type: string
- *                       example: "ADMIN"
+ *                       example: "Receptionist"
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
@@ -285,14 +285,14 @@ router.post("/receptionist/auth/profile", entryPoint,passport.authenticate("bear
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Alex"
+ *                 example: "Receptionist Mike"
  *               email:
  *                 type: string
- *                 example: "alex@example.com"
+ *                 example: "receptionist@example.com"
  *               role:
  *                 type: string
  *                 enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
- *                 example: "ADMIN"
+ *                 example: "Receptionist"
  *               isDeleted:
  *                 type: boolean
  *                 example: false
@@ -304,9 +304,9 @@ router.post("/receptionist/auth/profile", entryPoint,passport.authenticate("bear
  *             fullUpdate:
  *               summary: Full profile update
  *               value:
- *                 name: "Alex"
- *                 email: "alex@example.com"
- *                 role: "DOCTOR"
+ *                 name: "Receptionist Mike"
+ *                 email: "receptionist@example.com"
+ *                 role: "Receptionist"
  *                 isDeleted: false
  *             partialUpdate:
  *               summary: Update only isDeleted status

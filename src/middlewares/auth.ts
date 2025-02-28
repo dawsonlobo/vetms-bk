@@ -235,7 +235,7 @@ export async function verifyReceptionist(req: Request, res: Response, next: Next
         res.status(403).json({
             status: 403,
             message: "Forbidden",
-            data: "Admin access required.",
+            data: "Receptionist access required.",
             toastMessage: "You do not have permission to access this resource.",
         });
         return;
