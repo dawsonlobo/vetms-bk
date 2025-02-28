@@ -1,5 +1,6 @@
 import { Request, Response,NextFunction } from "express";
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 import {PatientModel} from "../../../models/patients"
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
@@ -131,18 +132,26 @@ export const Update = async (req: Request, res: Response,next:NextFunction): Pro
       
         const{id}=req.params;
         const { weight, bmi, medicalHistory } = req.body;
+
+        const existingUser = await PatientModel.findOne({ _id: new ObjectId(id) });
         
 
         console.log(id);
+        console.log(existingUser);
 
               const updateFields = { weight, bmi, medicalHistory };
+              // const patientId=new mongoose.Types.ObjectId(id)
               
             //   if (updateFields.isDeleted) {
             //     delete updateFields.isDeleted;
             // }
 
-            const updatedPatients = await PatientModel.findById(new mongoose.Types.ObjectId(id), updateFields, { new: true });
-
+         // Perform the update operation
+        const updatedPatients = await PatientModel.findByIdAndUpdate(
+            {_id:new ObjectId(id)},  // Pass the patient ID directly here
+            updateFields,  // Fields to update
+            { new: true }  // Return the updated document
+        );
             console.log(updatedPatients);
             
 
