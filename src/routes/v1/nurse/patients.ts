@@ -16,13 +16,14 @@ const router = Router();
  *       - nurse/patients
  *     security:
  *       - nurseBearerAuth: []
- *     summary: Get all
+ *     summary: Get all patients
+ *     description: Retrieves a list of patients with optional filters, search, and pagination.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: "object"
+ *             type: object
  *             properties:
  *               projection:
  *                 type: object
@@ -43,13 +44,16 @@ const router = Router();
  *                   type: object
  *               date:
  *                 type: integer
- *                 description: The specific date in Unix timestamp format
+ *                 format: int64
+ *                 description: The specific date in epoch format
  *               fromDate:
  *                 type: integer
- *                 description: The starting date in Unix timestamp format
+ *                 format: int64
+ *                 description: The specific date in epoch format
  *               toDate:
  *                 type: integer
- *                 description: The ending date in Unix timestamp format
+ *                 format: int64
+ *                 description: The specific date in epoch format
  *           examples:
  *             projectionExample:
  *               summary: Projection Example
@@ -66,20 +70,20 @@ const router = Router();
  *                   bmi: 1
  *                   bloodGroup: 1
  *             filterExample:
- *                summary: filter example
- *                value:
- *                  filter:
- *                    name: "rammy"
+ *               summary: Filter Example
+ *               value:
+ *                 filter:
+ *                   name: "Rammy"
  *             singleDateExample:
- *               summary: Multi-date Example
+ *               summary: Single Date Example
  *               value:
- *                 date: 1738658701
+ *                 date: 17459904000
  *             multiDateExample:
- *               summary: Single-date Example
+ *               summary: Multi-Date Example
  *               value:
- *                 fromDate: 1707036301
- *                 toDate: 1738658701
- *             pagination:
+ *                 fromDate: 1745990400000
+ *                 toDate: 17459904000
+ *             paginationExample:
  *               summary: Pagination Example
  *               value:
  *                 options:
@@ -89,10 +93,8 @@ const router = Router();
  *               summary: Sort Example
  *               value:
  *                 options:
- *                   sortBy:
- *                     - "createdAt"
- *                   sortDesc:
- *                     - true
+ *                   sortBy: ["createdAt"]
+ *                   sortDesc: [true]
  *             searchExample:
  *               summary: Search Example
  *               value:
@@ -103,80 +105,80 @@ const router = Router();
  *                     endsWith: false
  *     responses:
  *       200:
- *         description: Get all patients.
+ *         description: Successfully retrieved patients.
  *         content:
  *           application/json:
  *             schema:
- *               type: "object"
+ *               type: object
  *               properties:
  *                 status:
- *                   type: "integer"
- *                   format: "int64"
+ *                   type: integer
+ *                   format: int64
  *                 message:
- *                   type: "string"
+ *                   type: string
  *                 data:
- *                   type: "object"
+ *                   type: object
  *                   properties:
  *                     totalCount:
- *                       type: "integer"
+ *                       type: integer
  *                       description: Total number of patients
  *                     tableData:
- *                       type: "array"
+ *                       type: array
  *                       items:
- *                         type: "object"
+ *                         type: object
  *                         properties:
  *                           _id:
- *                             type: "string"
+ *                             type: string
  *                             description: The unique ID of the patient
  *                           name:
- *                             type: "string"
+ *                             type: string
  *                             description: The name of the patient
  *                           species:
- *                             type: "string"
+ *                             type: string
  *                             description: The species of the patient
  *                           breed:
- *                             type: "string"
+ *                             type: string
  *                             description: The breed of the patient
  *                           age:
- *                             type: "integer"
+ *                             type: integer
  *                             description: The age of the patient
  *                           weight:
- *                             type: "number"
- *                             format: "float"
+ *                             type: number
+ *                             format: float
  *                             description: The weight of the patient
  *                           gender:
- *                             type: "string"
+ *                             type: string
  *                             enum: ["MALE", "FEMALE"]
  *                             description: The gender of the patient
  *                           medicalHistory:
- *                             type: "string"
+ *                             type: string
  *                             description: The medical history of the patient
- *                           BMI:
- *                             type: "number"
- *                             format: "float"
+ *                           bmi:
+ *                             type: number
+ *                             format: float
  *                             description: The BMI of the patient
  *                           bloodGroup:
- *                             type: "string"
+ *                             type: string
  *                             enum: ["DEA 1.1+", "DEA 1.1-", "DEA 1.2+", "DEA 1.2-", "DEA 3", "DEA 4", "DEA 5", "DEA 7", "A", "B", "AB"]
  *                             description: The blood group of the patient
  *                           createdAt:
- *                             type: "string"
- *                             format: "date-time"
+ *                             type: string
+ *                             format: date-time
  *                             description: Timestamp when the patient record was created
  *                           updatedAt:
- *                             type: "string"
- *                             format: "date-time"
+ *                             type: string
+ *                             format: date-time
  *                             description: Timestamp when the patient record was last updated
  *             examples:
- *               example1:
- *                 summary: "Successful response with data"
+ *               successExample:
+ *                 summary: Successful Response
  *                 value:
  *                   status: 200
  *                   message: "Success"
  *                   data:
  *                     totalCount: 2
  *                     tableData:
- *                     -   _id: "66b3279c39c21f7342c125b4"
+ *                       - _id: "66b3279c39c21f7342c125b4"
  *                         name: "Buddy"
  *                         species: "Dog"
  *                         breed: "Golden Retriever"
@@ -188,7 +190,7 @@ const router = Router();
  *                         bloodGroup: "DEA 1.1+"
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
- *                     -   _id: "66b3279c39c21f7342c1520n"
+ *                       - _id: "66b3279c39c21f7342c1520n"
  *                         name: "Mittens"
  *                         species: "Cat"
  *                         breed: "Persian"
@@ -201,10 +203,7 @@ const router = Router();
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post(
-  "/getAll",
-  entryPoint,
-  passport.authenticate("bearer", { session: false }),
+router.post("/getAll", entryPoint,passport.authenticate("bearer", { session: false }),
   verifyNurse,
   getAll,
   exitPoint

@@ -9,7 +9,6 @@ export const CONSTANTS = {
       CANCELLED: "cancelled",
       COMPLETED: "completed",
       NOTATTENDED:"not attended"
-      
     },
     USER_ROLE: {
       ADMIN : "ADMIN",
