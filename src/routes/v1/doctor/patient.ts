@@ -374,16 +374,16 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
  *   post:
  *     tags:
  *       - doctor/patients
- *     summary: Update an appointment record
+ *     summary: Update an patient record
  *     security:
  *       - doctorBearerAuth: []  # Requires a bearer token for this route
  *     parameters:
  *       - in: path
- *         name: _id
+ *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The unique identifier of the appointment to retrieve
+ *         description: The unique identifier of the patient to retrieve
  *     requestBody:
  *       required: true
  *       content:
