@@ -85,6 +85,9 @@ export async function loginController(req: Request, res: Response, next: NextFun
 export async function refreshTokenController  (req: Request, res: Response, next: NextFunction) :Promise<void> {
     try {
         const { refresh_token: refreshToken } = req.body;
+
+        console.log(refreshToken);
+        
         
         if (!refreshToken) {
             req.apiStatus = {
@@ -417,8 +420,8 @@ export async function updateDoctorProfile(req: Request, res: Response, next: Nex
         }
 
         // Extract allowed fields from request body
-        const { name, email, role, isDeleted } = req.body;
-        const updateFields: Partial<Record<string, any>> = { name, email, role, isDeleted };
+        const { name, email, isDeleted } = req.body;
+        const updateFields: Partial<Record<string, any>> = { name, email, isDeleted };
 
         // Remove undefined fields to avoid unnecessary updates
         Object.keys(updateFields).forEach((key) => {

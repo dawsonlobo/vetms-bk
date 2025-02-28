@@ -6,6 +6,8 @@ import UserModel from "../../../models/users"
 import {PatientModel} from "../../../models/patients"
 import { ObjectId } from "mongodb";
 import { ErrorCodes } from "../../../models/models";
+import {IUserDocument} from "../../../models/users"
+import { log } from "console";
 
 
 
@@ -13,10 +15,18 @@ import { ErrorCodes } from "../../../models/models";
 
 export async function createUpdateFollowUp(req: Request, res: Response,next:NextFunction): Promise<void> {
   try {
-      const { _id, patientId, doctorId, diagnosis, treatment, prescription, visitDate, ...rest } = req.body;
+      const { _id, patientId,diagnosis, treatment, prescription, visitDate, ...rest } = req.body;
       
-      // Validate if doctor exists and has the correct role
+
+      const doctorId = (req.user as { id: string }).id;
+
+    
+   
+      
       const existingUser = await UserModel.findOne({ _id: new ObjectId(doctorId) });
+
+      console.log(req.user);
+      
 
       
       if (!existingUser) {
@@ -136,7 +146,7 @@ export async function getAll(req: Request, res: Response,next:NextFunction): Pro
       projection = {},
       filter = {},
       options = {},
-      search = [],
+      search = [],  
       date,
       fromDate,
       toDate,

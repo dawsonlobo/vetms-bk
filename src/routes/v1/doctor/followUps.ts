@@ -57,7 +57,6 @@ const router = Router();
  *                summary: Example of a follow-up record
  *                value:
  *                  patientId: "67c1408cb2c2f6be65087847"
- *                  doctorId: "67bc480859691058622faf3e"
  *                  diagnosis: "Skin infection due to allergy"
  *                  treatment: "Antibiotic injection and medicated shampoo"
  *                  prescription: "Amoxicillin 250mg, Antihistamines"
