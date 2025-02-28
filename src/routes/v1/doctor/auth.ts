@@ -25,13 +25,13 @@ const router = Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: "aleyx@example.com"
+ *                 example: "password@example.com"
  *               password:
  *                 type: string
  *                 example: "Doctor@123"
  *           example:
- *              email: "aleyx@example.com"
- *              password: "Doctor@123"  
+ *              email: "password@example.com"
+ *              password: "password"  
  *     responses:
  *       200:
  *         description: Login successful
@@ -343,7 +343,7 @@ router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,do
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
+router.post("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
 
 /**
  * @swagger

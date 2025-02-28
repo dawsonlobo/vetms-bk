@@ -6,6 +6,7 @@ import { AccessToken } from "../../../models/accessTokens";
 import bcrypt from "bcryptjs";
 import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import {ErrorCodes} from "../../../models/models"
+import { log } from "console";
 
 const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
@@ -22,8 +23,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
                 isSuccess: false,
                 error: ErrorCodes[1002],
                 data: "User not found or verified",
-                log: "User not found",
-                toastMessage: "Invalid email or password",
+                toastMessage: "User not found or verified",
             };
             next();
             return;
@@ -35,7 +35,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
-                data: "Failed to login",
+                data: "Invalid email or password",
                 toastMessage: "Invalid email or password",
             };
             next();
@@ -91,7 +91,7 @@ export async function refreshTokenController  (req: Request, res: Response, next
                 isSuccess: false,
                 error: ErrorCodes[1001],
                 data: "Refresh token is required",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Refresh token is required",
             };
             return next();
         }
@@ -103,7 +103,7 @@ export async function refreshTokenController  (req: Request, res: Response, next
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Invalid or expired refresh token",
-                toastMessage: "Please log in again.",
+                toastMessage: "Invalid or expired refresh token log in again.",
             };
             return next();
         }
@@ -115,7 +115,7 @@ export async function refreshTokenController  (req: Request, res: Response, next
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Refresh token not found",
-                toastMessage: "Refresh token not found. Please log in again.",
+                toastMessage: "Refresh token not found",
             };
             return next();
         }
@@ -128,7 +128,7 @@ export async function refreshTokenController  (req: Request, res: Response, next
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "User not found",
-                toastMessage: "User no longer exists.",
+                toastMessage: "User not found",
             };
             return next();
         }
@@ -165,8 +165,8 @@ export async function refreshTokenController  (req: Request, res: Response, next
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
-            data: "Failed to refresh token",
-            toastMessage: "An error occurred while refreshing the token. Please try again later.",
+            data: "An error occurred while refreshing the token. Please try again later",
+            toastMessage: "An error occurred while refreshing the token. Please try again later",
         };
         next();
     }
@@ -187,7 +187,7 @@ export async function logoutController (req: Request, res: Response, next: NextF
                 isSuccess: false,
                 error: ErrorCodes[1001],
                 data: "Access token and Refresh token are required",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Access token and Refresh token are required",
             };
             next();
             return 
@@ -200,7 +200,7 @@ export async function logoutController (req: Request, res: Response, next: NextF
                 isSuccess: false,
                 error: ErrorCodes[1004],
                 data: "Invalid or expired refresh token",
-                toastMessage: "Invalid refresh token provided.",
+                toastMessage: "Invalid or expired refresh token",
             };
             next();
             return
@@ -215,7 +215,7 @@ export async function logoutController (req: Request, res: Response, next: NextF
                 isSuccess: false,
                 error: ErrorCodes[1002],
                 data: "Tokens not found or already deleted",
-                toastMessage: "Tokens not found. Already logged out?",
+                toastMessage: "Tokens not found or already deleted",
             };
             next();
             return 
@@ -228,15 +228,16 @@ export async function logoutController (req: Request, res: Response, next: NextF
             toastMessage: "Logged out successfully",
         };
 
-        return next();
+        next();
+        return 
     } catch (error: unknown) {
         console.error(`Logout error: ${error instanceof Error ? error.message : "Unknown error"}`);
 
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
-            data: "Failed to logout",
-            toastMessage: "An error occurred while logging out. Please try again later.",
+            data: "An error occurred while logging out. Please try again later",
+            toastMessage: "An error occurred while logging out. Please try again later",
         };
 
         next();
@@ -250,19 +251,21 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
     try {
         console.log(req.user);
         
+        const projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
+
+
         const user = req.user as { id: string }; 
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Unauthorized",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Unauthorized",
             };
             next();
             return
         }
 
-        const projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
         const adminProfile = await UserModel.findById(user.id, projection).lean();
 
         if (!adminProfile) {
@@ -270,7 +273,7 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Admin profile not found",
-                toastMessage: "Admin profile does not exist.",
+                toastMessage: "Admin profile not found.",
             };
             next();
             return
@@ -285,7 +288,7 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Refresh token not found",
-                log: "No refresh token found in DB",
+                log: "Refresh token not found",
             };
             next();
             return
@@ -309,85 +312,184 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
-            data: "Internal server error",
-            toastMessage: "An error occurred while fetching the profile.",
+            data: "An error occurred while fetching the profile",
+            toastMessage: "An error occurred while fetching the profile",
         };
         return next();
     }
 }
 
 
-export async function updateDoctorProfile  (req: Request, res: Response, next: NextFunction) :Promise<void> {
+// export async function updateDoctorProfile  (req: Request, res: Response, next: NextFunction) :Promise<void> {
+//     try {
+        
+//         const user = req.user as { id: string };
+//         if (!user || !user.id) {
+//             req.apiStatus = {
+//                 isSuccess: false,
+//                 error: ErrorCodes[1012],
+//                 data: "Unauthorized",
+//                 toastMessage: "Unauthorized",
+//             };
+//             next();
+//             return
+//         }
+
+//         // Define allowed fields to update
+//         const allowedFields = ["name", "email", "role", "isDeleted"];
+//         const updateData: Partial<Record<string, any>> = {};
+
+//         Object.keys(req.body).forEach((key) => {
+//             if (allowedFields.includes(key)) {
+//                 updateData[key] = req.body[key];
+//             }
+//         });
+
+//         if (Object.keys(updateData).length === 0) {
+//             req.apiStatus = {
+//                 isSuccess: false,
+//                 error: ErrorCodes[1003],
+//                 data: "Please provide valid fields to update",
+//                 toastMessage: "Please provide valid fields to update",
+//             };
+//             next();
+//             return 
+//         }
+
+//         // Update admin profile
+//         const updatedAdmin = await UserModel.findByIdAndUpdate(user.id, updateData, {
+//             new: true,
+//             select: "-password",
+//         });
+
+//         if (!updatedAdmin) {
+//             req.apiStatus = {
+//                 isSuccess: false,
+//                 error: ErrorCodes[1003],
+//                 data: "Admin profile not updated",
+//                 toastMessage: "Update failed",
+//             };
+//             next();
+//             return 
+//         }
+
+//         req.apiStatus = {
+//             isSuccess: true,
+//             message:"Success",
+//             data: "Updated successfully",
+//             toastMessage: "Updated successfully",
+//         };
+
+//         next();
+//         return 
+//     } catch (error) {
+//         console.error(`Error updating admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+
+//         req.apiStatus = {
+//             isSuccess: false,
+//             error: ErrorCodes[1010],
+//             data: "An error occurred while updating the profile",
+//             toastMessage: "An error occurred while updating the profile",
+//         };
+//         next();
+//         return 
+//     }
+// }
+
+
+
+export async function updateDoctorProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+        // Get user ID from request
         const user = req.user as { id: string };
+        console.log("first log",user);
+        console.log("second log",user.id);
+        
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Unauthorized",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Unauthorized",
             };
             next();
-            return
+            return;
         }
 
-        // Define allowed fields to update
-        const allowedFields = ["name", "email", "role", "isDeleted"];
-        const updateData: Partial<Record<string, any>> = {};
+        // Extract allowed fields from request body
+        const { name, email, role, isDeleted } = req.body;
+        const updateFields: Partial<Record<string, any>> = { name, email, role, isDeleted };
 
-        Object.keys(req.body).forEach((key) => {
-            if (allowedFields.includes(key)) {
-                updateData[key] = req.body[key];
+        // Remove undefined fields to avoid unnecessary updates
+        Object.keys(updateFields).forEach((key) => {
+            if (updateFields[key] === undefined) {
+                delete updateFields[key];
             }
         });
 
-        if (Object.keys(updateData).length === 0) {
+        if (Object.keys(updateFields).length === 0) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1003],
-                data: "No valid fields to update",
-                toastMessage: "Please provide valid fields to update.",
+                data: "Please provide valid fields to update",
+                toastMessage: "Please provide valid fields to update",
             };
             next();
-            return 
+            return;
         }
 
-        // Update admin profile
-        const updatedAdmin = await UserModel.findByIdAndUpdate(user.id, updateData, {
-            new: true,
-            select: "-password",
-        });
+        // Update doctor profile
+        const updatedDoctor = await UserModel.findByIdAndUpdate(
+            user.id, 
+            updateFields, 
+            { new: true, select: "-password" } // Return updated document without password
+        );
 
-        if (!updatedAdmin) {
+        if (!updatedDoctor) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1003],
-                data: "Admin profile not updated",
+                data: "Doctor profile not updated",
                 toastMessage: "Update failed",
             };
             next();
-            return 
+            return;
         }
 
+        // Success response
         req.apiStatus = {
             isSuccess: true,
-            message:"Success",
-            data: "Updated successfully",
-            toastMessage: "Updated successfully",
+            message: "Success",
+            data: updatedDoctor,
+            toastMessage: "Profile updated successfully",
         };
-
         next();
-        return 
-    } catch (error) {
-        console.error(`Error updating admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+        return;
 
+    } catch (error: any) {
+        console.error(`Error updating doctor profile: ${error.message}`);
+
+        // Handle duplicate key (email already exists) error
+        if (error.code === 11000 && error.keyPattern?.email) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[11000],
+                data: "Email already exists",
+                toastMessage: "This email is already in use",
+            };
+            next();
+            return;
+        }
+
+        // Generic error handling
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
-            data: "Internal server error",
-            toastMessage: "An error occurred while updating the profile.",
+            data: "An error occurred while updating the profile",
+            toastMessage: "An error occurred while updating the profile",
         };
         next();
-        return 
+        return;
     }
 }
+

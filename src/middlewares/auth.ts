@@ -305,7 +305,6 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
 };
 
 export async function verifyDoctor(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log("Req User in verifyAdmin:", req.user); // Debugging
 
     if (!req.user) {
         res.status(401).json({

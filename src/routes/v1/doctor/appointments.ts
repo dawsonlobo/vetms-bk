@@ -32,10 +32,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *           schema:
  *             type: object
  *             required:
- *               - patientId
- *               - doctorId
- *               - date
- *               - status
+ *               - remarks
  *             properties:
  *               remarks:
  *                 type: string
@@ -115,10 +112,14 @@ router.post("/update/:_id",entryPoint,
  *               value:
  *                 projection:
  *                   _id: 1
- *                   petId: 1
+ *                   patientId: 1
  *                   doctorId: 1
+ *                   nurseId: 1
  *                   date: 1
  *                   status: 1
+ *                   remarks: 1
+ *                   createdAt: 1
+ *                   updatedAt: 1
  *     responses:
  *       200:
  *         description: Get one follow-up record.
