@@ -1,56 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { PatientModel } from "../../../models/patients"; // Import the Nurse model
+import { PatientModel } from "../../../models/patients"; // Import the patients model
 import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
-export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { id, ...nurseData } = req.body;
 
-    let result;
-    if (id) {
-      // Update existing nurse record
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        req.apiStatus = {
-          isSuccess: false,
-          error: ErrorCodes[1003],
-          toastMessage: "Invalid ID",
-        };
-        return next();
-      }
-
-      result = await PatientModel.findByIdAndUpdate(id, nurseData, { new: true, runValidators: true });
-
-      if (!result) {
-        req.apiStatus = {
-          isSuccess: false,
-          error: ErrorCodes[1004],
-          toastMessage: "Record not found or deleted",
-        };
-        return next();
-      }
-    } else {
-      // Create new nurse record
-      result = await PatientModel.create(nurseData);
-    }
-
-    req.apiStatus = {
-      isSuccess: true,
-      message: id ? "Nurse updated successfully" : "Nurse created successfully",
-      data: result,
-    };
-    next();
-  } catch (error) {
-    console.error("Error in createUpdate:", error);
-    req.apiStatus = {
-      isSuccess: false,
-      error: ErrorCodes[1002],
-      toastMessage: "Something went wrong. Please try again.",
-    };
-    next();
-  }
-};
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
