@@ -54,7 +54,7 @@ const router = express.Router();
  *                 _id: "67c19180b2e8bfba6a12a561"
  *                 doctorId: "67bc28582dc692c7133ad092"
  *                 date: 1745990400000  # Example epoch timestamp (in milliseconds)
- *                 status: "CONFIRMED"
+ *                 status: "completed"
  *     responses:
  *       201:
  *         description: Appointment created successfully
@@ -206,8 +206,8 @@ router.post("/create", entryPoint,passport.authenticate("bearer", { session: fal
  *               summary: Filter Example
  *               value:
  *                 filter:
- *                   doctorId: "66b3279c39c21f7342c13333"
- *                   status: "PENDING"
+ *                   doctorId: "67b6c0afb1fd18bba95f928a"
+ *                   status: "pending"
  *             singleDateExample:
  *               summary: Single-date Example
  *               value:
@@ -233,7 +233,7 @@ router.post("/create", entryPoint,passport.authenticate("bearer", { session: fal
  *               summary: Search Example
  *               value:
  *                 search:
- *                   term: "PENDING"
+ *                   term: "pending"
  *                   fields: ["status"]
  *                   startsWith: true
  */
@@ -328,7 +328,7 @@ router.post("/getAll", entryPoint, passport.authenticate("bearer", { session: fa
  *                     patientId: "66b3279c39c21f7342c1520p"
  *                     doctorId: "66b3279c39c21f7342c1520d"
  *                     date: "2025-02-19T10:00:00Z"
- *                     status: "PENDING"
+ *                     status: "pending"
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
