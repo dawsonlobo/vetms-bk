@@ -36,6 +36,8 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
         }
   
         const { _id, doctorId, patientId, date, status } = req.body;
+
+      
   
         // Prevent unauthorized modification of nurseId or patientId
         if (_id && (req.body.patientId || req.body.nurseId)) {
@@ -76,7 +78,8 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
             }
         }
   
-        const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
+        const validatedStatus = status ? status.toLowerCase() : CONSTANTS.APPOINTMENT_STATUS.PENDING;
+        // Default status
   
         let appointment;
         const isUpdate = Boolean(_id);
@@ -158,42 +161,42 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
             fromDate,
             toDate,
         } = req.body;
-
-        // Remove `isDeleted` from projection
+  
+        // Remove isDeleted from projection to ensure it's never included
         const Projection = { ...projection };
         delete Projection.isDeleted;
-
-        // Ensure filtering conditions
-        const Filter: any = { ...filter, isDeleted: false, isEnabled: true };
-
-        if (filter.doctorId) {
-            try {
-                Filter.doctorId = new Object(filter.doctorId);
-            } catch (error) {
-                console.error("Invalid ObjectId format:", filter.doctorId);
-            }
+  
+        // Ensure deleted records are not included in the filter
+        const Filter: any = { ...filter, isDeleted: false };
+  
+        // Convert `doctorId` to ObjectId if it's a valid ObjectId string
+        if (filter.doctorId && mongoose.isValidObjectId(filter.doctorId)) {
+            Filter.doctorId = new mongoose.Types.ObjectId(filter.doctorId);
         }
-
+        
+        // Case-insensitive status filtering
         if (filter.status) {
-            Filter.status = filter.status.toUpperCase(); // Ensure case consistency
+            Filter.status = new RegExp(`^${filter.status}$`, "i");
         }
-
-        // Convert **milliseconds epoch** to proper date at UTC midnight
+  
+        console.log("Final Filter:", JSON.stringify(Filter, null, 2));
+  
+        // Helper function to convert **milliseconds epoch** to proper date at UTC midnight
         const parseEpoch = (epoch: number): Date => {
             const dateObj = new Date(epoch);
             dateObj.setUTCHours(0, 0, 0, 0);
             return dateObj;
         };
-
+  
         // Apply single date filtering
         if (date) {
             const isoDate = parseEpoch(date);
             Filter.date = {
                 $gte: isoDate,
-                $lt: new Date(isoDate.getTime() + 86400000), // Next day midnight
+                $lt: new Date(isoDate.getTime() + 86400000),
             };
         }
-
+  
         // Apply date range filtering
         if (fromDate && toDate) {
             Filter.date = {
@@ -201,43 +204,69 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
                 $lte: parseEpoch(toDate),
             };
         }
-
-        // Apply search filters
+  
+        // Apply search filters correctly
         if (search.term && search.fields && Array.isArray(search.fields)) {
             const regex = search.startsWith
                 ? new RegExp(`^${search.term}`, "i")
                 : new RegExp(search.term, "i");
-
+  
             Filter.$or = search.fields.map((field: string) => ({
                 [field]: { $regex: regex },
             }));
         }
-
+  
         // Sorting options
-        const sortBy = options.sortBy?.[0] || "createdAt";
-        const sortOrder = options.sortDesc?.[0] ? -1 : 1;
+        const sortBy = options.sortBy?.length > 0 ? options.sortBy[0] : "createdAt";
+        const sortOrder = options.sortDesc?.length > 0 && options.sortDesc[0] ? -1 : 1;
         const sortOptions = { [sortBy]: sortOrder };
-
+  
+        // 🔹 Pagination logic
+        const page = options.page && options.page > 0 ? options.page : 1;
+        const itemsPerPage = options.itemsPerPage >= 0 ? options.itemsPerPage : 10;
+  
+        // If itemsPerPage is 0, return an empty response immediately
+        if (itemsPerPage === 0) {
+            req.apiStatus = {
+                isSuccess: true,
+                message: "Success",
+                data: { totalCount: 0, tableData: [] },
+            };
+            next();
+            return;
+        }
+  
+        // Calculate skip for pagination
+        const skip = (page - 1) * itemsPerPage;
+  
         // Call reusable aggregation function
         const { totalCount, tableData } = await aggregateData(
             AppointmentModel,
             Filter,
             Projection,
-            { ...options, sort: sortOptions }
+            { ...options, sort: sortOptions,skip, limit: itemsPerPage } // Apply pagination
         );
-
-        // Convert only `date` field to ISO format in response
+  
+        // Convert only the `date` field to ISO format in response
         const formattedData = tableData.map((appointment: any) => {
-            const { date, ...rest } = appointment; // Remove `date` if it's null
-            return date ? { ...rest, date: new Date(date).toISOString() } : rest;
+            const formattedAppointment = { ...appointment };
+            
+            if (appointment.date) {
+                formattedAppointment.date = new Date(appointment.date).toISOString();
+            } else {
+                delete formattedAppointment.date; // Remove it from the response
+            }
+        
+            return formattedAppointment;
         });
-
+  
         req.apiStatus = {
             isSuccess: true,
             message: "Success",
             data: { totalCount, tableData: formattedData },
         };
         next();
+        return;
     } catch (error) {
         console.error("Error fetching data:", error);
         req.apiStatus = {
@@ -247,8 +276,10 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
             toastMessage: "Something went wrong. Please try again.",
         };
         next();
+        return;
     }
-}
+  }
+  
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -329,32 +360,37 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       next();
   }
 };
-
 export const deleteAppointment = async (req: Request, res: Response): Promise<void> => {
-  try {
-      const user = req.user as { _id?: string };
-      if (!user?._id) {
-          res.status(401).json({ status: 401, message: "Unauthorized" });
-          return;
-      }
-
-      const { id } = req.params;
-
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-          res.status(400).json({ status: 400, message: "Invalid appointment ID" });
-          return;
-      }
-
-      const appointment = await AppointmentModel.findOneAndDelete({ _id: id, nurseId: user._id }).exec();
-
-      if (!appointment) {
-          res.status(404).json({ status: 404, message: "Appointment not found or unauthorized" });
-          return;
-      }
-
-      res.status(200).json({ status: 200, message: "Appointment deleted successfully" });
-  } catch (error) {
-      console.error("Error deleting appointment:", error);
-      res.status(500).json({ status: 500, message: "Internal Server Error" });
-  }
-};
+    try {
+        const user = req.user as { _id?: string };
+        if (!user?._id) {
+            res.status(401).json({ status: 401, message: "Unauthorized" });
+            return;
+        }
+  
+        const { id } = req.params;
+  
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.status(400).json({ status: 400, message: "Invalid appointment ID" });
+            return;
+        }
+  
+        // Soft delete by setting isDeleted: true
+        const appointment = await AppointmentModel.findOneAndUpdate(
+            { _id: id, nurseId: user._id }, // Ensure the appointment belongs to the logged-in nurse
+            { isDeleted: true }, // Set isDeleted flag instead of deleting
+            { new: true } // Return the updated document
+        ).exec();
+  
+        if (!appointment) {
+            res.status(404).json({ status: 404, message: "Appointment not found or unauthorized" });
+            return;
+        }
+  
+        res.status(200).json({ status: 200, message: "Appointment marked as deleted" });
+    } catch (error) {
+        console.error("Error deleting appointment:", error);
+        res.status(500).json({ status: 500, message: "Internal Server Error" });
+    }
+  };
+  
