@@ -25,7 +25,7 @@ export async function loginController (req: Request, res: Response, next: NextFu
     try {
         // Find user by email
         const user = await UserModel.findOne({ email });
-        if (!user) {
+        if (!user || user.isDeleted===true) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1002],
@@ -252,31 +252,46 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 export async function getNurseProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         console.log(req.user);
+        console.log("Fetching nurse profile...");
         
-        const user = req.user as { id: string }; 
+        const user = req.user as { id: string };
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
-                data: "Unauthorized",
+                data: "Access denied",
                 toastMessage: "Session expired. Please log in again.",
             };
             return next();
         }
 
-        const projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
+        // Exclude sensitive fields instead of selecting
+        const projection = { password: 0, __v: 0, isDeleted: 0 }; 
+
+        // Fetch nurse profile
         const nurseProfile = await UserModel.findById(user.id, projection).lean();
 
         if (!nurseProfile) {
             req.apiStatus = {
                 isSuccess: false,
-                error: ErrorCodes[1012],
-                data: "Nurse profile not found",
-                toastMessage: "Nurse profile does not exist.",
+                error: ErrorCodes[1004],
+                data: "Account does not exist",
+                toastMessage: "This account has been deleted.",
             };
             return next();
         }
 
+        if (nurseProfile.isDeleted === true) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1004],
+                data: "User account deleted",
+                toastMessage: "User account deleted",
+            };
+            return next();
+        }
+
+        // Fetch refresh token
         const refreshTokenData = await RefreshToken.findOne({ userId: user.id })
             .select("token refreshExpiresAt")
             .lean();
@@ -315,11 +330,9 @@ export async function getNurseProfile(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function updateNurseProfile(
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> {
+
+// Update nurse profile
+export async function updateNurseProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const user = req.user as { id: string };
         if (!user || !user.id) {
@@ -327,18 +340,19 @@ export async function updateNurseProfile(
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Unauthorized",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Unauthorized access",
             };
             return next();
         }
 
-        // Define allowed fields to update
-        const allowedFields = ["name", "email", "role", "isDeleted"];
-        const updateData: Partial<Record<string, any>> = {};
+        // Extract allowed fields (without isDeleted)
+        const { name, email } = req.body;
+        const updateData: Partial<Record<string, any>> = { name, email };
 
-        Object.keys(req.body).forEach((key) => {
-            if (allowedFields.includes(key)) {
-                updateData[key] = req.body[key];
+        // Remove undefined fields
+        Object.keys(updateData).forEach((key) => {
+            if (updateData[key] === undefined) {
+                delete updateData[key];
             }
         });
 
@@ -346,31 +360,35 @@ export async function updateNurseProfile(
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1003],
-                data: "No valid fields to update",
-                toastMessage: "Please provide valid fields to update.",
+                data: "No valid fields provided for update",
+                toastMessage: "Please provide valid fields to update",
             };
             return next();
         }
 
-        // Update nurse profile
-        const updatedNurse = await UserModel.findByIdAndUpdate(user.id, updateData, {
-            new: true,
-            select: "-password",
-        });
+        // Find and update nurse profile only if not deleted
+        const updatedNurse = await UserModel.findOneAndUpdate(
+            { _id: user.id, isDeleted: { $ne: true } }, // Prevent updates if already deleted
+            updateData,
+            {
+                new: true,
+                select: "-password",
+            }
+        );
 
         if (!updatedNurse) {
             req.apiStatus = {
                 isSuccess: false,
-                error: ErrorCodes[1003],
-                data: "Nurse profile not updated",
-                toastMessage: "Update failed",
+                error: ErrorCodes[1004],
+                data: "Nurse profile does not exist",
+                toastMessage: "Profile does not exist or has been deleted",
             };
             return next();
         }
 
         req.apiStatus = {
             isSuccess: true,
-            data: "Updated successfully",
+            data: updatedNurse,
             toastMessage: "Updated successfully",
         };
 

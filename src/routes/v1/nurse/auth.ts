@@ -76,7 +76,7 @@ import { verifyNurse } from "../../../middlewares/auth";
  */
 
 
-router.post("/nurse/auth/login",entryPoint, auth.loginController,exitPoint);
+router.post("/nurse/auth/login",entryPoint,passport.authenticate("bearer", { session: false }), auth.loginController,exitPoint);
 
 
 /**
@@ -305,11 +305,6 @@ router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                 name: "Jane"
  *                 email: "nurse@example.com"
  *                 role: "NURSE"
- *                 isDeleted: false
- *             partialUpdate:
- *               summary: Update only isDeleted status
- *               value:
- *                 isDeleted: true
  *     responses:
  *       200:
  *         description: User profile updated successfully
@@ -399,8 +394,6 @@ router.put("/nurse/auth/update",entryPoint,passport.authenticate("bearer", { ses
 //  *                       format: date-time
 //  *                       example: "2024-07-15T12:57:10.956Z"
 //  */
-
-
 
 router.post("/nurse/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.refreshTokenController,exitPoint);
 
