@@ -29,7 +29,6 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
     txId: txId,
     path: path,
   };
-
   // Include body, query, and params if they exist
   if (req.body) {
     reqData.body = req.body;

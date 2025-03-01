@@ -249,6 +249,7 @@ export async function authenticateDoctor (req: Request, res: Response, next: Nex
         const accessToken = req.headers.authorization?.split(" ")[1];
 
         if (!accessToken) {
+            
             res.status(401).json({
                 status: 401,
                 message: "Unauthorized",
