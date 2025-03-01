@@ -4,10 +4,13 @@ import {PatientModel} from "../../../models/patients"
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
+
+
+
 export const getOne = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const { projection = {} } = req.body;
+    const { projection} = req.body;
     
     
     if (!mongoose.Types.ObjectId.isValid(id)) {
