@@ -5,11 +5,6 @@ import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
 // Helper function to convert **epoch (milliseconds)** to a Date object set to UTC midnight
-const parseEpoch = (epoch: number): Date => {
-  const dateObj = new Date(epoch); // Convert epoch to Date
-  dateObj.setUTCHours(0, 0, 0, 0); // Normalize to UTC midnight
-  return dateObj;
-};
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -23,19 +18,24 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate,
     } = req.body;
 
-    // Convert `date`, `fromDate`, `toDate` from epoch to Date format
+    // Helper function to convert epoch (IST) to UTC midnight date range
+    const parseEpochIST = (epoch: number): { $gte: Date; $lt: Date } => {
+      const utcDate = new Date(epoch); // Epoch is in milliseconds
+      utcDate.setUTCHours(0, 0, 0, 0); // Convert to UTC midnight
+      const nextDay = new Date(utcDate.getTime() + 86400000); // Add 1 day
+      return { $gte: utcDate, $lt: nextDay };
+    };
+
+    // Handle single date filtering (Convert IST input to UTC range)
     if (date) {
-      const isoDate = parseEpoch(date);
-      filter.date = { 
-        $gte: isoDate, 
-        $lt: new Date(isoDate.getTime() + 86400000) // Less than next day
-      };
+      filter.date = parseEpochIST(date);
     }
 
+    // Handle date range filtering (Convert IST to UTC range)
     if (fromDate && toDate) {
       filter.date = {
-        $gte: parseEpoch(fromDate),
-        $lte: parseEpoch(toDate),
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
       };
     }
 
@@ -48,18 +48,12 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search
     );
 
-    // Convert `date` field in response to ISO format
-    const formattedData = tableData.map((item: any) => ({
-      ...item,
-      date: item.date ? new Date(item.date).toISOString() : null, // Convert only if `date` exists
-    }));
-
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
-      data: { totalCount, tableData: formattedData },
+      data: { totalCount, tableData },
     };
-    next();
+    return next();
   } catch (error) {
     console.error("Error fetching data:", error);
     req.apiStatus = {
@@ -67,54 +61,59 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       error: ErrorCodes[1002],
       toastMessage: "Something went wrong. Please try again.",
     };
-    next();
+    return next();
   }
 };
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const { projection } = req.body;
+    try {
+        const { id } = req.params;
+        const { projection = {} } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      req.apiStatus = {
-        isSuccess: false,
-        error: ErrorCodes[1003],
-        toastMessage: "Invalid ID",
-      };
-      return next();
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            req.apiStatus = {
+                isSuccess: false,
+                message: "Invalid patient ID",
+                toastMessage: "Invalid record",
+                error: { statusCode: 400, message: "The provided ID format is incorrect." },
+            };
+            return next();
+        }
+
+        const Projection = { ...projection };
+        delete Projection.isDeleted;
+
+        const result = await aggregateData(
+            PatientModel,
+            { _id: new mongoose.Types.ObjectId(id), isDeleted: false },
+            Projection
+        );
+
+        if (!result?.tableData?.length) {
+            req.apiStatus = {
+                isSuccess: false,
+                message: "Record not found or deleted",
+                toastMessage: "No record found",
+            };
+            return next();
+        }
+
+        const patient = result.tableData[0];
+
+        req.apiStatus = {
+            isSuccess: true,
+            message: "Success",
+            data: patient,
+        };
+        next();
+    } catch (error) {
+        console.error("Error fetching patient:", error);
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1002],
+            message: "Internal Server Error",
+            toastMessage: "Something went wrong. Please try again.",
+        };
+        next();
     }
-
-    const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
-
-    if (!result.tableData.length) {
-      req.apiStatus = {
-        isSuccess: false,
-        error: ErrorCodes[1004],
-        toastMessage: "Record not found or deleted",
-      };
-      return next();
-    }
-
-    // Convert `date` field in response to ISO format
-    const formattedResult = {
-      ...result.tableData[0],
-      date: result.tableData[0].date ? new Date(result.tableData[0].date).toISOString() : null,
-    };
-
-    req.apiStatus = {
-      isSuccess: true,
-      message: "Success",
-      data: formattedResult,
-    };
-    next();
-  } catch (error) {
-    console.error("Error fetching record:", error);
-    req.apiStatus = {
-      isSuccess: false,
-      error: ErrorCodes[1002],
-      toastMessage: "Something went wrong. Please try again.",
-    };
-    next();
-  }
 };
