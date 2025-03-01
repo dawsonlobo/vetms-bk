@@ -7,6 +7,7 @@ import UserModel from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
 import {ErrorCodes} from "../../../models/models"
+import _ from "lodash";
 
 
 const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
@@ -19,9 +20,13 @@ const logger: winston.Logger = winston.createLogger({
  export default logger; 
 
 // Login Controller
-export async function loginController (req: Request, res: Response, next: NextFunction): Promise<void>{
+export async function loginController(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
     const { email, password } = req.body;
-  
+
     try {
         // Find user by email
         const user = await UserModel.findOne({ email });
@@ -33,10 +38,30 @@ export async function loginController (req: Request, res: Response, next: NextFu
                 log: "User not found",
                 toastMessage: "Invalid email or password",
             };
-            next();
-            return;
+            return next();
         }
-  
+
+        // Prevent login if the account is deleted or disabled
+        if (user.isDeleted === true) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Your account has been deleted",
+                toastMessage: "You cannot log in with a deleted account.",
+            };
+            return next();
+        }
+
+        if (user.isEnabled === false) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Your account is disabled",
+                toastMessage: "Your account is disabled. Please contact support.",
+            };
+            return next();
+        }
+
         // Validate password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
@@ -46,17 +71,16 @@ export async function loginController (req: Request, res: Response, next: NextFu
                 data: "Failed to login",
                 toastMessage: "Invalid email or password",
             };
-            next();
-            return;
+            return next();
         }
-  
+
         // Generate Tokens
         const { accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt } = generateTokens(user.id);
-  
+
         // Save tokens in the database
         await AccessToken.create({ token: accessToken, userId: user.id, accessExpiresAt: accessTokenExpiresAt });
         await RefreshToken.create({ token: refreshToken, userId: user.id, refreshExpiresAt: refreshTokenExpiresAt });
-  
+
         // Success response
         req.apiStatus = {
             isSuccess: true,
@@ -73,9 +97,8 @@ export async function loginController (req: Request, res: Response, next: NextFu
             },
             toastMessage: "Login successful",
         };
-        
-        next();
-        return;
+
+        return next();
     } catch (error) {
         logger.error("Login error:", error);
         req.apiStatus = {
@@ -84,10 +107,9 @@ export async function loginController (req: Request, res: Response, next: NextFu
             data: error instanceof Error ? error.message : JSON.stringify(error),
             toastMessage: "Internal server error",
         };
-        next();
-        return;
+        return next();
     }
-};
+}
 
 
 // Refresh Token Controller
@@ -251,53 +273,76 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 // Nurse Profile Controller
 export async function getNurseProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        console.log(req.user);
-        
-        const user = req.user as { id: string }; 
+
+        // Ensure projection is an object
+        let projection = req.body.project || {};
+
+        // Remove `isDeleted` and `password`
+        projection = _.omit(projection, ["isDeleted", "password"]);
+
+        const user = req.user as { id: string };
         if (!user || !user.id) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
                 data: "Unauthorized",
-                toastMessage: "Session expired. Please log in again.",
+                toastMessage: "Unauthorized",
             };
             return next();
         }
 
-        const projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
+        console.log("Fetching user with ID:", user.id);
+
+        const doesExist = await UserModel.findById(user.id)?.select("_id isDeleted isEnabled").lean();
+
+        if (!doesExist) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1012],
+                data: "Nurse profile not found",
+                toastMessage: "Nurse profile not found.",
+            };
+            return next();
+        }
+
+        if (doesExist.isDeleted === true) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Deleted",
+                toastMessage: "User is Deleted",
+            };
+            return next();
+        }
+
+        if (doesExist.isEnabled === false) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Disabled",
+                toastMessage: "User is Disabled",
+            };
+            return next();
+        }
+
+        // Fetch profile with projection
         const nurseProfile = await UserModel.findById(user.id, projection).lean();
 
         if (!nurseProfile) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
-                data: "Nurse profile not found",
-                toastMessage: "Nurse profile does not exist.",
+                data: "Profile not found",
+                toastMessage: "Profile not found.",
             };
             return next();
         }
 
-        const refreshTokenData = await RefreshToken.findOne({ userId: user.id })
-            .select("token refreshExpiresAt")
-            .lean();
-
-        if (!refreshTokenData) {
-            req.apiStatus = {
-                isSuccess: false,
-                error: ErrorCodes[1012],
-                data: "Refresh token not found",
-                log: "No refresh token found in DB",
-            };
-            return next();
-        }
+        console.log("Nurse Profile Fetched:", nurseProfile);
 
         req.apiStatus = {
             isSuccess: true,
-            data: {
-                ...nurseProfile,
-                refresh_token: refreshTokenData.token,
-                refreshExpiresAt: REFRESH_TOKEN_EXPIRY,
-            },
+            data: nurseProfile, // Already excludes `isDeleted`
             toastMessage: "Nurse profile fetched successfully",
         };
 
@@ -308,12 +353,13 @@ export async function getNurseProfile(req: Request, res: Response, next: NextFun
         req.apiStatus = {
             isSuccess: false,
             error: ErrorCodes[1010],
-            data: "Internal server error",
-            toastMessage: "An error occurred while fetching the profile.",
+            data: "An error occurred while fetching the profile",
+            toastMessage: "An error occurred while fetching the profile",
         };
         return next();
     }
 }
+
 
 export async function updateNurseProfile(
     req: Request,
@@ -332,8 +378,44 @@ export async function updateNurseProfile(
             return next();
         }
 
+        // Fetch current user status (to check isDeleted and isEnabled)
+        const currentUser = await UserModel.findById(user.id)
+            .select("isDeleted isEnabled")
+            .lean();
+
+        if (!currentUser) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Nurse profile not found",
+                toastMessage: "Profile not found",
+            };
+            return next();
+        }
+
+        // Prevent updates if the account is deleted or disabled
+        if (currentUser.isDeleted === true) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Your account has been deleted",
+                toastMessage: "You cannot update a deleted account.",
+            };
+            return next();
+        }
+
+        if (currentUser.isEnabled === false) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                data: "Your account is disabled",
+                toastMessage: "You cannot update a disabled account.",
+            };
+            return next();
+        }
+
         // Define allowed fields to update
-        const allowedFields = ["name", "email", "role", "isDeleted"];
+        const allowedFields = ["name", "email", "role"];
         const updateData: Partial<Record<string, any>> = {};
 
         Object.keys(req.body).forEach((key) => {
@@ -352,7 +434,7 @@ export async function updateNurseProfile(
             return next();
         }
 
-        // Update nurse profile
+        // Update nurse profile (excluding password field)
         const updatedNurse = await UserModel.findByIdAndUpdate(user.id, updateData, {
             new: true,
             select: "-password",

@@ -5,229 +5,250 @@ import { aggregateData } from "../../../utils/aggregation";
 import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
 import test from "node:test";
+import UserModel from "../../../models/users";
 /**
  * Create or update an appointment (Nurse only)
  */
 export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-      // Extract nurse ID from authenticated user
-      const user = req.user as { _id?: string };
-      const nurseId = user?._id;
-
-      if (!nurseId) {
-          req.apiStatus = {
-              isSuccess: false,
-              error: ErrorCodes[1001],
-              toastMessage: "Unauthorized access",
-          };
-          return next();
-      }
-
-      const { _id, doctorId, patientId, date, status } = req.body;
-
-      // Prevent unauthorized modification of nurseId or patientId
-      if (_id && (req.body.patientId || req.body.nurseId)) {
-          req.apiStatus = {
-              isSuccess: false,
-              error: ErrorCodes[1002],
-              toastMessage: "You cannot modify patientId or nurseId during an update",
-          };
-          return next();
-      }
-
-      // Validate `_id`
-      if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
-          req.apiStatus = {
-              isSuccess: false,
-              error: ErrorCodes[1003],
-              toastMessage: "Invalid Appointment ID",
-          };
-          return next();
-      }
-
-      // Convert epoch timestamp to ISO format
-      let parsedDate: Date | null = null;
-      if (date) {
-          if (typeof date === "number") {
-              parsedDate = new Date(date); // Convert epoch timestamp
-          } else if (typeof date === "string") {
-              parsedDate = new Date(date);
-          }
-
-          if (isNaN(parsedDate!.getTime())) {
-              req.apiStatus = {
-                  isSuccess: false,
-                  error: ErrorCodes[1005],
-                  toastMessage: "Invalid date format. Use epoch timestamp.",
-              };
-              return next();
-          }
-      }
-
-      const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
-
-      let appointment;
-      const isUpdate = Boolean(_id);
-
-      if (isUpdate) {
-          // Update appointment only if it belongs to the logged-in nurse
-          appointment = await AppointmentModel.findOneAndUpdate(
-              { _id, nurseId },  // Ensure the appointment belongs to the nurse
-              { 
-                  ...(doctorId && { doctorId }),
-                  ...(parsedDate && { date: parsedDate }),
-                  status: validatedStatus
-              }, 
-              { new: true }
-          ).exec();
-
-          if (!appointment) {
-              req.apiStatus = {
-                  isSuccess: false,
-                  error: ErrorCodes[1004],
-                  toastMessage: "Appointment record not found",
-              };
-              return next();
-          }
-      } else {
-          // Create a new appointment, automatically setting nurseId
-          appointment = await new AppointmentModel({
-              doctorId,
-              date: parsedDate,
-              nurseId, // Taken from req.user
-              patientId, // Make sure this is extracted from req.body
-              status: CONSTANTS.APPOINTMENT_STATUS.PENDING
-          }).save();
-      }
-      req.apiStatus = {
-        isSuccess: true,
-        message: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
-        data: isUpdate
-            ? {
-                _id: appointment._id,
-                createdAt: appointment.createdAt,
-                updatedAt: appointment.updatedAt,
-                ...(doctorId && { doctorId }),
-                ...(parsedDate && { date: new Date(parsedDate).toISOString() }),
-                ...(status && { status })
+    try {
+        // Extract nurse ID from authenticated user
+        const user = req.user as { _id?: string };
+        const nurseId = user?._id;
+  
+        if (!nurseId) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1001],
+                toastMessage: "Unauthorized access",
+            };
+            return next();
+        }
+  
+        // Check if the nurse account is deleted or disabled
+        const nurse = await UserModel.findById(nurseId);
+        if (!nurse || nurse.isDeleted === true || nurse.isEnabled === false) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1007], 
+                toastMessage: "You cannot create or update appointments with a disabled or deleted account.",
+            };
+            return next();
+        }
+  
+        const { _id, doctorId, patientId, date, status } = req.body;
+  
+        // Prevent unauthorized modification of nurseId or patientId
+        if (_id && (req.body.patientId || req.body.nurseId)) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                toastMessage: "You cannot modify patientId or nurseId during an update",
+            };
+            return next();
+        }
+  
+        // Validate `_id`
+        if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1003],
+                toastMessage: "Invalid Appointment ID",
+            };
+            return next();
+        }
+  
+        // Convert epoch timestamp to ISO format
+        let parsedDate: Date | null = null;
+        if (date) {
+            if (typeof date === "number") {
+                parsedDate = new Date(date); // Convert epoch timestamp
+            } else if (typeof date === "string") {
+                parsedDate = new Date(date);
             }
-            : {
-                _id: appointment._id,
-                createdAt: appointment.createdAt,
-                updatedAt: appointment.updatedAt
-            },
-        toastMessage: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
-    };
-    next();
-     
-  } catch (error) {
-      console.error("Error in createUpdate:", error);
-      req.apiStatus = {
-          isSuccess: false,
-          error: ErrorCodes[1006],
-          toastMessage: "Internal Server Error",
-      };
-      next();
-      return;
-  }
-};
+  
+            if (isNaN(parsedDate!.getTime())) {
+                req.apiStatus = {
+                    isSuccess: false,
+                    error: ErrorCodes[1005],
+                    toastMessage: "Invalid date format. Use epoch timestamp.",
+                };
+                return next();
+            }
+        }
+  
+        const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
+  
+        let appointment;
+        const isUpdate = Boolean(_id);
+  
+        if (isUpdate) {
+            // Update appointment only if it belongs to the logged-in nurse
+            appointment = await AppointmentModel.findOneAndUpdate(
+                { _id, nurseId },  // Ensure the appointment belongs to the nurse
+                { 
+                    ...(doctorId && { doctorId }),
+                    ...(parsedDate && { date: parsedDate }),
+                    status: validatedStatus
+                }, 
+                { new: true }
+            ).exec();
+  
+            if (!appointment) {
+                req.apiStatus = {
+                    isSuccess: false,
+                    error: ErrorCodes[1004],
+                    toastMessage: "Appointment record not found",
+                };
+                return next();
+            }
+        } else {
+            // Create a new appointment, automatically setting nurseId
+            appointment = await new AppointmentModel({
+                doctorId,
+                date: parsedDate,
+                nurseId, // Taken from req.user
+                patientId, // Make sure this is extracted from req.body
+                status: CONSTANTS.APPOINTMENT_STATUS.PENDING
+            }).save();
+        }
+  
+        req.apiStatus = {
+            isSuccess: true,
+            message: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
+            data: isUpdate
+                ? {
+                    _id: appointment._id,
+                    createdAt: appointment.createdAt,
+                    updatedAt: appointment.updatedAt,
+                    ...(doctorId && { doctorId }),
+                    ...(parsedDate && { date: new Date(parsedDate).toISOString() }),
+                    ...(status && { status })
+                }
+                : {
+                    _id: appointment._id,
+                    createdAt: appointment.createdAt,
+                    updatedAt: appointment.updatedAt
+                },
+            toastMessage: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
+        };
+        return next();
+    } catch (error) {
+        console.error("Error in createUpdate:", error);
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1006],
+            toastMessage: "Internal Server Error",
+        };
+        return next();
+    }
+  };
+  
 
 /**
  * Get all appointments for the logged-in nurse
  */
 export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-      const {
-          projection = {},
-          filter = {},
-          options = {},
-          search = {},
-          date,
-          fromDate,
-          toDate,
-      } = req.body;
+    try {
+        const {
+            projection = {},
+            filter = {},
+            options = {},
+            search = {},
+            date,
+            fromDate,
+            toDate,
+        } = req.body;
 
-      // Remove isDeleted from projection to ensure it's never included
-      const Projection = { ...projection };
-      delete Projection.isDeleted;
+        // Remove `isDeleted` from projection
+        const Projection = { ...projection };
+        delete Projection.isDeleted;
 
-      // Ensure deleted records are not included in the filter
-      const Filter: any = { ...filter, isDeleted: false };
+        // Ensure filtering conditions
+        const Filter: any = { ...filter, isDeleted: false, isEnabled: true };
 
-      // Helper function to convert **milliseconds epoch** to proper date at UTC midnight
-      const parseEpoch = (epoch: number): Date => {
-          const dateObj = new Date(epoch); // Epoch is already in milliseconds
-          dateObj.setUTCHours(0, 0, 0, 0); // Normalize time to midnight UTC
-          return dateObj;
-      };
+        if (filter.doctorId) {
+            try {
+                Filter.doctorId = new Object(filter.doctorId);
+            } catch (error) {
+                console.error("Invalid ObjectId format:", filter.doctorId);
+            }
+        }
 
-      // Apply single date filtering (Ensure DB stores only Date object)
-      if (date) {
-          const isoDate = parseEpoch(date);
-          Filter.date = {
-              $gte: isoDate,
-              $lt: new Date(isoDate.getTime() + 86400000), // Less than next day
-          };
-      }
+        if (filter.status) {
+            Filter.status = filter.status.toUpperCase(); // Ensure case consistency
+        }
 
-      // Apply date range filtering
-      if (fromDate && toDate) {
-          Filter.date = {
-              $gte: parseEpoch(fromDate),
-              $lte: parseEpoch(toDate),
-          };
-      }
+        // Convert **milliseconds epoch** to proper date at UTC midnight
+        const parseEpoch = (epoch: number): Date => {
+            const dateObj = new Date(epoch);
+            dateObj.setUTCHours(0, 0, 0, 0);
+            return dateObj;
+        };
 
-      // Apply search filters correctly
-      if (search.term && search.fields && Array.isArray(search.fields)) {
-          const regex = search.startsWith
-              ? new RegExp(`^${search.term}`, "i") // Starts with search
-              : new RegExp(search.term, "i"); // Default contains search
+        // Apply single date filtering
+        if (date) {
+            const isoDate = parseEpoch(date);
+            Filter.date = {
+                $gte: isoDate,
+                $lt: new Date(isoDate.getTime() + 86400000), // Next day midnight
+            };
+        }
 
-          Filter.$or = search.fields.map((field: string) => ({
-              [field]: { $regex: regex },
-          }));
-      }
+        // Apply date range filtering
+        if (fromDate && toDate) {
+            Filter.date = {
+                $gte: parseEpoch(fromDate),
+                $lte: parseEpoch(toDate),
+            };
+        }
 
-      // Sorting options
-      const sortBy = options.sortBy?.length > 0 ? options.sortBy[0] : "createdAt"; // Default sorting field
-      const sortOrder = options.sortDesc?.length > 0 && options.sortDesc[0] ? -1 : 1; // Default ascending
-      const sortOptions = { [sortBy]: sortOrder };
+        // Apply search filters
+        if (search.term && search.fields && Array.isArray(search.fields)) {
+            const regex = search.startsWith
+                ? new RegExp(`^${search.term}`, "i")
+                : new RegExp(search.term, "i");
 
-      // Call reusable aggregation function
-      const { totalCount, tableData } = await aggregateData(
-          AppointmentModel,
-          Filter, // Date filters now applied
-          Projection,
-          { ...options, sort: sortOptions } // Sorting applied
-      );
+            Filter.$or = search.fields.map((field: string) => ({
+                [field]: { $regex: regex },
+            }));
+        }
 
-      // Convert only the `date` field to ISO format in response
-      const formattedData = tableData.map((appointment: any) => ({
-          ...appointment,
-          date: appointment.date ? new Date(appointment.date).toISOString() : null, // Convert only if `date` exists
-      }));
+        // Sorting options
+        const sortBy = options.sortBy?.[0] || "createdAt";
+        const sortOrder = options.sortDesc?.[0] ? -1 : 1;
+        const sortOptions = { [sortBy]: sortOrder };
 
-      req.apiStatus = {
-          isSuccess: true,
-          message: "Success",
-          data: { totalCount, tableData: formattedData },
-      };
-      next();
-      return;
-  } catch (error) {
-      console.error("Error fetching data:", error);
-      req.apiStatus = {
-          isSuccess: false,
-          error: ErrorCodes[1002],
-          message: "Internal Server Error",
-          toastMessage: "Something went wrong. Please try again.",
-      };
-      next();
-      return;
-  }
+        // Call reusable aggregation function
+        const { totalCount, tableData } = await aggregateData(
+            AppointmentModel,
+            Filter,
+            Projection,
+            { ...options, sort: sortOptions }
+        );
+
+        // Convert only `date` field to ISO format in response
+        const formattedData = tableData.map((appointment: any) => {
+            const { date, ...rest } = appointment; // Remove `date` if it's null
+            return date ? { ...rest, date: new Date(date).toISOString() } : rest;
+        });
+
+        req.apiStatus = {
+            isSuccess: true,
+            message: "Success",
+            data: { totalCount, tableData: formattedData },
+        };
+        next();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        req.apiStatus = {
+            isSuccess: false,
+            error: ErrorCodes[1002],
+            message: "Internal Server Error",
+            toastMessage: "Something went wrong. Please try again.",
+        };
+        next();
+    }
 }
-
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
