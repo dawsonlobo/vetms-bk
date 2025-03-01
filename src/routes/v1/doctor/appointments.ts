@@ -12,7 +12,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
 /**
  * @swagger
  * /v1/doctor/appointments/update/{_id}:
- *   post:
+ *   put:
  *     tags:
  *       - doctor/appointments
  *     summary: Update an appointment record
@@ -73,7 +73,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:_id",entryPoint,
+router.put("/update/:_id",entryPoint,
     authenticateDoctor,verifyDoctor,
     appointment.Update,exitPoint);
 
@@ -150,7 +150,7 @@ router.post("/update/:_id",entryPoint,
  *                       description: Unique ID of the doctor responsible for the follow-up
  *                     date:
  *                       type: string
- *                       description: Diagnosis of the pet's condition
+ *                       description: date of he patients appointment
  *                     status:
  *                       type: string
  *                       description: Treatment provided to the pet
@@ -217,15 +217,15 @@ router.post("/getone/:id",entryPoint, authenticateDoctor,verifyDoctor,appointmen
  *                 items:
  *                   type: object
  *               date:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Specific date filter
  *               fromDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Starting date filter
  *               toDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Ending date filter
  *           examples:
@@ -307,7 +307,7 @@ router.post("/getone/:id",entryPoint, authenticateDoctor,verifyDoctor,appointmen
  *                             description: Unique ID of the doctor responsible for the follow-up
  *                           date:
  *                             type: string
- *                             description: Diagnosis of the pet's condition
+ *                             description: date of the patients appointment
  *                           status:
  *                             type: string
  *                             enum: [SCHEDULED, COMPLETED, CANCELLED]
