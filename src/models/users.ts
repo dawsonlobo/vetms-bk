@@ -58,7 +58,8 @@ import { CONSTANTS } from "../config/constant";
     role: keyof typeof CONSTANTS.USER_ROLE;
     createdAt?: Date;
     updatedAt?: Date;
-    isDeleted: boolean
+    isDeleted: boolean,
+    isEnabled:boolean
   }
   
   
@@ -72,7 +73,8 @@ import { CONSTANTS } from "../config/constant";
       email: { type: String, required: true, unique: true },
       password: { type: String, required: true },
       role: { type: String, enum: Object.values(CONSTANTS.USER_ROLE), required: true },
-      isDeleted: { type: Boolean, default: false }
+      isDeleted: { type: Boolean, default: false },
+      isEnabled: { type: Boolean, default: true }
     },
     { timestamps: true,
       usePushEach: true,

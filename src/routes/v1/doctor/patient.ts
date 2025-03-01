@@ -83,7 +83,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                       type: string
  *                       description: Breed of the pet
  *                       example: "Golden Retriever"
- *                     DOB:
+ *                     dob:
  *                       type: string
  *                       format: date
  *                       description: Date of birth of the patient
@@ -190,15 +190,15 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                 items:
  *                   type: object
  *               date:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Specific date filter
  *               fromDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Starting date filter
  *               toDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Ending date filter
  *           examples:
@@ -282,7 +282,7 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                             type: string
  *                             description: Breed of the pet
  *                             example: "Golden Retriever"
- *                           DOB:
+ *                           dob:
  *                             type: string
  *                             format: date
  *                             description: Date of birth of the patient
@@ -343,7 +343,7 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                         name: "Buddy"
  *                         species: "Dog"
  *                         breed: "Golden Retriever"
- *                         DOB: "1990-05-15"
+ *                         dob: "1990-05-15"
  *                         weight: 25.5
  *                         gender: "MALE"
  *                         medicalHistory: "Vaccinated, No major illnesses"
@@ -355,7 +355,7 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                         name: "Buddy"
  *                         species: "Cat"
  *                         breed: "Golden Retriever"
- *                         DOB: "1990-05-15"
+ *                         dob: "1990-05-15"
  *                         weight: 25.5
  *                         gender: "MALE"
  *                         medicalHistory: "Vaccinated, No major illnesses"

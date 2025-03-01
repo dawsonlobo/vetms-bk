@@ -173,15 +173,6 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  *                   updatedAt:
  *                     type: integer
  *                     example: 1
- *                   access_token:
- *                     type: integer
- *                     example: 1
- *                   refresh_token:
- *                     type: integer
- *                     example: 1
- *                   tokenExpiresAt:
- *                     type: integer
- *                     example: 1
  *           examples:
  *             fullProjection:
  *               summary: Full data projection (Retrieve all fields)
@@ -193,9 +184,6 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  *                   role: 1
  *                   createdAt: 1
  *                   updatedAt: 1
- *                   access_token: 1
- *                   refresh_token: 1
- *                   tokenExpiresAt: 1
  *             limitedProjection:
  *               summary: Limited data projection (Retrieve only _id and createdAt)
  *               value:
@@ -239,16 +227,6 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  *                       type: string
  *                       format: date-time
  *                       example: "2024-02-06T15:30:00Z"
- *                     access_token:
- *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *                     refresh_token:
- *                       type: string
- *                       example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *                     tokenExpiresAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-02-07T18:00:00Z"
  *             examples:
  *               fullResponse:
  *                 summary: Full response (all fields)
@@ -262,9 +240,6 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  *                     role: "ADMIN"
  *                     createdAt: "2024-02-05T12:00:00Z"
  *                     updatedAt: "2024-02-06T15:30:00Z"
- *                     access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *                     refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *                     tokenExpiresAt: "2024-02-07T18:00:00Z"
  *               limitedResponse:
  *                 summary: Limited response (only _id and createdAt)
  *                 value:
@@ -299,29 +274,12 @@ router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,do
  *               email:
  *                 type: string
  *                 example: "alex@example.com"
- *               role:
- *                 type: string
- *                 enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
- *                 example: "DOCTOR"
- *               isDeleted:
- *                 type: boolean
- *                 example: false
- *             required:
- *               - name
- *               - email
- *               - role
  *           examples:
  *             fullUpdate:
  *               summary: Full profile update
  *               value:
  *                 name: "Alex"
  *                 email: "alex@example.com"
- *                 role: "DOCTOR"
- *                 isDeleted: false
- *             partialUpdate:
- *               summary: Update only isDeleted status
- *               value:
- *                 isDeleted: true
  *     responses:
  *       200:
  *         description: User profile updated successfully

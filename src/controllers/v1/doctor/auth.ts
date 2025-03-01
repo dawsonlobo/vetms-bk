@@ -8,7 +8,6 @@ import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshTok
 import {ErrorCodes} from "../../../models/models"
 import { log } from "console";
 
-const {  ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } = config;
 
 
 // Login Controller
@@ -18,12 +17,34 @@ export async function loginController(req: Request, res: Response, next: NextFun
     try {
         // Find user by email
         const user = await UserModel.findOne({ email });
-        if (!user) {
+        if (!user ) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1002],
                 data: "User not found or verified",
                 toastMessage: "User not found or verified",
+            };
+            next();
+            return;
+        }
+
+        if (user.isDeleted===true ) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Deleted",
+                toastMessage: "User is Deleted",
+            };
+            next();
+            return;
+        }
+
+        if (user.isEnabled===false ) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Disabled",
+                toastMessage: "User is Disabled",
             };
             next();
             return;
@@ -59,9 +80,9 @@ export async function loginController(req: Request, res: Response, next: NextFun
                 role: user.role,
                 updatedAt: user.updatedAt,
                 access_token: accessToken,
-                accessExpiresAt: ACCESS_TOKEN_EXPIRY,
+                accessExpiresAt: accessTokenExpiresAt,
                 refresh_token: refreshToken,
-                refreshExpiresAt: REFRESH_TOKEN_EXPIRY,
+                refreshExpiresAt: refreshTokenExpiresAt,
             },
             toastMessage: "Login successful",
         };
@@ -248,17 +269,27 @@ export async function logoutController (req: Request, res: Response, next: NextF
     }
 };
 
-// Admin Profile Controller
 
-export async function getDoctorProfile  (req: Request, res: Response, next: NextFunction) :Promise<void>    {
+
+export async function getDoctorProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         console.log(req.user);
-        
-        const projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
 
+        // Extract projection from request body
+        let projection = req.body.project;
+
+        // Ensure isDeleted and password are excluded from the projection
+        if (projection) {
+            // Remove isDeleted and password if they exist in projection
+            delete projection.isDeleted;
+            delete projection.password;
+        } else {
+            // If no projection is provided, set a default projection and exclude sensitive fields
+            projection = { _id: 1, name: 1, email: 1, role: 1, createdAt: 1, updatedAt: 1 };
+        }
 
         const user = req.user as { id: string }; 
-        if (!user || !user.id) {
+        if (!user || !user.id ) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
@@ -266,12 +297,16 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
                 toastMessage: "Unauthorized",
             };
             next();
-            return
+            return;
         }
 
-        const adminProfile = await UserModel.findById(user.id, projection).lean();
+        const doesExist=await UserModel.findById(user.id);
 
-        if (!adminProfile) {
+        console.log(doesExist);
+
+
+        
+        if (!doesExist) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1012],
@@ -279,8 +314,42 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
                 toastMessage: "Admin profile not found.",
             };
             next();
-            return
+            return;
         }
+
+
+
+        if (doesExist.isDeleted===true ) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Deleted",
+                toastMessage: "User is Deleted",
+            };
+            next();
+            return;
+        }
+
+        if (doesExist.isEnabled===false ) {
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1002],
+                data: "User is Disabled",
+                toastMessage: "User is Disabled",
+            };
+            next();
+            return;
+        }
+        
+        
+
+        // Fetch admin profile with dynamic projection (now with sensitive fields excluded)
+        const adminProfile = await UserModel.findById(user.id, projection).lean();
+
+        
+        
+
+
 
         const refreshTokenData = await RefreshToken.findOne({ userId: user.id })
             .select("token refreshExpiresAt")
@@ -294,21 +363,20 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
                 log: "Refresh token not found",
             };
             next();
-            return
+            return;
         }
 
         req.apiStatus = {
             isSuccess: true,
             data: {
-                ...adminProfile,
-                refresh_token: refreshTokenData.token,
-                refreshExpiresAt: REFRESH_TOKEN_EXPIRY,
+                ...adminProfile
+                
             },
-            toastMessage: "Admin profile fetched successfully",
+            toastMessage: "Doctor profile fetched successfully",
         };
 
         next();
-        return
+        return;
     } catch (error) {
         console.error(`Error fetching admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
@@ -323,81 +391,7 @@ export async function getDoctorProfile  (req: Request, res: Response, next: Next
 }
 
 
-// export async function updateDoctorProfile  (req: Request, res: Response, next: NextFunction) :Promise<void> {
-//     try {
-        
-//         const user = req.user as { id: string };
-//         if (!user || !user.id) {
-//             req.apiStatus = {
-//                 isSuccess: false,
-//                 error: ErrorCodes[1012],
-//                 data: "Unauthorized",
-//                 toastMessage: "Unauthorized",
-//             };
-//             next();
-//             return
-//         }
 
-//         // Define allowed fields to update
-//         const allowedFields = ["name", "email", "role", "isDeleted"];
-//         const updateData: Partial<Record<string, any>> = {};
-
-//         Object.keys(req.body).forEach((key) => {
-//             if (allowedFields.includes(key)) {
-//                 updateData[key] = req.body[key];
-//             }
-//         });
-
-//         if (Object.keys(updateData).length === 0) {
-//             req.apiStatus = {
-//                 isSuccess: false,
-//                 error: ErrorCodes[1003],
-//                 data: "Please provide valid fields to update",
-//                 toastMessage: "Please provide valid fields to update",
-//             };
-//             next();
-//             return 
-//         }
-
-//         // Update admin profile
-//         const updatedAdmin = await UserModel.findByIdAndUpdate(user.id, updateData, {
-//             new: true,
-//             select: "-password",
-//         });
-
-//         if (!updatedAdmin) {
-//             req.apiStatus = {
-//                 isSuccess: false,
-//                 error: ErrorCodes[1003],
-//                 data: "Admin profile not updated",
-//                 toastMessage: "Update failed",
-//             };
-//             next();
-//             return 
-//         }
-
-//         req.apiStatus = {
-//             isSuccess: true,
-//             message:"Success",
-//             data: "Updated successfully",
-//             toastMessage: "Updated successfully",
-//         };
-
-//         next();
-//         return 
-//     } catch (error) {
-//         console.error(`Error updating admin profile: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
-
-//         req.apiStatus = {
-//             isSuccess: false,
-//             error: ErrorCodes[1010],
-//             data: "An error occurred while updating the profile",
-//             toastMessage: "An error occurred while updating the profile",
-//         };
-//         next();
-//         return 
-//     }
-// }
 
 
 
@@ -420,8 +414,33 @@ export async function updateDoctorProfile(req: Request, res: Response, next: Nex
         }
 
         // Extract allowed fields from request body
-        const { name, email, isDeleted } = req.body;
-        const updateFields: Partial<Record<string, any>> = { name, email, isDeleted };
+        const { name, email,role,isDelete } = req.body;
+
+
+        if(role){
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1012],
+                data: "you do not have permission to change roles",
+                toastMessage: "you do not have permission to change roles",
+            };
+            next();
+            return;
+            }
+
+        if(isDelete){
+            req.apiStatus = {
+                isSuccess: false,
+                error: ErrorCodes[1012],
+                data: "you do not have permission to delete user",
+                toastMessage: "you do not have permission to delete user",
+            };
+            next();
+            return;
+            }
+
+
+        const updateFields: Partial<Record<string, any>> = { name, email };
 
         // Remove undefined fields to avoid unnecessary updates
         Object.keys(updateFields).forEach((key) => {
@@ -445,10 +464,12 @@ export async function updateDoctorProfile(req: Request, res: Response, next: Nex
         const updatedDoctor = await UserModel.findByIdAndUpdate(
             user.id, 
             updateFields, 
-            { new: true, select: "-password" } // Return updated document without password
+            { new: true, select: "-password -isDelete" } // Return updated document without password
         );
 
-        if (!updatedDoctor) {
+        if (!updatedDoctor 
+            // || updatedDoctor.isDeleted===true
+        ) {
             req.apiStatus = {
                 isSuccess: false,
                 error: ErrorCodes[1003],

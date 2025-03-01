@@ -321,15 +321,15 @@ router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.de
  *                 items:
  *                   type: object
  *               date:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Specific date filter
  *               fromDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Starting date filter
  *               toDate:
- *                 type: string
+ *                 type: number
  *                 format: date-time
  *                 description: Ending date filter
  *           examples:
