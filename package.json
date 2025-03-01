@@ -1,6 +1,6 @@
 {
   "name": "vetms-bk",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Veterinary management system",
   "main": "index.js",
   "directories": {
@@ -11,6 +11,7 @@
     "build": "tsc",
     "start": "npm run build:live",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts)\"",
     "build:live": "nodemon --watch \"src/**\" --watch \".env\" --ext \"ts\" --exec \"ts-node\" src/index.ts",
     "seed": "nodemon --watch \"src/seeds/**\" --ext \"ts\" --exec \"ts-node src/seeds/seed.ts\"",
     "prepare": "husky",
@@ -53,6 +54,7 @@
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "prettier": "^3.5.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uniqid": "^5.4.0",
