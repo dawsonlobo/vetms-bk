@@ -291,9 +291,6 @@ router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                 type: string
  *                 enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
  *                 example: "NURSE"
- *               isDeleted:
- *                 type: boolean
- *                 example: false
  *             required:
  *               - name
  *               - email
@@ -305,6 +302,10 @@ router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                 name: "Jane"
  *                 email: "nurse@example.com"
  *                 role: "NURSE"
+ *             partialUpdate:
+ *               summary: Update only isDeleted status
+ *               value:
+ *                 id: "67bbfed74cea23da08bb62a9"
  *     responses:
  *       200:
  *         description: User profile updated successfully
