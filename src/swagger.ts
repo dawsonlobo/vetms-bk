@@ -37,20 +37,21 @@ const options: swaggerJSDoc.Options = {
           bearerFormat: "JWT",
           description: "Specify the nurse token",
         },
-      
-      doctorBearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
-        description: "Specify the nurse token",
+
+        doctorBearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Specify the nurse token",
+        },
+        genericBearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Enter any role's token",
+        },
       },
-      genericBearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
-        description: "Enter any role's token",
-      },
-    },}
+    },
   },
   security: [
     {
@@ -58,7 +59,7 @@ const options: swaggerJSDoc.Options = {
       userBearerAuth: [],
       nurseBearerAuth: [],
       genericBearerAuth: [],
-      doctorBearerAuth: []
+      doctorBearerAuth: [],
     },
   ],
   apis: [
@@ -84,7 +85,7 @@ fs.writeFile(
       return;
     }
     console.log("File has been written successfully.");
-  }
+  },
 );
 
 export { swaggerUi, swaggerSpec };

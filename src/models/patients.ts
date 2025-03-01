@@ -1,4 +1,4 @@
-  import mongoose, { Document, Schema, Model } from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
 /**
  * @swagger
@@ -15,7 +15,7 @@
  *         - gender
  *         - medicalHistory
  *         - BMI
- *         - bloodGroup         
+ *         - bloodGroup
  *       properties:
  *         _id:
  *           type: string
@@ -58,7 +58,7 @@
  *           example: 18.2
  *         bloodGroup:
  *           type: string
- *           enum: 
+ *           enum:
  *             - DEA 1.1+
  *             - DEA 1.1-
  *             - DEA 1.2+
@@ -142,15 +142,15 @@ const PatientSchema: Schema = new Schema(
     },
     isDeleted: { type: Boolean, default: false },
   },
-  {    timestamps: true,
+  {
+    timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
-
   },
 );
 
 export const PatientModel: Model<IPatientModel> = mongoose.model<IPatientModel>(
   "patients",
-  PatientSchema
+  PatientSchema,
 );

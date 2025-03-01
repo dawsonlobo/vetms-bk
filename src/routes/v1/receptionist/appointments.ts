@@ -1,9 +1,14 @@
-import { Router} from 'express';
-import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/receptionist/appointments'
-import { entryPoint } from '../../../middlewares/entrypoint';
-import passport from 'passport';
-import { verifyReceptionist } from '../../../middlewares/auth';
-import { exitPoint } from '../../../middlewares/exitpoint';
+import { Router } from "express";
+import {
+  getAll,
+  getOne,
+  createUpdate,
+  deleteAppointment,
+} from "../../../controllers/v1/receptionist/appointments";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import passport from "passport";
+import { verifyReceptionist } from "../../../middlewares/auth";
+import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
 
 /**
@@ -98,7 +103,15 @@ const router = Router();
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.post('/create', entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, createUpdate, exitPoint);
+router.post(
+  "/create",
+  entryPoint,
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  createUpdate,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -108,7 +121,7 @@ router.post('/create', entryPoint,entryPoint,passport.authenticate("bearer", { s
  *       - receptionist/appointments
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get all 
+ *     summary: Get all
  *     requestBody:
  *       required: true
  *       content:
@@ -264,11 +277,12 @@ router.post('/create', entryPoint,entryPoint,passport.authenticate("bearer", { s
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-router.post('/getAll',
-   // passport.authenticate('bearer', { session: false }),
-    getAll,
-    //exitPoint
-    );
+router.post(
+  "/getAll",
+  // passport.authenticate('bearer', { session: false }),
+  getAll,
+  //exitPoint
+);
 /**
  * @swagger
  * /v1/receptionist/appointments/getOne/{id}:
@@ -277,7 +291,7 @@ router.post('/getAll',
  *       - receptionist/appointments
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get one 
+ *     summary: Get one
  *     parameters:
  *       - in: path
  *         name: id
@@ -363,11 +377,12 @@ router.post('/getAll',
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getOne/:id',
-    // passport.authenticate('bearer', { session: false }),
-     getOne,
-     //exitPoint
-     );
+router.post(
+  "/getOne/:id",
+  // passport.authenticate('bearer', { session: false }),
+  getOne,
+  //exitPoint
+);
 /**
  * @swagger
  * /v1/receptionist/appointments/delete/{id}:
@@ -414,6 +429,6 @@ router.post('/getOne/:id',
  *                   data: "Appointment deleted successfully"
  *                   toastMessage: "Appointment deleted successfully"
  */
-router.delete('/delete/:id', deleteAppointment);
+router.delete("/delete/:id", deleteAppointment);
 
-     export default router;
+export default router;

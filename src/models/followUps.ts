@@ -69,17 +69,17 @@ export interface IFollowUp extends Document {
   isDeleted?: boolean;
 }
 
-const FollowUpSchema: Schema= new Schema({
-  patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
-  doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
-  diagnosis: { type: String, required: true },
-  treatment: { type: String, required: true },
-  prescription: { type: String, required: true },
-  visitDate: { type: Date, required: true },
-  isDeleted: { type: Boolean, default: false },
-},{ timestamps: true,
-  bufferCommands: true,
-  versionKey: false,
-});
+const FollowUpSchema: Schema = new Schema(
+  {
+    patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    diagnosis: { type: String, required: true },
+    treatment: { type: String, required: true },
+    prescription: { type: String, required: true },
+    visitDate: { type: Date, required: true },
+    isDeleted: { type: Boolean, default: false },
+  },
+  { timestamps: true, bufferCommands: true, versionKey: false },
+);
 
 export const FollowUp = model<IFollowUp>("followUps", FollowUpSchema);

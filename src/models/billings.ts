@@ -111,21 +111,26 @@ const BillItemSchema: Schema = new Schema({
 const BillingSchema: Schema = new Schema(
   {
     patientId: { type: Schema.Types.ObjectId, ref: "patients", required: true },
-    receptionistId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    receptionistId: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
     doctorId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     totalAmount: { type: Number, required: true },
     billItems: { type: [BillItemSchema], required: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
   },
-  {  timestamps: true,
+  {
+    timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
- } // Automatically manages createdAt and updatedAt
+  }, // Automatically manages createdAt and updatedAt
 );
 
 // Export the Mongoose Model
 export const BillingModel: Model<IBillingModel> = mongoose.model<IBillingModel>(
   "billings",
-  BillingSchema
+  BillingSchema,
 );

@@ -5,7 +5,11 @@ import { aggregateData } from "../../../utils/aggregation";
 import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
 
-export const upsertBilling = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const upsertBilling = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { _id, ...billingData } = req.body;
 
@@ -29,7 +33,11 @@ export const upsertBilling = async (req: Request, res: Response, next: NextFunct
         return next();
       }
 
-      const updatedBilling = await BillingModel.findByIdAndUpdate(_id, billingData, { new: true }).exec();
+      const updatedBilling = await BillingModel.findByIdAndUpdate(
+        _id,
+        billingData,
+        { new: true },
+      ).exec();
 
       req.apiStatus = {
         isSuccess: true,
@@ -58,20 +66,66 @@ export const upsertBilling = async (req: Request, res: Response, next: NextFunct
   next();
 };
 
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
-    const { projection = {}, filter = {}, options = {}, search = [], date, fromDate, toDate } = req.body;
+    const {
+      projection = {},
+      filter = {},
+      options = {},
+      search = [],
+      date,
+      fromDate,
+      toDate,
+    } = req.body;
 
     const lookups = req.body?.lookupRequired
       ? [
-          { $lookup: { from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, localField: "patientId", foreignField: "_id", as: "patientDetails" } },
-          { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
-          { $lookup: { from: CONSTANTS.COLLECTIONS.USER_COLLECTION, localField: "doctorId", foreignField: "_id", as: "doctorDetails" } },
-          { $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } },
+          {
+            $lookup: {
+              from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION,
+              localField: "patientId",
+              foreignField: "_id",
+              as: "patientDetails",
+            },
+          },
+          {
+            $unwind: {
+              path: "$patientDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: CONSTANTS.COLLECTIONS.USER_COLLECTION,
+              localField: "doctorId",
+              foreignField: "_id",
+              as: "doctorDetails",
+            },
+          },
+          {
+            $unwind: {
+              path: "$doctorDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
         ]
       : [];
 
-    const { totalCount, tableData } = await aggregateData(BillingModel, filter, projection, options, search, date, fromDate, toDate, lookups);
+    const { totalCount, tableData } = await aggregateData(
+      BillingModel,
+      filter,
+      projection,
+      options,
+      search,
+      date,
+      fromDate,
+      toDate,
+      lookups,
+    );
 
     req.apiStatus = {
       isSuccess: true,
@@ -89,7 +143,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   next();
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -104,7 +162,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
 
     const objectId = new mongoose.Types.ObjectId(id);
 
-    const { tableData } = await aggregateData(BillingModel, { _id: objectId, isDeleted: false }, projection);
+    const { tableData } = await aggregateData(
+      BillingModel,
+      { _id: objectId, isDeleted: false },
+      projection,
+    );
 
     if (!tableData || tableData.length === 0) {
       req.apiStatus = {

@@ -1,13 +1,9 @@
-import { Router } from 'express';
-import * as appointment from '../../../controllers/v1/doctor/appointments'
+import { Router } from "express";
+import * as appointment from "../../../controllers/v1/doctor/appointments";
 const router = Router();
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
-
-
-
-
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { authenticateDoctor, verifyDoctor } from "../../../middlewares/auth";
 
 /**
  * @swagger
@@ -73,19 +69,21 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.put("/update/:_id",entryPoint,
-    authenticateDoctor,verifyDoctor,
-    appointment.Update,exitPoint);
-
-
-
+router.put(
+  "/update/:_id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  appointment.Update,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/appointments/getOne/{id}:
  *   post:
- *     summary: Get one appointment 
- *     tags: 
+ *     summary: Get one appointment
+ *     tags:
  *        - doctor/appointments
  *     security:
  *       - doctorBearerAuth: []  # Requires a bearer token
@@ -178,16 +176,20 @@ router.put("/update/:_id",entryPoint,
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
 
-router.post("/getone/:id",entryPoint, authenticateDoctor,verifyDoctor,appointment.getOne,exitPoint);
-
-
-
+router.post(
+  "/getone/:id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  appointment.getOne,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/appointments/getall:
  *   post:
- *     tags: 
+ *     tags:
  *       - doctor/appointments
  *     summary: Get all appointments
  *     security:
@@ -335,21 +337,23 @@ router.post("/getone/:id",entryPoint, authenticateDoctor,verifyDoctor,appointmen
  *                         date: 2025-03-01T10:00:00.000+00:00
  *                         status: "SCHEDULED"
  *                         createdAt: "2024-02-10T12:00:00Z"
- *                         updatedAt: "2024-02-11T15:30:00Z" 
+ *                         updatedAt: "2024-02-11T15:30:00Z"
  *                     -   _id: "67b9b29b0b78abeac1a39dbb"
  *                         petId: "6512c5f3e4b09a12d8f42b69"
  *                         doctorId: "6512c5f3e4b09a12d8f42b70"
  *                         date: 2025-03-01T10:00:00.000+00:00
  *                         status: "CANCELLED"
  *                         createdAt: "2024-02-10T12:00:00Z"
- *                         updatedAt: "2024-02-11T15:30:00Z" 
+ *                         updatedAt: "2024-02-11T15:30:00Z"
  */
 
-router.post("/getall",entryPoint,
-    authenticateDoctor,verifyDoctor,
-    appointment.getAll,exitPoint);
-
-
-
+router.post(
+  "/getall",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  appointment.getAll,
+  exitPoint,
+);
 
 export default router;

@@ -1,7 +1,11 @@
-import { Router } from 'express';
-import { createUpdate, getAll, getOne } from '../../../controllers/v1/receptionist/patients';
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
+import { Router } from "express";
+import {
+  createUpdate,
+  getAll,
+  getOne,
+} from "../../../controllers/v1/receptionist/patients";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
 import { verifyReceptionist } from "../../../middlewares/auth";
 import passport from "../../../passport/passport";
 const router = Router();
@@ -66,7 +70,7 @@ const router = Router();
  *                  description: BMI of the patient
  *                bloodGroup:
  *                  type: string
- *                  enum: 
+ *                  enum:
  *                    - DEA 1.1+
  *                    - DEA 1.1-
  *                    - DEA 1.2+
@@ -151,7 +155,15 @@ const router = Router();
  *                   toastMessage: "Patient record updated successfully"
  */
 
-router.post('/createupdate', entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, createUpdate, exitPoint);
+router.post(
+  "/createupdate",
+  entryPoint,
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  createUpdate,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/patients/getAll:
@@ -160,7 +172,7 @@ router.post('/createupdate', entryPoint,entryPoint,passport.authenticate("bearer
  *       - receptionist/patients
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get all 
+ *     summary: Get all
  *     requestBody:
  *       required: true
  *       content:
@@ -213,7 +225,7 @@ router.post('/createupdate', entryPoint,entryPoint,passport.authenticate("bearer
  *                summary: filter example
  *                value:
  *                  filter:
- *                    name: "rammy" 
+ *                    name: "rammy"
  *             singleDateExample:
  *               summary: Multi-date Example
  *               value:
@@ -345,11 +357,15 @@ router.post('/createupdate', entryPoint,entryPoint,passport.authenticate("bearer
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post('/getAll',
-    entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,
-    getAll,
-    exitPoint
-    );
+router.post(
+  "/getAll",
+  entryPoint,
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  getAll,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -359,7 +375,7 @@ router.post('/getAll',
  *       - receptionist/patients
  *     security:
  *       - adminBearerAuth: []
- *     summary: Get one 
+ *     summary: Get one
  *     parameters:
  *       - in: path
  *         name: id
@@ -466,11 +482,13 @@ router.post('/getAll',
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
 
-
-router.post('/getOne/:id',
-    entryPoint,entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,
-     getOne,
-     exitPoint
-     );
- export default router;
-
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  getOne,
+  exitPoint,
+);
+export default router;

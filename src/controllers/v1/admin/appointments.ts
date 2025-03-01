@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import { AppointmentModel } from "../../../models/appointments"; 
+import { AppointmentModel } from "../../../models/appointments";
 import { CONSTANTS } from "../../../config/constant";
 
 import { aggregateData } from "../../../utils/aggregation";
 
-
-
 import { ErrorCodes } from "../../../models/models";
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -20,31 +22,38 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       toDate,
     } = req.body;
 
-    const lookups = req.body?.lookupRequired ? [
-      {
-        $lookup: {
-          from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, // Lookup patient details
-          localField: "patientId",
-          foreignField: "_id",
-          as: "patientDetails"
-        }
-      },
-      { 
-        $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
-      },
-      {
-        $lookup: {
-          from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup doctor details
-          localField: "doctorId",
-          foreignField: "_id",
-          as: "doctorDetails"
-        }
-      },
-      { 
-        $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
-      }
-
-    ] : [];
+    const lookups = req.body?.lookupRequired
+      ? [
+          {
+            $lookup: {
+              from: CONSTANTS.COLLECTIONS.PATIENTS_COLLECTION, // Lookup patient details
+              localField: "patientId",
+              foreignField: "_id",
+              as: "patientDetails",
+            },
+          },
+          {
+            $unwind: {
+              path: "$patientDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: CONSTANTS.COLLECTIONS.USER_COLLECTION, // Lookup doctor details
+              localField: "doctorId",
+              foreignField: "_id",
+              as: "doctorDetails",
+            },
+          },
+          {
+            $unwind: {
+              path: "$doctorDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+        ]
+      : [];
 
     //console.log("Lookup Pipeline:", JSON.stringify(lookups, null, 2)); // Debugging
 
@@ -58,10 +67,9 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       date,
       fromDate,
       toDate,
-      lookups
+      lookups,
     );
 
-   
     req.apiStatus = {
       isSuccess: true,
       data: { totalCount, tableData },
@@ -71,14 +79,19 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     console.error("Error fetching data:", error);
     req.apiStatus = {
       isSuccess: false,
-      error:ErrorCodes[1002],
+      error: ErrorCodes[1002],
       message: "Internal Server Error",
       toastMessage: "Something went wrong. Please try again.",
     };
-  } next();
+  }
+  next();
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {}, lookupRequired = false } = req.body;
@@ -91,23 +104,29 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
               from: "patients", // Lookup patient details
               localField: "patientId",
               foreignField: "_id",
-              as: "patientDetails"
-            }
+              as: "patientDetails",
+            },
           },
-          { 
-            $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } 
+          {
+            $unwind: {
+              path: "$patientDetails",
+              preserveNullAndEmptyArrays: true,
+            },
           },
           {
             $lookup: {
               from: "users", // Lookup doctor details
               localField: "doctorId",
               foreignField: "_id",
-              as: "doctorDetails"
-            }
+              as: "doctorDetails",
+            },
           },
-          { 
-            $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true } 
-          }
+          {
+            $unwind: {
+              path: "$doctorDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
         ]
       : [];
 
@@ -128,7 +147,7 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       undefined, // No date, fromDate, or toDate
       undefined,
       undefined,
-      aggregationPipeline // Pass the pipeline directly
+      aggregationPipeline, // Pass the pipeline directly
     );
 
     if (!tableData.length) {
@@ -141,7 +160,6 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return;
     }
 
-
     req.apiStatus = {
       isSuccess: true,
       data: tableData[0],
@@ -151,10 +169,10 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     console.error("Error fetching record:", error);
     req.apiStatus = {
       isSuccess: false,
-      error:ErrorCodes[1002],
+      error: ErrorCodes[1002],
       message: "Internal Server Error",
       toastMessage: "Something went wrong. Please try again.",
     };
   }
-   next();
+  next();
 };

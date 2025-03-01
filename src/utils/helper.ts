@@ -6,7 +6,8 @@ export function generateTransactionId(): string {
 
 export function generatePassword(): string {
   let pass = "";
-  const str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz0123456789@#$";
+  const str =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz0123456789@#$";
 
   for (let i = 1; i <= 10; i++) {
     const char = Math.floor(Math.random() * str.length + 1);
@@ -18,7 +19,8 @@ export function generatePassword(): string {
 }
 
 export function getObjectIdFromDate(date: Date): string {
-  const objectId = Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+  const objectId =
+    Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
   return objectId;
 }
 
@@ -27,7 +29,9 @@ export function getDateFromObjectId(objectId: string): Date {
   return new Date(timestamp);
 }
 
-export function isCollectionEmpty(collectionName: string | null | undefined): boolean {
+export function isCollectionEmpty(
+  collectionName: string | null | undefined,
+): boolean {
   return !collectionName || collectionName.length === 0;
 }
 
@@ -35,7 +39,11 @@ export function isDateValid(date: Date | null | undefined): boolean {
   return date instanceof Date && !isNaN(date.valueOf());
 }
 
-export function findJsonInJsonArray<T>(list: { [key: string]: T }[], value: T, keyToSearch: string): boolean {
+export function findJsonInJsonArray<T>(
+  list: { [key: string]: T }[],
+  value: T,
+  keyToSearch: string,
+): boolean {
   for (const element of list) {
     if (element[keyToSearch] === value) {
       return true;
@@ -44,7 +52,11 @@ export function findJsonInJsonArray<T>(list: { [key: string]: T }[], value: T, k
   return false;
 }
 
-export function addJson<T>(obj: Record<string, T>, key: string, value: T): Record<string, T> {
+export function addJson<T>(
+  obj: Record<string, T>,
+  key: string,
+  value: T,
+): Record<string, T> {
   obj[key] = value;
   return obj;
 }

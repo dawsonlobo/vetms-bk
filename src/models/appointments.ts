@@ -48,7 +48,7 @@ import { CONSTANTS } from "../config/constant";
  *           example: "2025-03-10"
  *         status:
  *           type: string
- *           enum: 
+ *           enum:
  *             - PENDING
  *             - CANCELLED
  *             - COMPLETED
@@ -96,20 +96,22 @@ const AppointmentSchema: Schema = new Schema(
     nurseId: { type: Schema.Types.ObjectId, ref: "users" }, // Optional field
     receptionistId: { type: Schema.Types.ObjectId, ref: "users" }, // Newly added optional field
     date: { type: Date, required: true },
-    status: { type: String, enum: Object.values(CONSTANTS.APPOINTMENT_STATUS), required: true },
+    status: {
+      type: String,
+      enum: Object.values(CONSTANTS.APPOINTMENT_STATUS),
+      required: true,
+    },
     remarks: { type: String }, // Default value set to an empty string
-    isDeleted: { type: Boolean, default: false }, 
+    isDeleted: { type: Boolean, default: false },
   },
-  {     
+  {
     timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
-  } 
+  },
 );
 
 // Export the Mongoose Model
-export const AppointmentModel: Model<IAppointmentModel> = mongoose.model<IAppointmentModel>(
-  "appointments",
-  AppointmentSchema
-);
+export const AppointmentModel: Model<IAppointmentModel> =
+  mongoose.model<IAppointmentModel>("appointments", AppointmentSchema);

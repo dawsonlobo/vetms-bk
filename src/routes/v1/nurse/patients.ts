@@ -1,8 +1,5 @@
 import { Router } from "express";
-import {
-  getAll,
-  getOne,
-} from "../../../controllers/v1/nurse/patients";
+import { getAll, getOne } from "../../../controllers/v1/nurse/patients";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 import { verifyNurse } from "../../../middlewares/auth";
@@ -203,10 +200,13 @@ const router = Router();
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getAll", entryPoint,passport.authenticate("bearer", { session: false }),
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
   verifyNurse,
   getAll,
-  exitPoint
+  exitPoint,
 );
 /**
  * @swagger
@@ -327,6 +327,6 @@ router.post(
   entryPoint,
   passport.authenticate("bearer", { session: false }),
   getOne,
-  exitPoint
+  exitPoint,
 );
 export default router;

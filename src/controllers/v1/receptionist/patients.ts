@@ -4,7 +4,11 @@ import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
-export const createUpdate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createUpdate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { _id, dob, ...patientData } = req.body;
 
@@ -28,7 +32,7 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
       result = await PatientModel.findByIdAndUpdate(
         _id,
         { $set: updateFields },
-        { new: true, runValidators: true, strict: true }
+        { new: true, runValidators: true, strict: true },
       ).lean(); // Use lean() to return a plain JavaScript object
 
       if (!result) {
@@ -44,7 +48,7 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
         isSuccess: true,
         message: "Success",
         data: "Patient updated successfully",
-        toastMessage:"Patient updated successfully",
+        toastMessage: "Patient updated successfully",
       };
       return next();
     } else {
@@ -59,7 +63,8 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
       }
 
       const calculatedAge = Math.floor(
-        (new Date().getTime() - new Date(dob).getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+        (new Date().getTime() - new Date(dob).getTime()) /
+          (1000 * 60 * 60 * 24 * 365.25),
       );
 
       result = await PatientModel.create({
@@ -73,7 +78,7 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
         isSuccess: true,
         message: "Success",
         data: "Patient added successfully",
-        toastMessage:"Patient added successfully", 
+        toastMessage: "Patient added successfully",
       };
       return next();
     }
@@ -88,8 +93,11 @@ export const createUpdate = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -110,7 +118,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
     req.apiStatus = {
@@ -130,7 +138,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection } = req.body;
@@ -144,7 +156,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return next();
     }
 
-    const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    const result = await aggregateData(
+      PatientModel,
+      { _id: new mongoose.Types.ObjectId(id) },
+      projection,
+    );
 
     if (!result.tableData.length) {
       req.apiStatus = {

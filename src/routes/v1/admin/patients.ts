@@ -204,7 +204,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getAll,
-  exitPoint
+  exitPoint,
 );
 /**
  * @swagger
@@ -326,6 +326,6 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getOne,
-  exitPoint
+  exitPoint,
 );
 export default router;

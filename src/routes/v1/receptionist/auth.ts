@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "../../../passport/passport";
-import * as auth from "../../../controllers/v1/receptionist/auth"
+import * as auth from "../../../controllers/v1/receptionist/auth";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
@@ -75,11 +75,12 @@ import { verifyReceptionist } from "../../../middlewares/auth";
  *                   example: "Login successful"
  */
 
-
-router.post("/receptionist/auth/login",entryPoint, auth.loginController,exitPoint);
-
-
-
+router.post(
+  "/receptionist/auth/login",
+  entryPoint,
+  auth.loginController,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -121,13 +122,19 @@ router.post("/receptionist/auth/login",entryPoint, auth.loginController,exitPoin
  *                   example: "Admin logged out successfully"
  */
 
-
-router.post("/receptionist/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist,auth.logoutController,exitPoint);
+router.post(
+  "/receptionist/auth/logout",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  auth.logoutController,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/auth/profile:
  *   post:
- *     summary: Get user profile 
+ *     summary: Get user profile
  *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -265,14 +272,20 @@ router.post("/receptionist/auth/logout", entryPoint,passport.authenticate("beare
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
 
-
-router.post("/receptionist/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.getAdminProfile,exitPoint);
+router.post(
+  "/receptionist/auth/profile",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  auth.getAdminProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/receptionist/auth/update:
  *   put:
- *     summary: Update user profile 
+ *     summary: Update user profile
  *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -333,13 +346,20 @@ router.post("/receptionist/auth/profile", entryPoint,passport.authenticate("bear
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/receptionist/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.updateAdminProfile,exitPoint);
+router.put(
+  "/receptionist/auth/update",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  auth.updateAdminProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/receptionist/auth/refresh:
  *   post:
- *     summary: Refresh user token 
+ *     summary: Refresh user token
  *     tags: [receptionist/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -402,8 +422,13 @@ router.put("/receptionist/auth/update",entryPoint,passport.authenticate("bearer"
  *                       example: "2024-07-15T12:57:10.956Z"
  */
 
-
-
-router.post("/receptionist/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyReceptionist, auth.refreshTokenController,exitPoint);
+router.post(
+  "/receptionist/auth/refresh",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyReceptionist,
+  auth.refreshTokenController,
+  exitPoint,
+);
 
 export default router;

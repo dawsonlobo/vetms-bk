@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "../../../passport/passport";
-import * as auth from "../../../controllers/v1/admin/auth"
+import * as auth from "../../../controllers/v1/admin/auth";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
@@ -75,11 +75,7 @@ import { verifyAdmin } from "../../../middlewares/auth";
  *                   example: "Login successful"
  */
 
-
-router.post("/admin/auth/login",entryPoint,auth.loginController,exitPoint);
-
-
-
+router.post("/admin/auth/login", entryPoint, auth.loginController, exitPoint);
 
 /**
  * @swagger
@@ -121,13 +117,19 @@ router.post("/admin/auth/login",entryPoint,auth.loginController,exitPoint);
  *                   example: "Admin logged out successfully"
  */
 
-
-router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin,auth.logoutController,exitPoint);
+router.post(
+  "/admin/auth/logout",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  auth.logoutController,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/auth/profile:
  *   post:
- *     summary: Get user profile 
+ *     summary: Get user profile
  *     tags: [admin/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -265,14 +267,20 @@ router.post("/admin/auth/logout", entryPoint,passport.authenticate("bearer", { s
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
 
-
-router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.getAdminProfile,exitPoint);
+router.post(
+  "/admin/auth/profile",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  auth.getAdminProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/admin/auth/update:
  *   put:
- *     summary: Update user profile 
+ *     summary: Update user profile
  *     tags: [admin/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -333,13 +341,20 @@ router.post("/admin/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.updateAdminProfile,exitPoint);
+router.put(
+  "/admin/auth/update",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  auth.updateAdminProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/admin/auth/refresh:
  *   post:
- *     summary: Refresh user token 
+ *     summary: Refresh user token
  *     tags: [admin/auth]
  *     security:
  *       - adminBearerAuth: []
@@ -402,8 +417,13 @@ router.put("/admin/auth/update",entryPoint,passport.authenticate("bearer", { ses
  *                       example: "2024-07-15T12:57:10.956Z"
  */
 
-
-
-router.post("/admin/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyAdmin, auth.refreshTokenController,exitPoint);
+router.post(
+  "/admin/auth/refresh",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  auth.refreshTokenController,
+  exitPoint,
+);
 
 export default router;

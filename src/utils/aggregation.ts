@@ -9,7 +9,7 @@ export const aggregateData = async (
   date?: number,
   fromDate?: number,
   toDate?: number,
-  lookups: any[] = []
+  lookups: any[] = [],
 ) => {
   let query: any = { isDeleted: false, ...filter };
 
@@ -19,7 +19,7 @@ export const aggregateData = async (
   } else if (fromDate && toDate) {
     query.createdAt = {
       $gte: new Date(fromDate * 1000),
-      $lte: new Date(toDate * 1000)
+      $lte: new Date(toDate * 1000),
     };
   }
 
@@ -35,9 +35,9 @@ export const aggregateData = async (
           return {
             [field]: startsWith
               ? new RegExp(`^${escapedTerm}`, "i")
-              : new RegExp(escapedTerm, "i")
+              : new RegExp(escapedTerm, "i"),
           };
-        })
+        }),
     }));
     query.$and = query.$and ? [...query.$and, ...searchQueries] : searchQueries;
   }
@@ -47,7 +47,7 @@ export const aggregateData = async (
     page = 1,
     itemsPerPage = 10,
     sortBy = ["createdAt"],
-    sortDesc = [true]
+    sortDesc = [true],
   } = options;
   const sort: any = {};
   sortBy.forEach((field: string, index: number) => {
@@ -55,32 +55,34 @@ export const aggregateData = async (
   });
 
   // Projection
-let finalProjection: Record<string, number> = { isDeleted: 0 };
+  let finalProjection: Record<string, number> = { isDeleted: 0 };
 
-if (Object.keys(projection).length > 0) {
-  const isInclusionProjection = Object.values(projection).some((value) => value === 1);
-  const isExclusionProjection = Object.values(projection).every((value) => value === 0);
+  if (Object.keys(projection).length > 0) {
+    const isInclusionProjection = Object.values(projection).some(
+      (value) => value === 1,
+    );
+    const isExclusionProjection = Object.values(projection).every(
+      (value) => value === 0,
+    );
 
-  if (isInclusionProjection) {
-    finalProjection = { ...projection };
-  } else if (isExclusionProjection) {
-    finalProjection = { ...projection, isDeleted: 0 };
+    if (isInclusionProjection) {
+      finalProjection = { ...projection };
+    } else if (isExclusionProjection) {
+      finalProjection = { ...projection, isDeleted: 0 };
+    }
+
+    // Remove any field that is explicitly set to `0`
+    Object.keys(finalProjection).forEach((key) => {
+      if (finalProjection[key] === 0) {
+        delete finalProjection[key];
+      }
+    });
   }
 
-  // Remove any field that is explicitly set to `0`
-  Object.keys(finalProjection).forEach((key) => {
-    if (finalProjection[key] === 0) {
-      delete finalProjection[key];
-    }
-  });
-}
-
-// Ensure `_id` is included if missing
-if (finalProjection._id === undefined) {
-  finalProjection._id = 1;
-}
-
-
+  // Ensure `_id` is included if missing
+  if (finalProjection._id === undefined) {
+    finalProjection._id = 1;
+  }
 
   // Aggregation Pipeline
   const pipeline: any[] = [{ $match: query }];
@@ -98,10 +100,10 @@ if (finalProjection._id === undefined) {
         tableData: [
           { $skip: (page - 1) * itemsPerPage },
           { $limit: itemsPerPage },
-          { $project: finalProjection }
-        ]
-      }
-    }
+          { $project: finalProjection },
+        ],
+      },
+    },
   );
 
   // Execute Aggregation

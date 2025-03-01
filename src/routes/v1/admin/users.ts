@@ -1,10 +1,16 @@
-import { Router } from 'express';
-import { getAll, getOne ,createUser,updateUser,deleteUser} from '../../../controllers/v1/admin/users';
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
+import { Router } from "express";
+import {
+  getAll,
+  getOne,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../../../controllers/v1/admin/users";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
 import { verifyAdmin } from "../../../middlewares/auth";
 import passport from "../../../passport/passport";
-const router = Router()
+const router = Router();
 /**
 /**
  * @swagger
@@ -88,13 +94,14 @@ const router = Router()
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
-router.post('/create',
-    entryPoint,
-    passport.authenticate('bearer', { session: false }), 
-    verifyAdmin,
-    createUser, 
-    exitPoint
-    );
+router.post(
+  "/create",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  createUser,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/update/{id}:
@@ -176,13 +183,14 @@ router.post('/create',
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
-router.put('/update/:id',
-     entryPoint,
-    passport.authenticate('bearer', { session: false }),
-    verifyAdmin,
-     updateUser,
-    exitPoint
-    );
+router.put(
+  "/update/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  updateUser,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -233,14 +241,15 @@ router.put('/update/:id',
  *                   message: "Success"
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
-*/
-router.delete('/delete/:id',
-    entryPoint,
-    passport.authenticate('bearer', { session: false }),
-    verifyAdmin,
-    deleteUser, 
-     exitPoint
-    );
+ */
+router.delete(
+  "/delete/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  deleteUser,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/getAll:
@@ -395,13 +404,14 @@ router.delete('/delete/:id',
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
 
-router.post('/getAll',
-    entryPoint,
-    passport.authenticate('bearer', { session: false }),
-    verifyAdmin,
-    getAll,
-    exitPoint
-    );
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getAll,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/getOne/{id}:
@@ -487,11 +497,12 @@ router.post('/getAll',
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */
 
-router.post('/getOne/:id',
-    entryPoint,
-     passport.authenticate('bearer', { session: false }),
-     verifyAdmin,
-     getOne,
-     exitPoint
-     );
- export default router;
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyAdmin,
+  getOne,
+  exitPoint,
+);
+export default router;

@@ -61,14 +61,13 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
 
   JSON.stringify(reqData);
 
-  if (req.apiStatus?.data) 
-    {
+  if (req.apiStatus?.data) {
     if (req?.apiStatus?.isSuccess) {
       const responseObj = new ResponseObj(
         200,
         "Success",
         req.apiStatus.data,
-        req.apiStatus.toastMessage
+        req.apiStatus.toastMessage,
       );
       res.status(responseObj.status).json(responseObj);
     } else {
@@ -76,7 +75,7 @@ export const exitPoint: RequestHandler = (req: Request, res: Response) => {
         req.apiStatus?.error?.statusCode ?? 500,
         req.apiStatus?.error?.message ?? "Unknown error",
         req.apiStatus?.data,
-        req.apiStatus?.toastMessage
+        req.apiStatus?.toastMessage,
       );
       res.status(responseObj.status).json(responseObj);
     }

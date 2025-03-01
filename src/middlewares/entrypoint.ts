@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import * as Helper from "../utils/helper";
 
-
 declare global {
   namespace Express {
     export interface Request {
@@ -25,7 +24,6 @@ declare global {
     }
   }
 }
-
 
 export const entryPoint: RequestHandler = (req, res, next) => {
   req.startTime = Date.now();

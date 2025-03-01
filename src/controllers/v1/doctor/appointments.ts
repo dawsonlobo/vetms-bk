@@ -6,96 +6,99 @@ import { ObjectId } from "mongodb";
 import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
 
+export const Update = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { _id } = req.params;
+    const { remarks } = req.body;
 
+    // Find the existing appointment
+    const existingAppointment = await AppointmentModel.findOne({
+      _id: new ObjectId(_id),
+    });
+    console.log(existingAppointment);
 
-
-
-
-export const Update = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
-    try {
-        const { _id } = req.params;
-        const { remarks } = req.body;
-
-        // Find the existing appointment
-        const existingAppointment = await AppointmentModel.findOne({ _id: new ObjectId(_id) });
-        console.log(existingAppointment);
-        
-        if (!existingAppointment) {
-          req.apiStatus = {
-            isSuccess: false,
-            error:ErrorCodes[1002],
-            data: "Internal Server Error",
-            toastMessage: "Something went wrong. Please try again.",
-          };
-          next();
-          return;
-        } 
-              
-            
-            // "Appointment record not found matching the appointment id" });
-            
-        // Extract current status
-        const { status } = existingAppointment;
-
-        // Prepare update fields
-        const updateFields: Record<string, any> = { remarks };
-
-        // Only update status if it's "pending", do nothing if it's "cancelled"
-        if (status === CONSTANTS.APPOINTMENT_STATUS.PENDING) {
-            updateFields.status = CONSTANTS.APPOINTMENT_STATUS.COMPLETED;
-        } else if (status === CONSTANTS.APPOINTMENT_STATUS.CANCELLED) {
-          console.error("Error fetching data:");
-          req.apiStatus = {
-            isSuccess: false,
-            error:ErrorCodes[1002],
-            data: "Cannot update cancelled or not attended status.",
-            toastMessage: "Cannot update cancelled or not attended status.",
-          };
-          next();
-          return;
-        } 
-        
-
-      
-        // Update appointment
-        const updatedAppointment = await AppointmentModel.findByIdAndUpdate(_id, updateFields, { new: true });
-
-        if (!updatedAppointment) {
-          req.apiStatus = {
-            isSuccess: false,
-            error:ErrorCodes[1002],
-            message: "Follow-up record not found.",
-            toastMessage: "Follow-up record not found.",
-          };
-          next();
-             return;
-        }
-        
-  req.apiStatus = {
-  isSuccess: true,
-  message: "Success",
-  data: "Appointment updated successfully",
-  toastMessage: "Appointment updated successfully",
-};
-next();
-return;
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    if (!existingAppointment) {
       req.apiStatus = {
         isSuccess: false,
-        error:ErrorCodes[1002],
-        message: "Something went wrong. Please try again.",
+        error: ErrorCodes[1002],
+        data: "Internal Server Error",
         toastMessage: "Something went wrong. Please try again.",
-      } 
-      next(); 
-      return;   
       };
+      next();
+      return;
+    }
+
+    // "Appointment record not found matching the appointment id" });
+
+    // Extract current status
+    const { status } = existingAppointment;
+
+    // Prepare update fields
+    const updateFields: Record<string, any> = { remarks };
+
+    // Only update status if it's "pending", do nothing if it's "cancelled"
+    if (status === CONSTANTS.APPOINTMENT_STATUS.PENDING) {
+      updateFields.status = CONSTANTS.APPOINTMENT_STATUS.COMPLETED;
+    } else if (status === CONSTANTS.APPOINTMENT_STATUS.CANCELLED) {
+      console.error("Error fetching data:");
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1002],
+        data: "Cannot update cancelled or not attended status.",
+        toastMessage: "Cannot update cancelled or not attended status.",
+      };
+      next();
+      return;
+    }
+
+    // Update appointment
+    const updatedAppointment = await AppointmentModel.findByIdAndUpdate(
+      _id,
+      updateFields,
+      { new: true },
+    );
+
+    if (!updatedAppointment) {
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1002],
+        message: "Follow-up record not found.",
+        toastMessage: "Follow-up record not found.",
+      };
+      next();
+      return;
+    }
+
+    req.apiStatus = {
+      isSuccess: true,
+      message: "Success",
+      data: "Appointment updated successfully",
+      toastMessage: "Appointment updated successfully",
     };
+    next();
+    return;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      message: "Something went wrong. Please try again.",
+      toastMessage: "Something went wrong. Please try again.",
+    };
+    next();
+    return;
+  }
+};
 
-
-
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -117,20 +120,24 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     delete sanitizedProjection.isDeleted;
 
     // Fetch follow-up data using aggregation
-    const { tableData } = await aggregateData(AppointmentModel, { _id: objectId, isDeleted: false }, sanitizedProjection);
+    const { tableData } = await aggregateData(
+      AppointmentModel,
+      { _id: objectId, isDeleted: false },
+      sanitizedProjection,
+    );
 
     if (!tableData || tableData.length === 0) {
       req.apiStatus = {
-      isSuccess: false,
-      error: ErrorCodes[1010],
-      toastMessage: "Something went wrong. Please try again.",
-    };
-    next();
-    return;
+        isSuccess: false,
+        error: ErrorCodes[1010],
+        toastMessage: "Something went wrong. Please try again.",
+      };
+      next();
+      return;
     }
 
     const followUpObj = tableData[0];
-    
+
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
@@ -146,14 +153,15 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       toastMessage: "Something went wrong. Please try again.",
     };
     next();
-  return;
+    return;
   }
-  
-  };
+};
 
-
-
-export async function getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getAll(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const {
       projection = {},
@@ -174,17 +182,16 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
 
     // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
-        AppointmentModel,
+      AppointmentModel,
       sanitizedFilter,
       sanitizedProjection,
       options,
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
-    
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
@@ -192,16 +199,15 @@ export async function getAll(req: Request, res: Response, next: NextFunction): P
     };
     next();
     return;
-
   } catch (error) {
     console.error("Error fetching data:", error);
     req.apiStatus = {
       isSuccess: false,
-      error:ErrorCodes[1002],
+      error: ErrorCodes[1002],
       message: "Internal Server Error",
       toastMessage: "Something went wrong. Please try again.",
     };
     next();
     return;
   }
-};
+}

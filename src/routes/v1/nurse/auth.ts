@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "../../../passport/passport";
-import * as auth from "../../../controllers/v1/nurse/auth"
+import * as auth from "../../../controllers/v1/nurse/auth";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 const router = Router();
@@ -75,9 +75,13 @@ import { verifyNurse } from "../../../middlewares/auth";
  *                   example: "Login successful"
  */
 
-
-router.post("/nurse/auth/login",entryPoint,passport.authenticate("bearer", { session: false }), auth.loginController,exitPoint);
-
+router.post(
+  "/nurse/auth/login",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  auth.loginController,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -119,13 +123,19 @@ router.post("/nurse/auth/login",entryPoint,passport.authenticate("bearer", { ses
  *                   example: "Nurse logged out successfully"
  */
 
-
-router.post("/nurse/auth/logout", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse,auth.logoutController,exitPoint);
+router.post(
+  "/nurse/auth/logout",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  auth.logoutController,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/auth/profile:
  *   post:
- *     summary: Get user profile 
+ *     summary: Get user profile
  *     tags: [nurse/auth]
  *     security:
  *       - nurseBearerAuth: []
@@ -263,14 +273,20 @@ router.post("/nurse/auth/logout", entryPoint,passport.authenticate("bearer", { s
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
 
-
-router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.getNurseProfile,exitPoint);
+router.post(
+  "/nurse/auth/profile",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  auth.getNurseProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/nurse/auth/update:
  *   put:
- *     summary: Update user profile 
+ *     summary: Update user profile
  *     tags: [nurse/auth]
  *     security:
  *       - nurseBearerAuth: []
@@ -327,13 +343,20 @@ router.post("/nurse/auth/profile", entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/nurse/auth/update",entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.updateNurseProfile,exitPoint);
+router.put(
+  "/nurse/auth/update",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  auth.updateNurseProfile,
+  exitPoint,
+);
 
 // /**
 //  * @swagger
 //  * /v1/nurse/auth/refresh:
 //  *   post:
-//  *     summary: Refresh user token 
+//  *     summary: Refresh user token
 //  *     tags: [nurse/auth]
 //  *     security:
 //  *       - nurseBearerAuth: []
@@ -396,6 +419,13 @@ router.put("/nurse/auth/update",entryPoint,passport.authenticate("bearer", { ses
 //  *                       example: "2024-07-15T12:57:10.956Z"
 //  */
 
-router.post("/nurse/auth/refresh",entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, auth.refreshTokenController,exitPoint);
+router.post(
+  "/nurse/auth/refresh",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  auth.refreshTokenController,
+  exitPoint,
+);
 
 export default router;

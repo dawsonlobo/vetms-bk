@@ -67,21 +67,30 @@ export interface IPaymentModel extends IPayment, Document {}
 // Define the Mongoose Schema
 const PaymentSchema: Schema = new Schema(
   {
-    appointmentId: { type: Schema.Types.ObjectId, ref: "appointments", required: true },
+    appointmentId: {
+      type: Schema.Types.ObjectId,
+      ref: "appointments",
+      required: true,
+    },
     amount: { type: Number, required: true },
-    paymentStatus: { type: String, enum: ["PENDING", "PAID", "CANCELLED"], required: true },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID", "CANCELLED"],
+      required: true,
+    },
     referenceNo: { type: String, required: true, unique: true },
     isDeleted: { type: Boolean, default: false }, // Added isDeleted field
   },
-  {  timestamps: true,
+  {
+    timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
-} // Automatically manages createdAt and updatedAt
+  }, // Automatically manages createdAt and updatedAt
 );
 
 // Export the Mongoose Model
 export const PaymentModel: Model<IPaymentModel> = mongoose.model<IPaymentModel>(
   "payments",
-  PaymentSchema
+  PaymentSchema,
 );

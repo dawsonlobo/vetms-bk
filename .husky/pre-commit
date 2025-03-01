@@ -11,7 +11,7 @@ else
     echo "Skipping package version update (not on 'dev' and 'dev' not merged)."
 fi
 exec git diff --cached --name-only | npx cspell "src/**/*.ts" --no-summary --no-progress --no-must-find-files --file-list stdin
-npx lint-staged
+# npx lint-staged
 npm run format
 npm run build
 # git add package.json

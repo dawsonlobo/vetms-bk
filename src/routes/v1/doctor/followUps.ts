@@ -1,11 +1,10 @@
-import { Router } from 'express';
-import * as followUp from '../../../controllers/v1/doctor/followUps'
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
+import { Router } from "express";
+import * as followUp from "../../../controllers/v1/doctor/followUps";
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { authenticateDoctor, verifyDoctor } from "../../../middlewares/auth";
 
 const router = Router();
-
 
 /**
  * @swagger
@@ -13,7 +12,7 @@ const router = Router();
  *  /v1/doctor/followUps/createupdate:
  *    post:
  *      summary: Create a new follow-up record
- *      tags: 
+ *      tags:
  *        - doctor/followups
  *      security:
  *        - doctorBearerAuth: []
@@ -109,16 +108,21 @@ const router = Router();
  *                    toastMessage: "Follow-up recorded successfully"
  */
 
-
-
-router.post("/createupdate",entryPoint,authenticateDoctor,verifyDoctor,followUp.createUpdateFollowUp,exitPoint);
+router.post(
+  "/createupdate",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  followUp.createUpdateFollowUp,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/followUps/getOne/{id}:
  *   post:
- *     summary: Get one follow-up 
- *     tags: 
+ *     summary: Get one follow-up
+ *     tags:
  *        - doctor/followups
  *     security:
  *       - doctorBearerAuth: []  # Requires a bearer token
@@ -215,19 +219,21 @@ router.post("/createupdate",entryPoint,authenticateDoctor,verifyDoctor,followUp.
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
 
-
-
-
-router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.getOne,exitPoint);
-
-
+router.post(
+  "/getone/:id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  followUp.getOne,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/followups/delete/{id}:
  *   post:
  *     summary: Delete a follow-up record
- *     tags: 
+ *     tags:
  *       - doctor/followups
  *     security:
  *       - doctorBearerAuth: []
@@ -284,14 +290,20 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.ge
  *               error: "Follow-up record not found or already deleted"
  */
 
-router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.deleteFollowUp,exitPoint);
-
+router.post(
+  "/delete/:id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  followUp.deleteFollowUp,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/followups/getall:
  *   post:
- *     tags: 
+ *     tags:
  *       - doctor/followups
  *     summary: Get all follow-ups
  *     security:
@@ -366,7 +378,7 @@ router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.de
  *                summary: filter example
  *                value:
  *                  filter:
- *                    name: "rammy" 
+ *                    name: "rammy"
  *             searchExample:
  *               summary: Search Example
  *               value:
@@ -461,6 +473,13 @@ router.post("/delete/:id",entryPoint,authenticateDoctor,verifyDoctor,followUp.de
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
 
-router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,followUp.getAll,exitPoint);
+router.post(
+  "/getall",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  followUp.getAll,
+  exitPoint,
+);
 
 export default router;

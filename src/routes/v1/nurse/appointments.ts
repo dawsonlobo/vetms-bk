@@ -1,10 +1,14 @@
 import express from "express";
-import {getAll,getOne,createUpdate, deleteAppointment} from '../../../controllers/v1/nurse/appointments';
-import {  verifyNurse } from '../../../middlewares/auth';
+import {
+  getAll,
+  getOne,
+  createUpdate,
+  deleteAppointment,
+} from "../../../controllers/v1/nurse/appointments";
+import { verifyNurse } from "../../../middlewares/auth";
 import { entryPoint } from "../../../middlewares/entrypoint";
 import { exitPoint } from "../../../middlewares/exitpoint";
 import passport from "passport";
-
 
 const router = express.Router();
 /**
@@ -120,12 +124,19 @@ const router = express.Router();
  *                       description: Timestamp when the item was last updated
  */
 
-router.post("/create", entryPoint,passport.authenticate("bearer", { session: false }), verifyNurse, createUpdate, exitPoint);
+router.post(
+  "/create",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  createUpdate,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/getAll:
  *   post:
- *     tags: 
+ *     tags:
  *       - nurse/appointments
  *     security:
  *       - nurseBearerAuth: []  # Requires a bearer token
@@ -237,7 +248,14 @@ router.post("/create", entryPoint,passport.authenticate("bearer", { session: fal
  *                   fields: ["status"]
  *                   startsWith: true
  */
-router.post("/getAll", entryPoint, passport.authenticate("bearer", { session: false }),verifyNurse, getAll, exitPoint);
+router.post(
+  "/getAll",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  getAll,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/getOne/{id}:
@@ -333,7 +351,14 @@ router.post("/getAll", entryPoint, passport.authenticate("bearer", { session: fa
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
 
-router.post("/getOne/:id", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse, getOne, exitPoint);
+router.post(
+  "/getOne/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  getOne,
+  exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/delete/{id}:
@@ -380,7 +405,13 @@ router.post("/getOne/:id", entryPoint,passport.authenticate("bearer", { session:
  *                   data: "Appointment deleted successfully"
  *                   toastMessage: "Appointment deleted successfully"
  */
-router.delete("/delete/:id", entryPoint,passport.authenticate("bearer", { session: false }),verifyNurse,deleteAppointment, exitPoint);
+router.delete(
+  "/delete/:id",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse,
+  deleteAppointment,
+  exitPoint,
+);
 
-
-     export default router;
+export default router;

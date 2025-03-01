@@ -48,44 +48,43 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { CONSTANTS } from "../config/constant";
 
+export interface IUser {
+  _id?: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  role: keyof typeof CONSTANTS.USER_ROLE;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isDeleted: boolean;
+  isEnabled: boolean;
+}
 
-  
-  export interface IUser {
-    _id?: mongoose.Types.ObjectId;
-    name: string;
-    email: string;
-    password: string;
-    role: keyof typeof CONSTANTS.USER_ROLE;
-    createdAt?: Date;
-    updatedAt?: Date;
-    isDeleted: boolean,
-    isEnabled:boolean
-  }
-  
-  
-  export interface IUserDocument extends IUser, Document {
-    _id: mongoose.Types.ObjectId; 
-  }
-  
-  const UserSchema: Schema = new Schema(
-    {
-      name: { type: String, required: true },
-      email: { type: String, required: true, unique: true },
-      password: { type: String, required: true },
-      role: { type: String, enum: Object.values(CONSTANTS.USER_ROLE), required: true },
-      isDeleted: { type: Boolean, default: false },
-      isEnabled: { type: Boolean, default: true }
+export interface IUserDocument extends IUser, Document {
+  _id: mongoose.Types.ObjectId;
+}
+
+const UserSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: {
+      type: String,
+      enum: Object.values(CONSTANTS.USER_ROLE),
+      required: true,
     },
-    { timestamps: true,
-      usePushEach: true,
-      bufferCommands: true,
-      versionKey: false,
-  
-    }
-  );
-  
-  const UserModel = mongoose.model<IUserDocument>("users", UserSchema);
-  
-  export default UserModel;
-  
-  
+    isDeleted: { type: Boolean, default: false },
+    isEnabled: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+    usePushEach: true,
+    bufferCommands: true,
+    versionKey: false,
+  },
+);
+
+const UserModel = mongoose.model<IUserDocument>("users", UserSchema);
+
+export default UserModel;

@@ -101,7 +101,12 @@ export class ResponseObj {
   public data: object | object[] | string;
   public toastMessage?: string;
 
-  constructor(status: number, message: string, data: object | object[] | string, toastMessage?: string) {
+  constructor(
+    status: number,
+    message: string,
+    data: object | object[] | string,
+    toastMessage?: string,
+  ) {
     this.status = status;
     this.message = message;
     this.data = data;
@@ -135,7 +140,12 @@ export class FeedbackObj {
   public message: string;
   public retryCount: number = 0;
 
-  constructor(status: FEEDBACK_STATUS, code: number, message: string, retryCount: number) {
+  constructor(
+    status: FEEDBACK_STATUS,
+    code: number,
+    message: string,
+    retryCount: number,
+  ) {
     this.status = status;
     this.message = message;
     this.code = code;
@@ -143,7 +153,12 @@ export class FeedbackObj {
   }
 
   public toJson(): object {
-    return { status: this.status, code: this.code, message: this.message, retryCount: this.retryCount };
+    return {
+      status: this.status,
+      code: this.code,
+      message: this.message,
+      retryCount: this.retryCount,
+    };
   }
 
   // public toPlain(): string {

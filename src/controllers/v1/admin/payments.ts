@@ -4,7 +4,11 @@ import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -25,7 +29,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
     req.apiStatus = {
@@ -45,7 +49,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -62,7 +70,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     const objectId = new mongoose.Types.ObjectId(id); // ✅ Convert string to ObjectId
 
     // Fetch payment using aggregateData
-    const { tableData } = await aggregateData(PaymentModel, { _id: objectId, isDeleted: false }, projection);
+    const { tableData } = await aggregateData(
+      PaymentModel,
+      { _id: objectId, isDeleted: false },
+      projection,
+    );
 
     if (!tableData || tableData.length === 0) {
       req.apiStatus = {

@@ -12,7 +12,9 @@ async function seedDatabase() {
       const existingUser = await UserModel.findOne({ email: user.email });
 
       if (existingUser) {
-        console.log(`User with email ${user.email} already exists. Skipping...`);
+        console.log(
+          `User with email ${user.email} already exists. Skipping...`,
+        );
         continue;
       }
 

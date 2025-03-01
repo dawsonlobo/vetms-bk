@@ -11,7 +11,11 @@ const parseEpoch = (epoch: number): Date => {
   return dateObj;
 };
 
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -26,9 +30,9 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     // Convert `date`, `fromDate`, `toDate` from epoch to Date format
     if (date) {
       const isoDate = parseEpoch(date);
-      filter.date = { 
-        $gte: isoDate, 
-        $lt: new Date(isoDate.getTime() + 86400000) // Less than next day
+      filter.date = {
+        $gte: isoDate,
+        $lt: new Date(isoDate.getTime() + 86400000), // Less than next day
       };
     }
 
@@ -45,7 +49,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       filter,
       projection,
       options,
-      search
+      search,
     );
 
     // Convert `date` field in response to ISO format
@@ -71,7 +75,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection } = req.body;
@@ -85,7 +93,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return next();
     }
 
-    const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    const result = await aggregateData(
+      PatientModel,
+      { _id: new mongoose.Types.ObjectId(id) },
+      projection,
+    );
 
     if (!result.tableData.length) {
       req.apiStatus = {
@@ -99,7 +111,9 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     // Convert `date` field in response to ISO format
     const formattedResult = {
       ...result.tableData[0],
-      date: result.tableData[0].date ? new Date(result.tableData[0].date).toISOString() : null,
+      date: result.tableData[0].date
+        ? new Date(result.tableData[0].date).toISOString()
+        : null,
     };
 
     req.apiStatus = {

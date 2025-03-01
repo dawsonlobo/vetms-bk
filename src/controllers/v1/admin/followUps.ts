@@ -3,14 +3,15 @@ import mongoose from "mongoose";
 import { FollowUp } from "../../../models/followUps";
 import { aggregateData } from "../../../utils/aggregation";
 
-
-
-
 import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
 
 // Get All Follow-Ups
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -33,7 +34,10 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
             },
           },
           {
-            $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true },
+            $unwind: {
+              path: "$patientDetails",
+              preserveNullAndEmptyArrays: true,
+            },
           },
           {
             $lookup: {
@@ -44,7 +48,10 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
             },
           },
           {
-            $unwind: { path: "$doctorDetails", preserveNullAndEmptyArrays: true },
+            $unwind: {
+              path: "$doctorDetails",
+              preserveNullAndEmptyArrays: true,
+            },
           },
         ]
       : [];
@@ -58,7 +65,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       date,
       fromDate,
       toDate,
-      lookups
+      lookups,
     );
 
     req.apiStatus = {
@@ -78,7 +85,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
 };
 
 // Get a Single Follow-Up Record
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection = {} } = req.body;
@@ -93,7 +104,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
 
     const objectId = new mongoose.Types.ObjectId(id);
 
-    const { tableData } = await aggregateData(FollowUp, { _id: objectId, isDeleted: false }, projection);
+    const { tableData } = await aggregateData(
+      FollowUp,
+      { _id: objectId, isDeleted: false },
+      projection,
+    );
 
     if (!tableData || tableData.length === 0) {
       req.apiStatus = {
@@ -112,10 +127,9 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
     console.error("Error fetching FollowUp record:", error);
     req.apiStatus = {
       isSuccess: false,
-      error:ErrorCodes[1010],
+      error: ErrorCodes[1010],
     };
   }
-
 
   next();
 };

@@ -1,28 +1,27 @@
-import { Request, Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
-import {PatientModel} from "../../../models/patients"
+import { PatientModel } from "../../../models/patients";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
-
-
-
-export const getOne = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
-    const { projection} = req.body;
-    
-    
+    const { projection } = req.body;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       req.apiStatus = {
         isSuccess: false,
-        error:ErrorCodes[1002],
+        error: ErrorCodes[1002],
         message: "Invalid Appointment ID.",
         toastMessage: "Invalid Appointment ID.",
       };
       next();
-         return;
-      
+      return;
     }
 
     const objectId = new mongoose.Types.ObjectId(id); // Convert string to ObjectId
@@ -32,35 +31,38 @@ export const getOne = async (req: Request, res: Response,next:NextFunction): Pro
     delete sanitizedProjection.isDeleted;
 
     // Fetch follow-up data using aggregation
-    const { tableData } = await aggregateData(PatientModel, { _id: objectId, isDeleted: false }, sanitizedProjection);
+    const { tableData } = await aggregateData(
+      PatientModel,
+      { _id: objectId, isDeleted: false },
+      sanitizedProjection,
+    );
 
     if (!tableData || tableData.length === 0) {
       req.apiStatus = {
         isSuccess: false,
-        error:ErrorCodes[1002],
-        message: "Patient record not found or deleted" ,
+        error: ErrorCodes[1002],
+        message: "Patient record not found or deleted",
         toastMessage: "Patient record not found or deleted",
       };
       next();
-         return;
+      return;
     }
 
     const followUpObj = tableData[0];
 
-    
-   // Only includes fields from sanitizedProjection
-   req.apiStatus = {
-    isSuccess: true,
-    message: "Success",
-    data: followUpObj,
-  };
-  next();
-  return;
+    // Only includes fields from sanitizedProjection
+    req.apiStatus = {
+      isSuccess: true,
+      message: "Success",
+      data: followUpObj,
+    };
+    next();
+    return;
   } catch (error) {
     console.error("Error fetching data:", error);
     req.apiStatus = {
       isSuccess: false,
-      error:ErrorCodes[1002],
+      error: ErrorCodes[1002],
       message: "Internal Server Error",
       toastMessage: "Something went wrong. Please try again.",
     };
@@ -69,9 +71,11 @@ export const getOne = async (req: Request, res: Response,next:NextFunction): Pro
   }
 };
 
-
-
-export async function getAll(req: Request, res: Response,next:NextFunction): Promise<void> {
+export async function getAll(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const {
       projection = {},
@@ -92,38 +96,41 @@ export async function getAll(req: Request, res: Response,next:NextFunction): Pro
 
     // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
-        PatientModel,
+      PatientModel,
       sanitizedFilter,
       sanitizedProjection,
       options,
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
       data: { totalCount, tableData },
-      };
+    };
     next();
     return;
-  }catch (error) {
-      console.error("Error fetching data:", error);
-      req.apiStatus = {
-        isSuccess: false,
-        error:ErrorCodes[1002],
-        message: "Internal Server Error",
-        toastMessage: "Internal Server Error",
-      };
-      next();
-      return;
-    }
-};
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    req.apiStatus = {
+      isSuccess: false,
+      error: ErrorCodes[1002],
+      message: "Internal Server Error",
+      toastMessage: "Internal Server Error",
+    };
+    next();
+    return;
+  }
+}
 
-
-export async function Update  (req: Request, res: Response, next: NextFunction): Promise<void>  {
+export async function Update(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     console.log("this is update controller");
     console.log("Request Params:", req.params);
@@ -162,7 +169,7 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
     const updatedPatient = await PatientModel.findByIdAndUpdate(
       id,
       { weight, bmi, medicalHistory },
-      { new: true }
+      { new: true },
     );
 
     console.log("Updated Patient:", updatedPatient);
@@ -195,15 +202,12 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
     };
     next();
   }
-};
-
-
+}
 
 // export const Update = async (req: Request, res: Response,next:NextFunction): Promise<void> => {
 //     try {
 //       console.log("this is update controller");
-      
-      
+
 //       const{id}=req.params;
 //       console.log(id);
 //         const { weight, bmi, medicalHistory } = req.body;
@@ -213,7 +217,7 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
 //         console.log(existingUser);
 
 //               const updateFields = { weight, bmi, medicalHistory };
-              
+
 //             //   if (updateFields.isDeleted) {
 //             //     delete updateFields.isDeleted;
 //             // }
@@ -221,10 +225,7 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
 //             const updatedPatients = await PatientModel.findById(new mongoose.Types.ObjectId(id), updateFields, { new: true });
 
 //             console.log(updatedPatients);
-            
 
-
-            
 //             if (!updatedPatients) {
 //               req.apiStatus = {
 //                 isSuccess: false,
@@ -235,7 +236,7 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
 //               next();
 //                  return;
 //             }
-            
+
 //             req.apiStatus = {
 //               isSuccess: true,
 //             message: "Success",
@@ -257,6 +258,3 @@ export async function Update  (req: Request, res: Response, next: NextFunction):
 //       return;
 //     }
 // };
-
-
-

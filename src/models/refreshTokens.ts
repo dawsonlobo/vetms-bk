@@ -38,11 +38,15 @@ export interface IRefreshToken extends Document {
   createdAt: Date;
 }
 
-const RefreshTokenSchema = new Schema<IRefreshToken>({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  token: { type: String, required: true },
-},
-    { timestamps: true }
+const RefreshTokenSchema = new Schema<IRefreshToken>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    token: { type: String, required: true },
+  },
+  { timestamps: true },
 );
 
-export const RefreshToken = model<IRefreshToken>("refreshTokens", RefreshTokenSchema);
+export const RefreshToken = model<IRefreshToken>(
+  "refreshTokens",
+  RefreshTokenSchema,
+);

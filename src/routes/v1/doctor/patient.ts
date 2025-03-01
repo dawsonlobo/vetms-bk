@@ -1,20 +1,16 @@
-import { Router } from 'express';
-import * as patients from '../../../controllers/v1/doctor/patient'
+import { Router } from "express";
+import * as patients from "../../../controllers/v1/doctor/patient";
 const router = Router();
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
-
-
-
-
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { authenticateDoctor, verifyDoctor } from "../../../middlewares/auth";
 
 /**
  * @swagger
  * /v1/doctor/patients/getOne/{id}:
  *   post:
- *     summary: Get one patient 
- *     tags: 
+ *     summary: Get one patient
+ *     tags:
  *        - doctor/patients
  *     security:
  *       - doctorBearerAuth: []  # Requires a bearer token
@@ -107,7 +103,7 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                       example: 18.2
  *                     bloodGroup:
  *                       type: string
- *                       enum: 
+ *                       enum:
  *                         - DEA 1.1+
  *                         - DEA 1.1-
  *                         - DEA 1.2+
@@ -152,15 +148,20 @@ import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
  *                     updatedAt: "2024-02-20T15:45:30Z"
  */
 
-router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.getOne,exitPoint);
-
-
+router.post(
+  "/getone/:id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  patients.getOne,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/patients/getall:
  *   post:
- *     tags: 
+ *     tags:
  *       - doctor/patients
  *     summary: Get all patients
  *     security:
@@ -306,7 +307,7 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                             example: 18.2
  *                           bloodGroup:
  *                             type: string
- *                             enum: 
+ *                             enum:
  *                               - DEA 1.1+
  *                               - DEA 1.1-
  *                               - DEA 1.2+
@@ -364,9 +365,14 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *                         createdAt: "2024-02-19T12:34:56Z"
  *                         updatedAt: "2024-02-20T15:45:30Z"
  */
-router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll,exitPoint);
-
-
+router.post(
+  "/getall",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  patients.getAll,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -444,7 +450,13 @@ router.post("/getall",entryPoint,authenticateDoctor,verifyDoctor,patients.getAll
  *                   toastMessage: "Appointment record updated successfully"
  */
 
-router.post("/update/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.Update,exitPoint);
-
+router.post(
+  "/update/:id",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  patients.Update,
+  exitPoint,
+);
 
 export default router;

@@ -4,7 +4,11 @@ import mongoose from "mongoose";
 import { aggregateData } from "../../../utils/aggregation";
 import { ErrorCodes } from "../../../models/models";
 
-export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const {
       projection = {},
@@ -25,7 +29,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
     req.apiStatus = {
@@ -45,7 +49,11 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { projection } = req.body;
@@ -59,7 +67,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction): P
       return next();
     }
 
-    const result = await aggregateData(PatientModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    const result = await aggregateData(
+      PatientModel,
+      { _id: new mongoose.Types.ObjectId(id) },
+      projection,
+    );
 
     if (!result.tableData.length) {
       req.apiStatus = {

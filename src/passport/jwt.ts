@@ -8,14 +8,20 @@ export const generateTokens = (userId: string) => {
   const accessTokenExpiresIn = config.ACCESS_TOKEN_EXPIRY || "15m"; // Default 15 minutes
   const refreshTokenExpiresIn = config.REFRESH_TOKEN_EXPIRY || "7d"; // Default 7 days
 
-  const accessToken = jwt.sign({ id: userId }, ACCESS_SECRET, { expiresIn: accessTokenExpiresIn });
-  const refreshToken = jwt.sign({ id: userId }, REFRESH_SECRET, { expiresIn: refreshTokenExpiresIn });
+  const accessToken = jwt.sign({ id: userId }, ACCESS_SECRET, {
+    expiresIn: accessTokenExpiresIn,
+  });
+  const refreshToken = jwt.sign({ id: userId }, REFRESH_SECRET, {
+    expiresIn: refreshTokenExpiresIn,
+  });
 
-  return { 
-    accessToken, 
+  return {
+    accessToken,
     accessTokenExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 min
-    refreshToken, 
-    refreshTokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+    refreshToken,
+    refreshTokenExpiresAt: new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString(), // 7 days
   };
 };
 
@@ -29,7 +35,9 @@ export const generateAccessToken = (userId: string) => {
 export const generateRefreshToken = (userId: string) => {
   return {
     refreshToken: jwt.sign({ id: userId }, REFRESH_SECRET, { expiresIn: "7d" }),
-    refreshExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    refreshExpiresAt: new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
   };
 };
 

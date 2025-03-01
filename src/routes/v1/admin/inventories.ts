@@ -98,7 +98,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   createInventory,
-  exitPoint
+  exitPoint,
 );
 /**
  * @swagger
@@ -186,7 +186,7 @@ router.put(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   updateInventory,
-  exitPoint
+  exitPoint,
 );
 
 /**
@@ -255,7 +255,7 @@ router.delete(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   deleteInventory,
-  exitPoint
+  exitPoint,
 );
 /**
  * @swagger
@@ -423,7 +423,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getAll,
-  exitPoint
+  exitPoint,
 );
 /**
  * @swagger
@@ -512,7 +512,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getOne,
-  exitPoint
+  exitPoint,
 );
 
 export default router;

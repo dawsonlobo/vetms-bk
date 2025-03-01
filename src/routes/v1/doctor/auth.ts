@@ -1,14 +1,11 @@
-import {  Router } from "express";
+import { Router } from "express";
 import * as doctor from "../../../controllers/v1/doctor/auth";
-import { exitPoint } from '../../../middlewares/exitpoint';
-import { entryPoint } from '../../../middlewares/entrypoint';
-import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
+import { exitPoint } from "../../../middlewares/exitpoint";
+import { entryPoint } from "../../../middlewares/entrypoint";
+import { authenticateDoctor, verifyDoctor } from "../../../middlewares/auth";
 import passport from "../../../passport/passport";
 
-
-
 const router = Router();
-
 
 /**
  * @swagger
@@ -33,7 +30,7 @@ const router = Router();
  *                 example: "Doctor@123"
  *           example:
  *              email: "password@example.com"
- *              password: "password"  
+ *              password: "password"
  *     responses:
  *       200:
  *         description: Login successful
@@ -82,15 +79,12 @@ const router = Router();
  *                   example: "Login successful"
  */
 
-
-router.post("/doctor/auth/login",
-    entryPoint,
-    doctor.loginController
-    ,exitPoint
-    );
-
-
-
+router.post(
+  "/doctor/auth/login",
+  entryPoint,
+  doctor.loginController,
+  exitPoint,
+);
 
 /**
  * @swagger
@@ -132,14 +126,20 @@ router.post("/doctor/auth/login",
  *                   example: "Admin logged out successfully"
  */
 
-
-router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, doctor.logoutController,exitPoint);
+router.post(
+  "/doctor/auth/logout",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  doctor.logoutController,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/auth/profile:
  *   post:
- *     summary: Get user profile 
+ *     summary: Get user profile
  *     tags: [doctor/auth]
  *     security:
  *       - doctorBearerAuth: []
@@ -252,15 +252,21 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
 
-
 // router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
-router.post("/doctor/auth/profile",entryPoint,passport.authenticate("bearer", { session: false }),verifyDoctor,doctor.getDoctorProfile,exitPoint);
+router.post(
+  "/doctor/auth/profile",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyDoctor,
+  doctor.getDoctorProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/auth/update/:
  *   put:
- *     summary: Update user profile 
+ *     summary: Update user profile
  *     tags: [doctor/auth]
  *     security:
  *       - doctorBearerAuth: []
@@ -304,13 +310,20 @@ router.post("/doctor/auth/profile",entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
+router.put(
+  "/doctor/auth/update",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  doctor.updateDoctorProfile,
+  exitPoint,
+);
 
 /**
  * @swagger
  * /v1/doctor/auth/refresh:
  *   post:
- *     summary: Refresh user token 
+ *     summary: Refresh user token
  *     tags: [doctor/auth]
  *     security:
  *       - doctorBearerAuth: []
@@ -373,8 +386,13 @@ router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doct
  *                       example: "2024-07-15T12:57:10.956Z"
  */
 
-
-
-router.post("/doctor/auth/refresh",entryPoint,authenticateDoctor,verifyDoctor,doctor.refreshTokenController,exitPoint);
+router.post(
+  "/doctor/auth/refresh",
+  entryPoint,
+  authenticateDoctor,
+  verifyDoctor,
+  doctor.refreshTokenController,
+  exitPoint,
+);
 
 export default router;

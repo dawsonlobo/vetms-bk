@@ -52,12 +52,14 @@ export interface IOTP extends Document {
   expiresAt: Date;
 }
 
-const OTPSchema = new Schema<IOTP>({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  expiresAt: { type: Date, required: true },
-},  { timestamps: true }
+const OTPSchema = new Schema<IOTP>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
+  },
+  { timestamps: true },
 );
 
 export const OTP = model<IOTP>("OTP", OTPSchema);

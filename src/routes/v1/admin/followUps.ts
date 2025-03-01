@@ -180,7 +180,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getAll,
-  exitPoint
+  exitPoint,
 );
 
 /**
@@ -289,7 +289,7 @@ router.post(
   passport.authenticate("bearer", { session: false }),
   verifyAdmin,
   getOne,
-  exitPoint
+  exitPoint,
 );
 
 export default router;
