@@ -78,7 +78,12 @@ var router = (0, express_1.Router)();
  *                   type: string
  *                   example: "Login successful"
  */
-router.post("/doctor/auth/login", entrypoint_1.entryPoint, doctor.loginController, exitpoint_1.exitPoint);
+router.post(
+  "/doctor/auth/login",
+  entrypoint_1.entryPoint,
+  doctor.loginController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/auth/logout:
@@ -118,7 +123,14 @@ router.post("/doctor/auth/login", entrypoint_1.entryPoint, doctor.loginControlle
  *                   type: string
  *                   example: "Admin logged out successfully"
  */
-router.post("/doctor/auth/logout", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, doctor.logoutController, exitpoint_1.exitPoint);
+router.post(
+  "/doctor/auth/logout",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  doctor.logoutController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/auth/profile:
@@ -236,7 +248,14 @@ router.post("/doctor/auth/logout", entrypoint_1.entryPoint, auth_1.authenticateD
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
 // router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
-router.post("/doctor/auth/profile", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyDoctor, doctor.getDoctorProfile, exitpoint_1.exitPoint);
+router.post(
+  "/doctor/auth/profile",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyDoctor,
+  doctor.getDoctorProfile,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/auth/update/:
@@ -285,7 +304,14 @@ router.post("/doctor/auth/profile", entrypoint_1.entryPoint, passport_1.default.
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/doctor/auth/update", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, doctor.updateDoctorProfile, exitpoint_1.exitPoint);
+router.put(
+  "/doctor/auth/update",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  doctor.updateDoctorProfile,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/auth/refresh:
@@ -352,5 +378,12 @@ router.put("/doctor/auth/update", entrypoint_1.entryPoint, auth_1.authenticateDo
  *                       format: date-time
  *                       example: "2024-07-15T12:57:10.956Z"
  */
-router.post("/doctor/auth/refresh", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, doctor.refreshTokenController, exitpoint_1.exitPoint);
+router.post(
+  "/doctor/auth/refresh",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  doctor.refreshTokenController,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

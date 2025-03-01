@@ -151,7 +151,15 @@ var router = (0, express_1.Router)();
  *                   data: "Patient record updated successfully"
  *                   toastMessage: "Patient record updated successfully"
  */
-router.post("/createupdate", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, patients_1.createUpdate, exitpoint_1.exitPoint);
+router.post(
+  "/createupdate",
+  entrypoint_1.entryPoint,
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  patients_1.createUpdate,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/patients/getAll:
@@ -345,7 +353,15 @@ router.post("/createupdate", entrypoint_1.entryPoint, entrypoint_1.entryPoint, p
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getAll", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, patients_1.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getAll",
+  entrypoint_1.entryPoint,
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  patients_1.getAll,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/patients/getOne/{id}:
@@ -460,5 +476,13 @@ router.post("/getAll", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passpor
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getOne/:id", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, patients_1.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getOne/:id",
+  entrypoint_1.entryPoint,
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  patients_1.getOne,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

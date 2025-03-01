@@ -69,7 +69,14 @@ var auth_1 = require("../../../middlewares/auth");
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.put("/update/:_id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, appointment.Update, exitpoint_1.exitPoint);
+router.put(
+  "/update/:_id",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  appointment.Update,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/appointments/getOne/{id}:
@@ -167,7 +174,14 @@ router.put("/update/:_id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, a
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post("/getone/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, appointment.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getone/:id",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  appointment.getOne,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/appointments/getall:
@@ -329,5 +343,12 @@ router.post("/getone/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, a
  *                         createdAt: "2024-02-10T12:00:00Z"
  *                         updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post("/getall", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, appointment.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getall",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  appointment.getAll,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

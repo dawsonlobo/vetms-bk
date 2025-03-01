@@ -112,7 +112,14 @@ var router = (0, express_1.Router)();
  *                   type: "string"
  *                   example: "Billing updated successfully"
  */
-router.post("/upsert", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, billings_1.upsertBilling, exitpoint_1.exitPoint);
+router.post(
+  "/upsert",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  billings_1.upsertBilling,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/billings/getAll:
@@ -313,7 +320,14 @@ router.post("/upsert", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                         createdAt: "2025-02-02T08:30:00Z"
  *                         updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, billings_1.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getAll",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  billings_1.getAll,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/billings/getOne/{id}:
@@ -437,5 +451,12 @@ router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                     createdAt: "2025-02-02T08:30:00Z"
  *                     updatedAt: "2025-02-02T08:30:00Z"
  */
-router.post("/getOne/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, billings_1.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getOne/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  billings_1.getOne,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

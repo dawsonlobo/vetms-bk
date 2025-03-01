@@ -75,7 +75,13 @@ var auth_1 = require("../../../middlewares/auth");
  *                   type: string
  *                   example: "Login successful"
  */
-router.post("/nurse/auth/login", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth.loginController, exitpoint_1.exitPoint);
+router.post(
+  "/nurse/auth/login",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth.loginController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/auth/logout:
@@ -115,7 +121,14 @@ router.post("/nurse/auth/login", entrypoint_1.entryPoint, passport_1.default.aut
  *                   type: string
  *                   example: "Nurse logged out successfully"
  */
-router.post("/nurse/auth/logout", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, auth.logoutController, exitpoint_1.exitPoint);
+router.post(
+  "/nurse/auth/logout",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  auth.logoutController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/auth/profile:
@@ -257,7 +270,14 @@ router.post("/nurse/auth/logout", entrypoint_1.entryPoint, passport_1.default.au
  *                     _id: "6512c5f3e4b09a12d8f42b68"
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
-router.post("/nurse/auth/profile", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, auth.getNurseProfile, exitpoint_1.exitPoint);
+router.post(
+  "/nurse/auth/profile",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  auth.getNurseProfile,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/auth/update:
@@ -319,7 +339,14 @@ router.post("/nurse/auth/profile", entrypoint_1.entryPoint, passport_1.default.a
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/nurse/auth/update", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, auth.updateNurseProfile, exitpoint_1.exitPoint);
+router.put(
+  "/nurse/auth/update",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  auth.updateNurseProfile,
+  exitpoint_1.exitPoint,
+);
 // /**
 //  * @swagger
 //  * /v1/nurse/auth/refresh:
@@ -386,5 +413,12 @@ router.put("/nurse/auth/update", entrypoint_1.entryPoint, passport_1.default.aut
 //  *                       format: date-time
 //  *                       example: "2024-07-15T12:57:10.956Z"
 //  */
-router.post("/nurse/auth/refresh", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, auth.refreshTokenController, exitpoint_1.exitPoint);
+router.post(
+  "/nurse/auth/refresh",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  auth.refreshTokenController,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

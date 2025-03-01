@@ -164,7 +164,14 @@ var router = (0, express_1.Router)();
  *                         createdAt: "2025-02-01T08:00:00Z"
  *                         updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, payments_1.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getAll",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  payments_1.getAll,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/payments/getOne/{id}:
@@ -254,5 +261,12 @@ router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getOne/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, payments_1.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getOne/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  payments_1.getOne,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

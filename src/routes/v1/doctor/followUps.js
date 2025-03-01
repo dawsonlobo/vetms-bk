@@ -107,7 +107,14 @@ var router = (0, express_1.Router)();
  *                    data: "Follow-up record created successfully"
  *                    toastMessage: "Follow-up recorded successfully"
  */
-router.post("/createupdate", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, followUp.createUpdateFollowUp, exitpoint_1.exitPoint);
+router.post(
+  "/createupdate",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  followUp.createUpdateFollowUp,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/followUps/getOne/{id}:
@@ -209,7 +216,14 @@ router.post("/createupdate", entrypoint_1.entryPoint, auth_1.authenticateDoctor,
  *                     createdAt: "2024-02-10T12:00:00Z"
  *                     updatedAt: "2024-02-11T15:30:00Z"
  */
-router.post("/getone/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, followUp.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getone/:id",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  followUp.getOne,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/followups/delete/{id}:
@@ -271,7 +285,14 @@ router.post("/getone/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, a
  *               message: "error"
  *               error: "Follow-up record not found or already deleted"
  */
-router.post("/delete/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, followUp.deleteFollowUp, exitpoint_1.exitPoint);
+router.post(
+  "/delete/:id",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  followUp.deleteFollowUp,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/doctor/followups/getall:
@@ -445,5 +466,12 @@ router.post("/delete/:id", entrypoint_1.entryPoint, auth_1.authenticateDoctor, a
  *                         createdAt: "2025-02-06T11:00:00Z"
  *                         updatedAt: "2025-02-06T12:30:00Z"
  */
-router.post("/getall", entrypoint_1.entryPoint, auth_1.authenticateDoctor, auth_1.verifyDoctor, followUp.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getall",
+  entrypoint_1.entryPoint,
+  auth_1.authenticateDoctor,
+  auth_1.verifyDoctor,
+  followUp.getAll,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

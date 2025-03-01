@@ -119,7 +119,14 @@ var router = express_1.default.Router();
  *                       format: date-time
  *                       description: Timestamp when the item was last updated
  */
-router.post("/create", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, appointments_1.createUpdate, exitpoint_1.exitPoint);
+router.post(
+  "/create",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  appointments_1.createUpdate,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/getAll:
@@ -236,7 +243,14 @@ router.post("/create", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                   fields: ["status"]
  *                   startsWith: true
  */
-router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, appointments_1.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getAll",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  appointments_1.getAll,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/getOne/{id}:
@@ -331,7 +345,14 @@ router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getOne/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, appointments_1.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getOne/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  appointments_1.getOne,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/nurse/appointments/delete/{id}:
@@ -378,5 +399,12 @@ router.post("/getOne/:id", entrypoint_1.entryPoint, passport_1.default.authentic
  *                   data: "Appointment deleted successfully"
  *                   toastMessage: "Appointment deleted successfully"
  */
-router.delete("/delete/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyNurse, appointments_1.deleteAppointment, exitpoint_1.exitPoint);
+router.delete(
+  "/delete/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyNurse,
+  appointments_1.deleteAppointment,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

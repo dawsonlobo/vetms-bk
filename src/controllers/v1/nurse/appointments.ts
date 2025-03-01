@@ -408,12 +408,10 @@ export const deleteAppointment = async (
     ).exec();
 
     if (!appointment) {
-      res
-        .status(404)
-        .json({
-          status: 404,
-          message: "Appointment not found or unauthorized",
-        });
+      res.status(404).json({
+        status: 404,
+        message: "Appointment not found or unauthorized",
+      });
       return;
     }
 

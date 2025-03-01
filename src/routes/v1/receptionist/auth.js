@@ -75,7 +75,12 @@ var auth_1 = require("../../../middlewares/auth");
  *                   type: string
  *                   example: "Login successful"
  */
-router.post("/receptionist/auth/login", entrypoint_1.entryPoint, auth.loginController, exitpoint_1.exitPoint);
+router.post(
+  "/receptionist/auth/login",
+  entrypoint_1.entryPoint,
+  auth.loginController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/auth/logout:
@@ -115,7 +120,14 @@ router.post("/receptionist/auth/login", entrypoint_1.entryPoint, auth.loginContr
  *                   type: string
  *                   example: "Admin logged out successfully"
  */
-router.post("/receptionist/auth/logout", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, auth.logoutController, exitpoint_1.exitPoint);
+router.post(
+  "/receptionist/auth/logout",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  auth.logoutController,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/auth/profile:
@@ -257,7 +269,14 @@ router.post("/receptionist/auth/logout", entrypoint_1.entryPoint, passport_1.def
  *                     _id: "6512c5f3e4b09a12d8f42b68"
  *                     createdAt: "2024-02-05T12:00:00Z"
  */
-router.post("/receptionist/auth/profile", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, auth.getAdminProfile, exitpoint_1.exitPoint);
+router.post(
+  "/receptionist/auth/profile",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  auth.getAdminProfile,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/auth/update:
@@ -323,7 +342,14 @@ router.post("/receptionist/auth/profile", entrypoint_1.entryPoint, passport_1.de
  *                   type: string
  *                   example: "Updated successfully"
  */
-router.put("/receptionist/auth/update", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, auth.updateAdminProfile, exitpoint_1.exitPoint);
+router.put(
+  "/receptionist/auth/update",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  auth.updateAdminProfile,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/auth/refresh:
@@ -390,5 +416,12 @@ router.put("/receptionist/auth/update", entrypoint_1.entryPoint, passport_1.defa
  *                       format: date-time
  *                       example: "2024-07-15T12:57:10.956Z"
  */
-router.post("/receptionist/auth/refresh", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, auth.refreshTokenController, exitpoint_1.exitPoint);
+router.post(
+  "/receptionist/auth/refresh",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  auth.refreshTokenController,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;

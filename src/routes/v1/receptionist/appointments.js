@@ -99,7 +99,15 @@ var router = (0, express_1.Router)();
  *                   data: "Appointment record updated successfully"
  *                   toastMessage: "Appointment record updated successfully"
  */
-router.post("/create", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyReceptionist, appointments_1.createUpdate, exitpoint_1.exitPoint);
+router.post(
+  "/create",
+  entrypoint_1.entryPoint,
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyReceptionist,
+  appointments_1.createUpdate,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/receptionist/appointments/getAll:
@@ -264,9 +272,11 @@ router.post("/create", entrypoint_1.entryPoint, entrypoint_1.entryPoint, passpor
  *                         createdAt: "2025-02-02T08:00:00Z"
  *                         updatedAt: "2025-02-02T08:00:00Z"
  */
-router.post("/getAll", 
-// passport.authenticate('bearer', { session: false }),
-appointments_1.getAll);
+router.post(
+  "/getAll",
+  // passport.authenticate('bearer', { session: false }),
+  appointments_1.getAll,
+);
 /**
  * @swagger
  * /v1/receptionist/appointments/getOne/{id}:
@@ -361,9 +371,11 @@ appointments_1.getAll);
  *                     createdAt: "2025-02-01T08:00:00Z"
  *                     updatedAt: "2025-02-01T08:00:00Z"
  */
-router.post("/getOne/:id", 
-// passport.authenticate('bearer', { session: false }),
-appointments_1.getOne);
+router.post(
+  "/getOne/:id",
+  // passport.authenticate('bearer', { session: false }),
+  appointments_1.getOne,
+);
 /**
  * @swagger
  * /v1/receptionist/appointments/delete/{id}:

@@ -48,22 +48,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = require("mongoose");
 var constant_1 = require("../config/constant");
-var UserSchema = new mongoose_1.Schema({
+var UserSchema = new mongoose_1.Schema(
+  {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: {
-        type: String,
-        enum: Object.values(constant_1.CONSTANTS.USER_ROLE),
-        required: true,
+      type: String,
+      enum: Object.values(constant_1.CONSTANTS.USER_ROLE),
+      required: true,
     },
     isDeleted: { type: Boolean, default: false },
     isEnabled: { type: Boolean, default: true },
-}, {
+  },
+  {
     timestamps: true,
     usePushEach: true,
     bufferCommands: true,
     versionKey: false,
-});
+  },
+);
 var UserModel = mongoose_1.default.model("users", UserSchema);
 exports.default = UserModel;

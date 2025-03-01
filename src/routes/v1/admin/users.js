@@ -90,7 +90,14 @@ var router = (0, express_1.Router)();
  *                   data: "User created successfully"
  *                   toastMessage: "User successfully created"
  */
-router.post("/create", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, users_1.createUser, exitpoint_1.exitPoint);
+router.post(
+  "/create",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  users_1.createUser,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/update/{id}:
@@ -172,7 +179,14 @@ router.post("/create", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                   data: "User updated successfully"
  *                   toastMessage: "User successfully updated"
  */
-router.put("/update/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, users_1.updateUser, exitpoint_1.exitPoint);
+router.put(
+  "/update/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  users_1.updateUser,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/delete/{id}:
@@ -223,7 +237,14 @@ router.put("/update/:id", entrypoint_1.entryPoint, passport_1.default.authentica
  *                   data: "User deleted successfully"
  *                   toastMessage: "User successfully deleted"
  */
-router.delete("/delete/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, users_1.deleteUser, exitpoint_1.exitPoint);
+router.delete(
+  "/delete/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  users_1.deleteUser,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/getAll:
@@ -377,7 +398,14 @@ router.delete("/delete/:id", entrypoint_1.entryPoint, passport_1.default.authent
  *                         createdAt: "2025-02-06T10:15:00Z"
  *                         updatedAt: "2025-02-06T11:00:00Z"
  */
-router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, users_1.getAll, exitpoint_1.exitPoint);
+router.post(
+  "/getAll",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  users_1.getAll,
+  exitpoint_1.exitPoint,
+);
 /**
  * @swagger
  * /v1/admin/users/getOne/{id}:
@@ -462,5 +490,12 @@ router.post("/getAll", entrypoint_1.entryPoint, passport_1.default.authenticate(
  *                      createdAt: "2024-02-04T12:00:00.000Z"
  *                      updatedAt: "2024-02-04T12:00:00.000Z"
  */
-router.post("/getOne/:id", entrypoint_1.entryPoint, passport_1.default.authenticate("bearer", { session: false }), auth_1.verifyAdmin, users_1.getOne, exitpoint_1.exitPoint);
+router.post(
+  "/getOne/:id",
+  entrypoint_1.entryPoint,
+  passport_1.default.authenticate("bearer", { session: false }),
+  auth_1.verifyAdmin,
+  users_1.getOne,
+  exitpoint_1.exitPoint,
+);
 exports.default = router;
