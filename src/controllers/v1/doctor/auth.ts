@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { config } from "../../../config/config";
 import UserModel from "../../../models/users";
 import { RefreshToken } from "../../../models/refreshTokens";
 import { AccessToken } from "../../../models/accessTokens";
 import bcrypt from "bcryptjs";
 import {generateTokens,verifyRefreshToken,generateAccessToken,generateRefreshToken,} from "../../../passport/jwt";
 import {ErrorCodes} from "../../../models/models"
-import { log } from "console";
 
 
 
@@ -389,9 +387,6 @@ export async function getDoctorProfile(req: Request, res: Response, next: NextFu
         return next();
     }
 }
-
-
-
 
 
 

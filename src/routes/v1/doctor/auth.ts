@@ -3,6 +3,8 @@ import * as doctor from "../../../controllers/v1/doctor/auth";
 import { exitPoint } from '../../../middlewares/exitpoint';
 import { entryPoint } from '../../../middlewares/entrypoint';
 import {authenticateDoctor,verifyDoctor} from '../../../middlewares/auth'
+import passport from "../../../passport/passport";
+
 
 
 const router = Router();
@@ -251,7 +253,8 @@ router.post("/doctor/auth/logout",entryPoint,authenticateDoctor,verifyDoctor, do
  */
 
 
-router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
+// router.post("/doctor/auth/profile",entryPoint,authenticateDoctor,verifyDoctor,doctor.getDoctorProfile,exitPoint);
+router.post("/doctor/auth/profile",entryPoint,passport.authenticate("bearer", { session: false }),verifyDoctor,doctor.getDoctorProfile,exitPoint);
 
 /**
  * @swagger
