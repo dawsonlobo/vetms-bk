@@ -77,7 +77,10 @@ const NotificationSchema: Schema = new Schema(
     timestamps: true,
     bufferCommands: true,
     versionKey: false,
-  }
+  },
 );
 
-export const Notification = model<INotification>("Notification", NotificationSchema);
+export const Notification = model<INotification>(
+  "Notification",
+  NotificationSchema,
+);

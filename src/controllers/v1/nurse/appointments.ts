@@ -14,7 +14,9 @@ import { PatientModel } from "../../../models/patients";
 // First, add this helper function to get admin users (similar to the first snippet)
 const getAdminUsers = async (): Promise<string[]> => {
   const admins = await UserModel.find({ role: "ADMIN" }, "_id").exec();
-  return admins.map((admin: { _id: { toString: () => any } }) => admin._id.toString());
+  return admins.map((admin: { _id: { toString: () => any } }) =>
+    admin._id.toString(),
+  );
 };
 
 export const createUpdate = async (
@@ -131,9 +133,11 @@ export const createUpdate = async (
     // Send notifications to admins - NEW CODE STARTS HERE
     // Get nurse and patient names for the notification
     const nurseName = nurse ? nurse.name : "Unknown Nurse";
-    const patient = await PatientModel.findById(patientId).select("name").lean();
+    const patient = await PatientModel.findById(patientId)
+      .select("name")
+      .lean();
     const patientName = patient ? patient.name : "Unknown Patient";
-    
+
     // Get all admin users
     const adminUsers = await getAdminUsers();
 

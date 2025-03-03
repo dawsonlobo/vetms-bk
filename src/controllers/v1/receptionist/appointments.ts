@@ -13,7 +13,7 @@ import { aggregateData } from "../../../utils/aggregation";
 export const createUpdate = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
@@ -40,14 +40,16 @@ export const createUpdate = async (
     const receptionistId = accessTokenRecord.userId;
     console.log("Authenticated receptionist ID:", receptionistId);
 
-    const { _id, patientId, doctorId, date, status, ...appointmentData } = req.body;
+    const { _id, patientId, doctorId, date, status, ...appointmentData } =
+      req.body;
     console.log("Received request data:", req.body);
 
     if (_id && (req.body.patientId || req.body.doctorId)) {
       req.apiStatus = {
         isSuccess: false,
         error: ErrorCodes[1002],
-        toastMessage: "You cannot modify patientId or doctorId during an update",
+        toastMessage:
+          "You cannot modify patientId or doctorId during an update",
       };
       return next();
     }
@@ -87,7 +89,7 @@ export const createUpdate = async (
           ...(parsedDate && { date: parsedDate }),
           status: validatedStatus,
         },
-        { new: true }
+        { new: true },
       ).exec();
 
       if (!appointment) {
@@ -110,9 +112,15 @@ export const createUpdate = async (
 
     console.log("Created/Updated appointment:", appointment);
 
-    const receptionist = await UserModel.findById(receptionistId).select("name").lean();
-    const receptionistName = receptionist ? receptionist.name : "Unknown Receptionist";
-    const patient = await PatientModel.findById(patientId).select("name").lean();
+    const receptionist = await UserModel.findById(receptionistId)
+      .select("name")
+      .lean();
+    const receptionistName = receptionist
+      ? receptionist.name
+      : "Unknown Receptionist";
+    const patient = await PatientModel.findById(patientId)
+      .select("name")
+      .lean();
     const patientName = patient ? patient.name : "Unknown Patient";
     const adminUsers = await getAdminUsers();
 
@@ -131,9 +139,13 @@ export const createUpdate = async (
 
     req.apiStatus = {
       isSuccess: true,
-      message: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
+      message: isUpdate
+        ? "Appointment record updated successfully"
+        : "Appointment added successfully",
       data: appointment,
-      toastMessage: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
+      toastMessage: isUpdate
+        ? "Appointment record updated successfully"
+        : "Appointment added successfully",
     };
     next();
   } catch (error) {
@@ -148,15 +160,15 @@ export const createUpdate = async (
 };
 const getAdminUsers = async (): Promise<string[]> => {
   const admins = await UserModel.find({ role: "ADMIN" }, "_id").exec();
-  return admins.map((admin: { _id: { toString: () => any; }; }) => admin._id.toString());
+  return admins.map((admin: { _id: { toString: () => any } }) =>
+    admin._id.toString(),
+  );
 };
-
-
 
 export const getAll = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const {
@@ -178,7 +190,7 @@ export const getAll = async (
       search,
       date,
       fromDate,
-      toDate
+      toDate,
     );
 
     req.apiStatus = {
@@ -201,7 +213,7 @@ export const getAll = async (
 export const getOne = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const { id } = req.params;
@@ -216,7 +228,11 @@ export const getOne = async (
       return next();
     }
 
-    const result = await aggregateData(AppointmentModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
+    const result = await aggregateData(
+      AppointmentModel,
+      { _id: new mongoose.Types.ObjectId(id) },
+      projection,
+    );
 
     if (!result.tableData || result.tableData.length === 0) {
       req.apiStatus = {
@@ -247,7 +263,7 @@ export const getOne = async (
 export const deleteAppointment = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const { id } = req.params;
