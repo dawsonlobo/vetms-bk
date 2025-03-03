@@ -211,12 +211,12 @@ router.post("/getone/:id",entryPoint,authenticateDoctor,verifyDoctor,patients.ge
  *             date:
  *               summary: Using Single Date Filter
  *               value:
- *                 date: 1738758000  # Epoch timestamp for 2025-02-05T07:00:00Z
+ *                 date: 1740983516592  # Epoch timestamp for 2025-02-05T07:00:00Z
  *             dateRange:
  *               summary: Using Date Range Filter (Epoch Time)
  *               value:
- *                 fromDate: 1738368000  # Epoch timestamp for 2025-02-01T00:00:00Z
- *                 toDate: 1739222399  # Epoch timestamp for 2025-02-10T23:59:59Z
+ *                 fromDate: 1740727274428  # Epoch timestamp for 2025-02-01T00:00:00Z
+ *                 toDate: 1740983516592  # Epoch timestamp for 2025-02-10T23:59:59Z
  *             pagination:
  *               summary: Pagination Example
  *               value:

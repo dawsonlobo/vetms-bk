@@ -304,6 +304,7 @@ router.post("/doctor/auth/profile",entryPoint,passport.authenticate("bearer", { 
  *                   type: string
  *                   example: "Updated successfully"
  */
+
 router.put("/doctor/auth/update",entryPoint,authenticateDoctor,verifyDoctor,doctor.updateDoctorProfile,exitPoint);
 
 /**

@@ -33,6 +33,10 @@
  *           enum: [ADMIN, DOCTOR, RECEPTIONIST, NURSE]
  *           description: Role of the user in the system
  *           example: "DOCTOR"
+ *         isEnabled:
+ *           type: boolean
+ *           description: is the user disabled
+ *           example: false
  *         createdAt:
  *           type: string
  *           format: date-time
