@@ -70,16 +70,16 @@ const router = Router();
  *               summary: Filter Example
  *               value:
  *                 filter:
- *                   name: "Rammy"
+ *                   name: "John"
  *             singleDateExample:
  *               summary: Single Date Example
  *               value:
- *                 date: 17459904000
+ *                 date:  1740983516592
  *             multiDateExample:
  *               summary: Multi-Date Example
  *               value:
- *                 fromDate: 1745990400000
- *                 toDate: 17459904000
+ *                 fromDate: 1740727274428
+ *                 toDate: 1740983516592
  *             paginationExample:
  *               summary: Pagination Example
  *               value:
