@@ -10,7 +10,7 @@ const router = express.Router();
  * @swagger
  * /v1/nurse/dashboard:
  *   post:
- *     tags: 
+ *     tags:
  *       - nurse/dashboard
  *     security:
  *       - nurseBearerAuth: []  # Requires a bearer token
@@ -38,13 +38,13 @@ const router = express.Router();
  *                       example: 5
  */
 
-
 router.post(
-    "/dashboard",entryPoint, 
-    passport.authenticate("bearer", { session: false }),
-    verifyNurse,  // Ensure the authenticated user is a nurse
-    getNurseDashboard,
-    exitPoint     // Optional middleware for logging
+  "/dashboard",
+  entryPoint,
+  passport.authenticate("bearer", { session: false }),
+  verifyNurse, // Ensure the authenticated user is a nurse
+  getNurseDashboard,
+  exitPoint, // Optional middleware for logging
 );
 
 export default router;

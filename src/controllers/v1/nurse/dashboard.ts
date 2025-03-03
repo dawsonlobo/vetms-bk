@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { AppointmentModel } from "../../../models/appointments";
 import UserModel from "../../../models/users";
 
-export const getNurseDashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getNurseDashboard = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     // 🔹 Extract nurse ID from authenticated user
     const user = req.user as { id?: string };
@@ -30,13 +34,13 @@ export const getNurseDashboard = async (req: Request, res: Response, next: NextF
     const result = await AppointmentModel.aggregate([
       { $match: { nurseId } }, // Filter by nurseId
       { $group: { _id: "$patientId" } }, // Get unique patient IDs
-      { 
-        $group: { 
-          _id: null, 
-          totalPatients: { $sum: 1 } // Count unique patients
-        } 
+      {
+        $group: {
+          _id: null,
+          totalPatients: { $sum: 1 }, // Count unique patients
+        },
       },
-      { $project: { _id: 0, totalPatients: 1 } } // Only return totalPatients
+      { $project: { _id: 0, totalPatients: 1 } }, // Only return totalPatients
     ]);
 
     // 🔹 If no patients found, return 0

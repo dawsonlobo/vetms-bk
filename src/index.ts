@@ -9,24 +9,24 @@ import { swaggerUi, swaggerSpec } from "./swagger";
 import "./passport/passport"; // Ensure passport is configured before routes
 import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
 //import adminAuth from "./routes/v1/admin/auth"; // Use the correct route file
-import patients from './routes/v1/admin/patients'
-import users from './routes/v1/admin/users'
-import inventories from './routes/v1/admin/inventories'
-import adminAppointments from './routes/v1/admin/appointments'
-import doctorAppointments from './routes/v1/doctor/appointments'
-import doctorPatients from './routes/v1/doctor/patient'
-import followUps from './routes/v1/admin/followUps'
-import doctorFollowUps from './routes/v1/doctor/followUps'
-import billings from './routes/v1/admin/billings'
-import payments from './routes/v1/admin/payments'
-import doctors from './routes/v1/doctor/auth'
-import nurseAuth from "./routes/v1/nurse/auth"; 
-import nurseAppointments from "./routes/v1/nurse/appointments"; 
-import receptionistAuth from './routes/v1/receptionist/auth'
-import receptionistPatients from './routes/v1/receptionist/patients'
-import receptionistAppointments from './routes/v1/receptionist/appointments'
-import nursePatients from './routes/v1/nurse/patients';
-import dashboard from './routes/v1/nurse/dashboard';
+import patients from "./routes/v1/admin/patients";
+import users from "./routes/v1/admin/users";
+import inventories from "./routes/v1/admin/inventories";
+import adminAppointments from "./routes/v1/admin/appointments";
+import doctorAppointments from "./routes/v1/doctor/appointments";
+import doctorPatients from "./routes/v1/doctor/patient";
+import followUps from "./routes/v1/admin/followUps";
+import doctorFollowUps from "./routes/v1/doctor/followUps";
+import billings from "./routes/v1/admin/billings";
+import payments from "./routes/v1/admin/payments";
+import doctors from "./routes/v1/doctor/auth";
+import nurseAuth from "./routes/v1/nurse/auth";
+import nurseAppointments from "./routes/v1/nurse/appointments";
+import receptionistAuth from "./routes/v1/receptionist/auth";
+import receptionistPatients from "./routes/v1/receptionist/patients";
+import receptionistAppointments from "./routes/v1/receptionist/appointments";
+import nursePatients from "./routes/v1/nurse/patients";
+import dashboard from "./routes/v1/nurse/dashboard";
 
 //import ngrok from "ngrok";
 dotenv.config();
@@ -63,10 +63,10 @@ app.use("/v1/receptionist/patients", receptionistPatients);
 app.use("/v1/receptionist/appointments", receptionistAppointments);
 
 app.use(express.urlencoded({ extended: true }));
-app.use('/v1',nurseAuth)
-app.use('/v1/nurse/appointments',nurseAppointments)
-app.use('/v1/nurse/patients',nursePatients)
-app.use('/v1/nurse',dashboard)
+app.use("/v1", nurseAuth);
+app.use("/v1/nurse/appointments", nurseAppointments);
+app.use("/v1/nurse/patients", nursePatients);
+app.use("/v1/nurse", dashboard);
 // app.use((req, res, next) => {
 //   res.setHeader("ngrok-skip-browser-warning", "true");
 //   next();
