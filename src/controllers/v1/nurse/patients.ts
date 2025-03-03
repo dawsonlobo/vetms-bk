@@ -8,7 +8,7 @@ import { ErrorCodes } from "../../../models/models";
 
 export const getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const {
+    let {
       projection = {},
       filter = {},
       options = {},
@@ -16,27 +16,40 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       date,
       fromDate,
       toDate,
+      sort = { createdAt: -1 } // Default sorting by createdAt (latest first)
     } = req.body;
 
-    // Helper function to convert epoch (IST) to UTC midnight date range
-    const parseEpochIST = (epoch: number): { $gte: Date; $lt: Date } => {
-      const utcDate = new Date(epoch); // Epoch is in milliseconds
-      utcDate.setUTCHours(0, 0, 0, 0); // Convert to UTC midnight
-      const nextDay = new Date(utcDate.getTime() + 86400000); // Add 1 day
-      return { $gte: utcDate, $lt: nextDay };
-    };
-
-    // Handle single date filtering (Convert IST input to UTC range)
-    if (date) {
-      filter.date = parseEpochIST(date);
+    // Ensure filter is an object
+    if (typeof filter !== "object") {
+      filter = {};
     }
 
-    // Handle date range filtering (Convert IST to UTC range)
-    if (fromDate && toDate) {
-      filter.date = {
-        $gte: new Date(fromDate),
-        $lte: new Date(toDate),
-      };
+    // Helper function to convert epoch (IST) to UTC midnight range
+    const parseEpochIST = (epoch: number): { $gte: Date; $lt: Date } => {
+      const start = new Date(epoch); // Start time (exact timestamp)
+      const end = new Date(epoch + 999); // End time (999ms later for precision)
+      
+      return { $gte: start, $lt: end };
+    };
+    
+    
+    // If searching by exact createdAt timestamp (epoch in milliseconds)
+if (date) {
+  filter.createdAt = parseEpochIST(date);
+}
+
+// If searching by a date range (fromDate, toDate)
+if (fromDate && toDate) {
+  filter.createdAt = {
+    $gte: new Date(fromDate), // Convert fromDate to Date
+    $lte: new Date(toDate),   // Convert toDate to Date
+  };
+}
+
+
+    // Ensure sorting is an object
+    if (typeof sort !== "object") {
+      sort = { createdAt: -1 }; // Default sorting
     }
 
     // Call reusable aggregation function
@@ -44,7 +57,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
       PatientModel,
       filter,
       projection,
-      options,
+      { ...options, sort }, // Ensure sorting is passed
       search
     );
 
@@ -64,6 +77,7 @@ export const getAll = async (req: Request, res: Response, next: NextFunction): P
     return next();
   }
 };
+
 
 export const getOne = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
