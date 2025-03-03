@@ -13,7 +13,7 @@ const options: swaggerJSDoc.Options = {
     openapi: "3.0.0",
     info: {
       title: "VETMS",
-      version: "1.0.1",
+      version: "1.0.2",
       description: "A simple API application with Swagger documentation",
     },
     servers: swaggerUrls.map((url) => ({ url })),
