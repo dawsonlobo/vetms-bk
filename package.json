@@ -1,6 +1,6 @@
 {
   "name": "vetms-bk",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Veterinary management system",
   "main": "index.js",
   "directories": {
