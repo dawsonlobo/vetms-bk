@@ -19,7 +19,7 @@ const router = Router();
  *     summary: Create or update a patient record
  *     description: This endpoint allows the receptionist to create a new patient record or update an existing one based on the provided `_id`.
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -171,7 +171,7 @@ router.post(
  *     tags:
  *       - receptionist/patients
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     summary: Get all
  *     requestBody:
  *       required: true
@@ -374,7 +374,7 @@ router.post(
  *     tags:
  *       - receptionist/patients
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     summary: Get one
  *     parameters:
  *       - in: path

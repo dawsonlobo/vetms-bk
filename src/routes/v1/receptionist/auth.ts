@@ -13,7 +13,7 @@ import { verifyReceptionist } from "../../../middlewares/auth";
  *     summary: login
  *     tags: [receptionist/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -89,7 +89,7 @@ router.post(
  *     summary: logout
  *     tags: [receptionist/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -137,7 +137,7 @@ router.post(
  *     summary: Get user profile
  *     tags: [receptionist/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -288,7 +288,7 @@ router.post(
  *     summary: Update user profile
  *     tags: [receptionist/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -362,7 +362,7 @@ router.put(
  *     summary: Refresh user token
  *     tags: [receptionist/auth]
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

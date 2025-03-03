@@ -19,7 +19,7 @@ const router = Router();
  *       - receptionist/appointments
  *     summary: Create/Update an appointment record
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token for this route
+ *       - receptionistBearerAuth: []  # Requires a bearer token for this route
  *     requestBody:
  *       required: true
  *       content:
@@ -41,10 +41,10 @@ const router = Router();
  *                 type: string
  *                 description: The ID of the doctor assigned to the appointment
  *               date:
- *                 type: string
- *                 format: date-time
+ *                 type: integer
+ *                 format: int64
  *                 description: The scheduled date and time of the appointment
- *               schedule:
+ *               status:
  *                 type: string
  *                 enum: [SCHEDULED, COMPLETED, CANCELLED]
  *                 description: Status of the appointment
@@ -57,15 +57,14 @@ const router = Router();
  *               value:
  *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "27-02-2025"
+ *                 date: 1740992435000
  *             updateAppointment:
  *               summary: Example request body for updating an appointment
  *               value:
  *                 _id: "66b3279c39c21f7342c100c6"
- *                 patientId: "66b3279c39c21f7342c100c4"
  *                 doctorId: "66b3279c39c21f7342c100c5"
- *                 date: "2025-03-05T14:00:00.000Z"
- *                 schedule: "COMPLETED"
+ *                 date: 1740992435000
+ *                 status: "COMPLETED"
  *     responses:
  *       200:
  *         description: Appointment record created/updated successfully
@@ -106,7 +105,6 @@ const router = Router();
 router.post(
   "/create",
   entryPoint,
-  entryPoint,
   passport.authenticate("bearer", { session: false }),
   verifyReceptionist,
   createUpdate,
@@ -120,7 +118,7 @@ router.post(
  *     tags:
  *       - receptionist/appointments
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     summary: Get all
  *     requestBody:
  *       required: true
@@ -290,7 +288,7 @@ router.post(
  *     tags:
  *       - receptionist/appointments
  *     security:
- *       - adminBearerAuth: []
+ *       - receptionistBearerAuth: []
  *     summary: Get one
  *     parameters:
  *       - in: path
@@ -391,7 +389,7 @@ router.post(
  *       - receptionist/appointments
  *     summary: Delete an appointment
  *     security:
- *       - adminBearerAuth: []  # Requires a bearer token
+ *       - receptionistBearerAuth: []  # Requires a bearer token
  *     parameters:
  *       - in: path
  *         name: id

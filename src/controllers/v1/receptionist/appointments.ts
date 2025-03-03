@@ -12,43 +12,20 @@ export const createUpdate = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // Extract access token from Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      req.apiStatus = {
-        isSuccess: false,
-        error: ErrorCodes[1001],
-        toastMessage: "Unauthorized: Access token is missing",
-      };
-      return next();
-    }
+    const user = req.user as { id: string; role: string; email: string };
+    const receptionistId = user.id; // Authenticated receptionist ID
 
-    const token = authHeader.split(" ")[1];
-
-    // Find receptionist ID from AccessToken model
-    const accessTokenRecord = await AccessToken.findOne({ token }).exec();
-    if (!accessTokenRecord) {
-      req.apiStatus = {
-        isSuccess: false,
-        error: ErrorCodes[1001],
-        toastMessage: "Unauthorized: Invalid access token",
-      };
-      return next();
-    }
-
-    const receptionistId = accessTokenRecord.userId;
     console.log("Authenticated receptionist ID:", receptionistId);
-
-    const { _id, doctorId, patientId, date, status } = req.body;
     console.log("Received request data:", req.body);
 
-    // Prevent unauthorized modification of patientId or doctorId during an update
-    if (_id && (req.body.patientId || req.body.doctorId)) {
+    let { _id, doctorId, patientId, date, status } = req.body;
+
+    // Prevent modifying `patientId` during an update
+    if (_id && patientId) {
       req.apiStatus = {
         isSuccess: false,
         error: ErrorCodes[1002],
-        toastMessage:
-          "You cannot modify patientId or doctorId during an update",
+        toastMessage: "You cannot modify patientId during an update",
       };
       return next();
     }
@@ -63,22 +40,31 @@ export const createUpdate = async (
       return next();
     }
 
-    // Validate Date
-    let parsedDate: Date | null = null;
-    if (date) {
-      const formattedDate = moment(date, "DD-MM-YYYY", true);
-      if (!formattedDate.isValid()) {
+    // Ensure date remains in epoch milliseconds format
+    if (date && typeof date !== "number") {
+      req.apiStatus = {
+        isSuccess: false,
+        error: ErrorCodes[1004],
+        toastMessage: "Invalid date format. Use epoch time in milliseconds.",
+      };
+      return next();
+    }
+
+    // Convert status to lowercase if provided
+    if (status) {
+      status = status.toLowerCase();
+      // Ensure status is a valid enum value
+      if (!Object.values(CONSTANTS.APPOINTMENT_STATUS).includes(status)) {
         req.apiStatus = {
           isSuccess: false,
-          error: ErrorCodes[1004],
-          toastMessage: "Invalid date format. Use 'DD-MM-YYYY'.",
+          error: ErrorCodes[1005],
+          toastMessage: "Invalid appointment status",
         };
         return next();
       }
-      parsedDate = formattedDate.toDate();
+    } else {
+      status = CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
     }
-
-    const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
 
     let appointment;
     const isUpdate = Boolean(_id);
@@ -86,11 +72,11 @@ export const createUpdate = async (
     if (isUpdate) {
       // Update appointment only if it belongs to the logged-in receptionist
       appointment = await AppointmentModel.findOneAndUpdate(
-        { _id, receptionistId }, // Ensure the appointment belongs to the receptionist
+        { _id, receptionistId },
         {
-          ...(doctorId && { doctorId }),
-          ...(parsedDate && { date: parsedDate }),
-          status: validatedStatus,
+          ...(doctorId && { doctorId }), // Allow doctorId updates
+          ...(date && { date }), // Keep date as epoch time
+          status, // Store status in lowercase
         },
         { new: true },
       ).exec();
@@ -104,46 +90,36 @@ export const createUpdate = async (
         return next();
       }
     } else {
-      // Create a new appointment, automatically setting receptionistId
+      // Create new appointment
       appointment = await new AppointmentModel({
         doctorId,
         patientId,
-        date: parsedDate,
-        receptionistId, // Taken from AccessToken model
-        status: CONSTANTS.APPOINTMENT_STATUS.PENDING,
+        date,
+        receptionistId,
+        status, // Store status in lowercase
       }).save();
     }
 
     console.log("Created/Updated appointment:", appointment);
 
-    req.apiStatus = {
-      isSuccess: true,
-      message: isUpdate
+    res.status(200).json({
+      status: 200,
+      message: "Success",
+      data: isUpdate
         ? "Appointment record updated successfully"
         : "Appointment added successfully",
-      data: isUpdate
-        ? { ...appointment.toObject() } // Return all updated fields
-        : {
-            _id: appointment._id,
-            createdAt: appointment.createdAt,
-            updatedAt: appointment.updatedAt,
-          }, // Only selected fields for creation
       toastMessage: isUpdate
         ? "Appointment record updated successfully"
         : "Appointment added successfully",
-    };
-
-    next();
-    return;
+    });
   } catch (error) {
     console.error("Error in createUpdate:", error);
-    req.apiStatus = {
-      isSuccess: false,
+    res.status(500).json({
+      status: 500,
+      message: "Error",
       error: ErrorCodes[1006],
       toastMessage: "Internal Server Error",
-    };
-    next();
-    return;
+    });
   }
 };
 

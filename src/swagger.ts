@@ -50,6 +50,12 @@ const options: swaggerJSDoc.Options = {
           bearerFormat: "JWT",
           description: "Enter any role's token",
         },
+        receptionistBearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Specify the receptionist token",
+        },
       },
     },
   },
@@ -60,6 +66,7 @@ const options: swaggerJSDoc.Options = {
       nurseBearerAuth: [],
       genericBearerAuth: [],
       doctorBearerAuth: [],
+      receptionistBearerAuth: [],
     },
   ],
   apis: [

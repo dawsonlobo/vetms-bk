@@ -109,24 +109,47 @@ export const getAll = async (
       toDate,
     } = req.body;
 
+    let dateFilter: any = {};
+
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      dateFilter.createdAt = { $gte: startOfDay, $lte: endOfDay };
+    } else if (fromDate && toDate) {
+      dateFilter.createdAt = {
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate),
+      };
+    }
+
+    // Merge date filter with other filters
+    const finalFilter = { ...filter, ...dateFilter };
+
     // Call reusable aggregation function
     const { totalCount, tableData } = await aggregateData(
       PatientModel,
-      filter,
+      finalFilter,
       projection,
       options,
-      search,
-      date,
-      fromDate,
-      toDate,
+      search
     );
+
+    // Convert timestamps to epoch format
+    const formattedData = tableData.map((item: any) => ({
+      ...item,
+      createdAt: new Date(item.createdAt).getTime(),
+      updatedAt: new Date(item.updatedAt).getTime(),
+    }));
 
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
-      data: { totalCount, tableData },
+      data: { totalCount, tableData: formattedData },
     };
-    next(); // Pass control to the next middleware
+    next();
   } catch (error) {
     console.error("Error fetching data:", error);
     req.apiStatus = {
@@ -134,9 +157,10 @@ export const getAll = async (
       error: ErrorCodes[1002],
       toastMessage: "Something went wrong. Please try again.",
     };
-    next(); // Pass control to the error-handling middleware
+    next();
   }
 };
+
 
 export const getOne = async (
   req: Request,
