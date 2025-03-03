@@ -1,14 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
+import { Notification } from "../../../models/notifications";
 import { aggregateData } from "../../../utils/aggregation";
-import { CONSTANTS } from "../../../config/constant";
 import { ErrorCodes } from "../../../models/models";
-import test from "node:test";
+import { CONSTANTS } from "../../../config/constant";
 import UserModel from "../../../models/users";
+import { PatientModel } from "../../../models/patients";
+
 /**
  * Create or update an appointment (Nurse only)
  */
+// First, add this helper function to get admin users (similar to the first snippet)
+const getAdminUsers = async (): Promise<string[]> => {
+  const admins = await UserModel.find({ role: "ADMIN" }, "_id").exec();
+  return admins.map((admin: { _id: { toString: () => any } }) => admin._id.toString());
+};
+
 export const createUpdate = async (
   req: Request,
   res: Response,
@@ -120,6 +128,30 @@ export const createUpdate = async (
       }).save();
     }
 
+    // Send notifications to admins - NEW CODE STARTS HERE
+    // Get nurse and patient names for the notification
+    const nurseName = nurse ? nurse.name : "Unknown Nurse";
+    const patient = await PatientModel.findById(patientId).select("name").lean();
+    const patientName = patient ? patient.name : "Unknown Patient";
+    
+    // Get all admin users
+    const adminUsers = await getAdminUsers();
+
+    // Create a notification for each admin
+    for (const adminId of adminUsers) {
+      await new Notification({
+        title: isUpdate ? "Appointment Updated" : "New Appointment Added",
+        message: `${nurseName} ${isUpdate ? "updated" : "added"} an appointment for ${patientName}`,
+        userId: adminId,
+        otherDetails: {
+          appointmentId: appointment._id,
+          nurseId,
+          patientId,
+        },
+      }).save();
+    }
+    // NEW CODE ENDS HERE
+
     req.apiStatus = {
       isSuccess: true,
       message: isUpdate
@@ -154,7 +186,6 @@ export const createUpdate = async (
     return next();
   }
 };
-
 /**
  * Get all appointments for the logged-in nurse
  */

@@ -1,18 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { AppointmentModel } from "../../../models/appointments";
-import { aggregateData } from "../../../utils/aggregation";
+import { Notification } from "../../../models/notifications";
+import UserModel from "../../../models/users";
+import { PatientModel } from "../../../models/patients";
 import { ErrorCodes } from "../../../models/models";
 import { CONSTANTS } from "../../../config/constant";
 import moment from "moment";
 import { AccessToken } from "../../../models/accessTokens";
+import { aggregateData } from "../../../utils/aggregation";
+
 export const createUpdate = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
-    // Extract access token from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       req.apiStatus = {
@@ -24,8 +27,6 @@ export const createUpdate = async (
     }
 
     const token = authHeader.split(" ")[1];
-
-    // Find receptionist ID from AccessToken model
     const accessTokenRecord = await AccessToken.findOne({ token }).exec();
     if (!accessTokenRecord) {
       req.apiStatus = {
@@ -39,21 +40,18 @@ export const createUpdate = async (
     const receptionistId = accessTokenRecord.userId;
     console.log("Authenticated receptionist ID:", receptionistId);
 
-    const { _id, doctorId, patientId, date, status } = req.body;
+    const { _id, patientId, doctorId, date, status, ...appointmentData } = req.body;
     console.log("Received request data:", req.body);
 
-    // Prevent unauthorized modification of patientId or doctorId during an update
     if (_id && (req.body.patientId || req.body.doctorId)) {
       req.apiStatus = {
         isSuccess: false,
         error: ErrorCodes[1002],
-        toastMessage:
-          "You cannot modify patientId or doctorId during an update",
+        toastMessage: "You cannot modify patientId or doctorId during an update",
       };
       return next();
     }
 
-    // Validate `_id`
     if (_id && !mongoose.Types.ObjectId.isValid(_id)) {
       req.apiStatus = {
         isSuccess: false,
@@ -63,7 +61,6 @@ export const createUpdate = async (
       return next();
     }
 
-    // Validate Date
     let parsedDate: Date | null = null;
     if (date) {
       const formattedDate = moment(date, "DD-MM-YYYY", true);
@@ -78,21 +75,19 @@ export const createUpdate = async (
       parsedDate = formattedDate.toDate();
     }
 
-    const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING; // Default status
-
+    const validatedStatus = status || CONSTANTS.APPOINTMENT_STATUS.PENDING;
     let appointment;
     const isUpdate = Boolean(_id);
 
     if (isUpdate) {
-      // Update appointment only if it belongs to the logged-in receptionist
       appointment = await AppointmentModel.findOneAndUpdate(
-        { _id, receptionistId }, // Ensure the appointment belongs to the receptionist
+        { _id, receptionistId },
         {
           ...(doctorId && { doctorId }),
           ...(parsedDate && { date: parsedDate }),
           status: validatedStatus,
         },
-        { new: true },
+        { new: true }
       ).exec();
 
       if (!appointment) {
@@ -104,37 +99,43 @@ export const createUpdate = async (
         return next();
       }
     } else {
-      // Create a new appointment, automatically setting receptionistId
       appointment = await new AppointmentModel({
         doctorId,
         patientId,
         date: parsedDate,
-        receptionistId, // Taken from AccessToken model
+        receptionistId,
         status: CONSTANTS.APPOINTMENT_STATUS.PENDING,
       }).save();
     }
 
     console.log("Created/Updated appointment:", appointment);
 
+    const receptionist = await UserModel.findById(receptionistId).select("name").lean();
+    const receptionistName = receptionist ? receptionist.name : "Unknown Receptionist";
+    const patient = await PatientModel.findById(patientId).select("name").lean();
+    const patientName = patient ? patient.name : "Unknown Patient";
+    const adminUsers = await getAdminUsers();
+
+    for (const adminId of adminUsers) {
+      await new Notification({
+        title: isUpdate ? "Appointment Updated" : "New Appointment Added",
+        message: `${receptionistName} added ${patientName}`,
+        userId: adminId,
+        otherDetails: {
+          appointmentId: appointment._id,
+          receptionistId,
+          patientId,
+        },
+      }).save();
+    }
+
     req.apiStatus = {
       isSuccess: true,
-      message: isUpdate
-        ? "Appointment record updated successfully"
-        : "Appointment added successfully",
-      data: isUpdate
-        ? { ...appointment.toObject() } // Return all updated fields
-        : {
-            _id: appointment._id,
-            createdAt: appointment.createdAt,
-            updatedAt: appointment.updatedAt,
-          }, // Only selected fields for creation
-      toastMessage: isUpdate
-        ? "Appointment record updated successfully"
-        : "Appointment added successfully",
+      message: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
+      data: appointment,
+      toastMessage: isUpdate ? "Appointment record updated successfully" : "Appointment added successfully",
     };
-
     next();
-    return;
   } catch (error) {
     console.error("Error in createUpdate:", error);
     req.apiStatus = {
@@ -143,14 +144,19 @@ export const createUpdate = async (
       toastMessage: "Internal Server Error",
     };
     next();
-    return;
   }
 };
+const getAdminUsers = async (): Promise<string[]> => {
+  const admins = await UserModel.find({ role: "ADMIN" }, "_id").exec();
+  return admins.map((admin: { _id: { toString: () => any; }; }) => admin._id.toString());
+};
+
+
 
 export const getAll = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const {
@@ -172,7 +178,7 @@ export const getAll = async (
       search,
       date,
       fromDate,
-      toDate,
+      toDate
     );
 
     req.apiStatus = {
@@ -195,11 +201,11 @@ export const getAll = async (
 export const getOne = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { projection } = req.body;
+    const projection = req.body.projection || {};
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       req.apiStatus = {
@@ -210,13 +216,9 @@ export const getOne = async (
       return next();
     }
 
-    const result = await aggregateData(
-      AppointmentModel,
-      { _id: new mongoose.Types.ObjectId(id) },
-      projection,
-    );
+    const result = await aggregateData(AppointmentModel, { _id: new mongoose.Types.ObjectId(id) }, projection);
 
-    if (!result.tableData.length) {
+    if (!result.tableData || result.tableData.length === 0) {
       req.apiStatus = {
         isSuccess: false,
         error: ErrorCodes[1004],
@@ -228,7 +230,7 @@ export const getOne = async (
     req.apiStatus = {
       isSuccess: true,
       message: "Success",
-      data: result.tableData[0], // Access the first element of tableData
+      data: result.tableData[0], // Return first element if exists
     };
     next();
   } catch (error) {
@@ -241,10 +243,11 @@ export const getOne = async (
     next();
   }
 };
+
 export const deleteAppointment = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { id } = req.params;

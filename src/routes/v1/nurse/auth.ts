@@ -78,7 +78,7 @@ import { verifyNurse } from "../../../middlewares/auth";
 router.post(
   "/nurse/auth/login",
   entryPoint,
-  passport.authenticate("bearer", { session: false }),
+  // passport.authenticate("bearer", { session: false }),
   auth.loginController,
   exitPoint,
 );
